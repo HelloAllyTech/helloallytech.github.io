@@ -3,8 +3,11 @@
 
 @import "{{ site.theme }}";
 
+/* Import Google Fonts from helloally.ai */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=STIX+Two+Text:wght@500;600&family=Yeseva+One&display=swap');
+
 /* Ally Developer Hub Custom Styles */
-/* Inspired by helloally.ai theme */
+/* Matching helloally.ai theme */
 
 :root {
   /* Primary colors from helloally.ai */
@@ -16,6 +19,7 @@
 
   /* Accent colors */
   --blue: #4285F4;
+  --logo-blue: #264D8E;
   --gold: #F5B50A;
   --orange: #E77625;
 
@@ -27,14 +31,24 @@
   /* Supporting colors */
   --border-light: #E8E8E8;
   --shadow: rgba(0, 0, 0, 0.08);
+
+  /* Typography */
+  --font-serif: 'STIX Two Text', serif;
+  --font-display: 'Yeseva One', serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 /* Global styles */
 body {
   background-color: var(--cream-white);
   color: var(--text-dark);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
-  line-height: 1.7;
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.75;
+  letter-spacing: -0.2px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Header styles */
@@ -42,12 +56,23 @@ body {
   background-color: var(--pure-white);
   border-bottom: 2px solid var(--pale-yellow);
   box-shadow: 0 2px 8px var(--shadow);
+  padding: 1rem 0;
+}
+
+.header-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 .site-title {
-  color: var(--blue) !important;
-  font-weight: 700;
-  font-size: 1.5rem;
+  color: var(--logo-blue) !important;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 28px;
+  letter-spacing: -1px;
+  transition: color 0.3s ease;
 }
 
 .site-title:hover {
@@ -58,6 +83,10 @@ body {
 /* Navigation */
 .site-nav .page-link {
   color: var(--text-dark);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 16px;
+  letter-spacing: -0.2px;
   transition: color 0.2s ease;
 }
 
@@ -68,18 +97,36 @@ body {
 /* Main content */
 .page-content {
   background-color: var(--cream-white);
+  padding: 3rem 0;
 }
 
 .wrapper {
-  max-width: 900px;
-  padding: 2rem 1rem;
+  max-width: 1400px;
+  padding: 2rem 3rem;
+  margin: 0 auto;
+}
+
+@media screen and (max-width: 1440px) {
+  .wrapper {
+    max-width: 1200px;
+    padding: 2rem 2rem;
+  }
+}
+
+@media screen and (max-width: 1024px) {
+  .wrapper {
+    max-width: 100%;
+    padding: 2rem 1.5rem;
+  }
 }
 
 /* Typography */
 h1 {
   color: var(--text-dark);
-  font-size: 2.5rem;
-  font-weight: 700;
+  font-family: var(--font-serif);
+  font-size: 48px;
+  font-weight: 600;
+  letter-spacing: -1px;
   margin-top: 2rem;
   margin-bottom: 1.5rem;
   line-height: 1.2;
@@ -87,28 +134,47 @@ h1 {
 
 h2 {
   color: var(--text-dark);
-  font-size: 2rem;
+  font-family: var(--font-serif);
+  font-size: 38px;
   font-weight: 600;
-  margin-top: 2.5rem;
-  margin-bottom: 1rem;
+  letter-spacing: -1px;
+  margin-top: 3rem;
+  margin-bottom: 1.5rem;
   padding-bottom: 0.5rem;
   border-bottom: 3px solid var(--pale-yellow);
 }
 
 h3 {
-  color: var(--blue);
-  font-size: 1.5rem;
-  font-weight: 600;
+  color: var(--logo-blue);
+  font-family: var(--font-serif);
+  font-size: 28px;
+  font-weight: 500;
+  letter-spacing: -0.5px;
   margin-top: 2rem;
   margin-bottom: 1rem;
 }
 
 h4 {
   color: var(--text-dark);
-  font-size: 1.25rem;
+  font-family: var(--font-body);
+  font-size: 20px;
   font-weight: 600;
+  letter-spacing: -0.2px;
   margin-top: 1.5rem;
   margin-bottom: 0.75rem;
+}
+
+p {
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.75;
+  letter-spacing: -0.2px;
+  margin-bottom: 1.25rem;
+}
+
+strong, b {
+  font-weight: 600;
 }
 
 /* Links */
@@ -241,33 +307,67 @@ tr:hover {
   background-color: var(--pure-white);
   border-top: 2px solid var(--pale-yellow);
   color: var(--text-medium);
-  padding: 2rem 0;
+  padding: 3rem 0 2rem;
+  margin-top: 4rem;
 }
 
 .footer-col-wrapper {
   color: var(--text-medium);
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.footer-col-wrapper p {
+  font-size: 14px;
+  margin-bottom: 0.75rem;
+}
+
+.footer-col-wrapper a {
+  color: var(--logo-blue);
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.footer-col-wrapper a:hover {
+  color: var(--orange);
 }
 
 /* Responsive design */
 @media screen and (max-width: 768px) {
   h1 {
-    font-size: 2rem;
+    font-size: 36px;
+    letter-spacing: -0.8px;
   }
 
   h2 {
-    font-size: 1.5rem;
+    font-size: 28px;
+    letter-spacing: -0.8px;
   }
 
   h3 {
-    font-size: 1.25rem;
+    font-size: 22px;
+    letter-spacing: -0.4px;
+  }
+
+  h4 {
+    font-size: 18px;
+  }
+
+  p {
+    font-size: 15px;
   }
 
   .wrapper {
-    padding: 1rem 0.5rem;
+    padding: 1.5rem 1rem;
+  }
+
+  .site-title {
+    font-size: 24px;
   }
 
   table {
-    font-size: 0.9rem;
+    font-size: 14px;
   }
 
   th, td {
@@ -308,7 +408,9 @@ button:focus {
 /* Special styling for the welcome message */
 .post-title,
 .page-heading {
-  color: var(--blue);
+  color: var(--logo-blue);
+  font-family: var(--font-serif);
+  font-weight: 600;
   border-bottom: 4px solid var(--gold);
   padding-bottom: 0.5rem;
   margin-bottom: 2rem;

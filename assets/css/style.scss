@@ -1,0 +1,323 @@
+---
+---
+
+@import "{{ site.theme }}";
+
+/* Ally Developer Hub Custom Styles */
+/* Inspired by helloally.ai theme */
+
+:root {
+  /* Primary colors from helloally.ai */
+  --cream-white: #FEFCF6;
+  --pure-white: #FFFFFF;
+  --warm-cream: #FDF3ED;
+  --pale-yellow: #FAF2DB;
+  --light-blue: #F1F6FE;
+
+  /* Accent colors */
+  --blue: #4285F4;
+  --gold: #F5B50A;
+  --orange: #E77625;
+
+  /* Text colors */
+  --text-dark: #2C3E50;
+  --text-medium: #555555;
+  --text-light: #777777;
+
+  /* Supporting colors */
+  --border-light: #E8E8E8;
+  --shadow: rgba(0, 0, 0, 0.08);
+}
+
+/* Global styles */
+body {
+  background-color: var(--cream-white);
+  color: var(--text-dark);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  line-height: 1.7;
+}
+
+/* Header styles */
+.site-header {
+  background-color: var(--pure-white);
+  border-bottom: 2px solid var(--pale-yellow);
+  box-shadow: 0 2px 8px var(--shadow);
+}
+
+.site-title {
+  color: var(--blue) !important;
+  font-weight: 700;
+  font-size: 1.5rem;
+}
+
+.site-title:hover {
+  color: var(--orange) !important;
+  text-decoration: none;
+}
+
+/* Navigation */
+.site-nav .page-link {
+  color: var(--text-dark);
+  transition: color 0.2s ease;
+}
+
+.site-nav .page-link:hover {
+  color: var(--blue);
+}
+
+/* Main content */
+.page-content {
+  background-color: var(--cream-white);
+}
+
+.wrapper {
+  max-width: 900px;
+  padding: 2rem 1rem;
+}
+
+/* Typography */
+h1 {
+  color: var(--text-dark);
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-top: 2rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.2;
+}
+
+h2 {
+  color: var(--text-dark);
+  font-size: 2rem;
+  font-weight: 600;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 3px solid var(--pale-yellow);
+}
+
+h3 {
+  color: var(--blue);
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+h4 {
+  color: var(--text-dark);
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+/* Links */
+a {
+  color: var(--blue);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--orange);
+  text-decoration: underline;
+}
+
+/* Code blocks */
+code {
+  background-color: var(--pale-yellow);
+  color: var(--text-dark);
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+pre {
+  background-color: var(--warm-cream);
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+pre code {
+  background-color: transparent;
+  padding: 0;
+}
+
+/* Lists */
+ul, ol {
+  margin-left: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+li {
+  margin-bottom: 0.5rem;
+}
+
+/* Horizontal rules */
+hr {
+  border: none;
+  border-top: 2px solid var(--pale-yellow);
+  margin: 2.5rem 0;
+}
+
+/* Blockquotes */
+blockquote {
+  background-color: var(--light-blue);
+  border-left: 4px solid var(--blue);
+  padding: 1rem 1.5rem;
+  margin: 1.5rem 0;
+  border-radius: 4px;
+}
+
+/* Tables */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1.5rem 0;
+  background-color: var(--pure-white);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px var(--shadow);
+}
+
+th {
+  background-color: var(--blue);
+  color: white;
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border-light);
+}
+
+tr:hover {
+  background-color: var(--pale-yellow);
+}
+
+/* Buttons and badges */
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background-color: var(--gold);
+  color: white;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-right: 0.5rem;
+}
+
+/* Card-like sections for repositories */
+.repo-card {
+  background-color: var(--pure-white);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  box-shadow: 0 2px 12px var(--shadow);
+  border-left: 4px solid var(--blue);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.repo-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px var(--shadow);
+}
+
+/* Highlighted sections */
+.highlight-box {
+  background-color: var(--warm-cream);
+  border: 2px solid var(--gold);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+/* Footer */
+.site-footer {
+  background-color: var(--pure-white);
+  border-top: 2px solid var(--pale-yellow);
+  color: var(--text-medium);
+  padding: 2rem 0;
+}
+
+.footer-col-wrapper {
+  color: var(--text-medium);
+}
+
+/* Responsive design */
+@media screen and (max-width: 768px) {
+  h1 {
+    font-size: 2rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+  }
+
+  h3 {
+    font-size: 1.25rem;
+  }
+
+  .wrapper {
+    padding: 1rem 0.5rem;
+  }
+
+  table {
+    font-size: 0.9rem;
+  }
+
+  th, td {
+    padding: 0.5rem;
+  }
+}
+
+/* Accessibility improvements */
+a:focus,
+button:focus {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+/* Print styles */
+@media print {
+  body {
+    background-color: white;
+  }
+
+  .site-header,
+  .site-footer,
+  .site-nav {
+    display: none;
+  }
+}
+
+/* Custom utility classes */
+.text-center {
+  text-align: center;
+}
+
+.mt-1 { margin-top: 1rem; }
+.mt-2 { margin-top: 2rem; }
+.mb-1 { margin-bottom: 1rem; }
+.mb-2 { margin-bottom: 2rem; }
+
+/* Special styling for the welcome message */
+.post-title,
+.page-heading {
+  color: var(--blue);
+  border-bottom: 4px solid var(--gold);
+  padding-bottom: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+/* Emoji support */
+.emoji {
+  width: 1.2em;
+  height: 1.2em;
+  display: inline-block;
+  vertical-align: middle;
+}

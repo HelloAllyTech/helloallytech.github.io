@@ -1,0 +1,31 @@
+title: Ally Developer Hub
+description: Open-source mental health AI platform for empowering counselors
+theme: minima
+markdown: kramdown
+
+# Site settings
+url: "https://helloallytech.github.io"
+baseurl: ""
+
+# Build settings
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+
+# Exclude from processing
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor
+  - .git
+  - .gitignore
+  - README.md
+
+# Social links
+github_username: HelloAllyTech
+
+# Header pages
+header_pages:
+  - index.md
+  - CONTRIBUTING.md

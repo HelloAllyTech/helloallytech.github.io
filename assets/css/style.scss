@@ -147,7 +147,7 @@ body {
 .nav-dropdown .dropdown-menu {
   position: absolute;
   right: 0;
-  top: calc(100% + 0.75rem);
+  top: 100%;
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
@@ -165,7 +165,8 @@ body {
 }
 
 .nav-dropdown:hover .dropdown-menu,
-.nav-dropdown:focus-within .dropdown-menu {
+.nav-dropdown:focus-within .dropdown-menu,
+.nav-dropdown .dropdown-menu:hover {
   opacity: 1;
   pointer-events: auto;
   transform: translateY(0);

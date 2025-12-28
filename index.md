@@ -139,7 +139,7 @@ Ally runs on a modern, polyglot stack focused on reliability, security, and spee
 ### Progressive Docker Compose Rollout {#docker-compose}
 We are migrating each service family onto curated Docker Compose bundles so local and production environments stay in lockstep. New repositories launch with Compose files that mirror production images and networking, while legacy stacks are being refactored in phases—starting with infrastructure utilities and backend APIs, followed by AI workloads and frontends. This progressive rollout keeps onboarding friction low (`docker compose up` per bundle), lets teams adopt Compose incrementally, and gives CI/CD pipelines the same topology developers run on their laptops.
 
-## Getting Started
+## Getting Started {#getting-started}
 
 Ready to contribute? Here's how to get set up:
 

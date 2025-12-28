@@ -107,9 +107,22 @@ body {
 
 /* Navigation - aligned to the right */
 .site-nav {
-  float: none !important;
+  display: flex;
+  align-items: center;
+  margin-left: auto;
   line-height: normal;
   margin-top: 0;
+}
+
+.site-nav .nav-trigger,
+.site-nav label {
+  display: none;
+}
+
+.site-nav .trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 1.5rem;
 }
 
 .site-nav .page-link {
@@ -119,16 +132,10 @@ body {
   font-size: 16px;
   letter-spacing: -0.2px;
   transition: color 0.2s ease;
-  margin-left: 1.5rem;
 }
 
 .site-nav .page-link:hover {
   color: var(--blue);
-}
-
-.site-nav .trigger {
-  display: inline-flex;
-  align-items: center;
 }
 
 /* Main content - centered with wrapper */
@@ -139,6 +146,12 @@ body {
 
 .page-content .wrapper {
   /* Inherits centering from .wrapper above */
+}
+
+.content-inner {
+  max-width: 900px;
+  width: 100%;
+  margin: 0 auto;
 }
 
 /* Typography */
@@ -382,6 +395,43 @@ tr:hover {
   .wrapper {
     padding-left: 1rem;
     padding-right: 1rem;
+  }
+
+  .site-header .wrapper {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .site-nav {
+    width: 100%;
+    display: block;
+    margin-left: 0;
+  }
+
+  .site-nav .nav-trigger,
+  .site-nav label {
+    display: inline-block;
+  }
+
+  .site-nav label {
+    cursor: pointer;
+  }
+
+  .site-nav .trigger {
+    display: none;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-top: 0.75rem;
+  }
+
+  .site-nav .nav-trigger:checked + label + .trigger {
+    display: flex;
+  }
+
+  .site-nav .page-link {
+    margin: 0;
   }
 
   .site-title {

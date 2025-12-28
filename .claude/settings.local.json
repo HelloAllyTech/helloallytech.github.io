@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:helloally.ai)",
+      "Bash(git add:*)"
+    ]
+  }
+}

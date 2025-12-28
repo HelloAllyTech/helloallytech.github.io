@@ -8,6 +8,7 @@
   <meta name="description" content="{{ page.excerpt | default: site.description | strip_html | normalize_whitespace | truncate: 160 | escape }}">
 
   <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+  <link rel="icon" href="https://helloally.ai/favicon.ico" sizes="any">
   <link rel="canonical" href="{{ page.url | replace:'index.html','' | absolute_url }}">
 
   {% feed_meta %}
@@ -28,11 +29,24 @@
           </span>
         </label>
 
-        <div class="trigger">
-          <a class="page-link" href="{{ '/' | relative_url }}">Home</a>
-          <a class="page-link" href="{{ '/CONTRIBUTING.html' | relative_url }}">Contributing</a>
-          <a class="page-link" href="https://github.com/HelloAllyTech" target="_blank">GitHub</a>
-        </div>
+          <div class="trigger">
+            <a class="page-link" href="{{ '/' | relative_url }}">Home</a>
+            <a class="page-link" href="{{ '/CONTRIBUTING.html' | relative_url }}">Contributing</a>
+            <div class="nav-dropdown">
+              <a class="page-link" href="{{ '/#tech-stack' | relative_url }}">Tech Stack</a>
+              <div class="dropdown-menu">
+                <a class="dropdown-link" href="{{ '/#frontend-stack' | relative_url }}">Frontend</a>
+                <a class="dropdown-link" href="{{ '/#mobile-stack' | relative_url }}">Mobile</a>
+                <a class="dropdown-link" href="{{ '/#backend-stack' | relative_url }}">Backend &amp; APIs</a>
+                <a class="dropdown-link" href="{{ '/#ai-stack' | relative_url }}">AI Services</a>
+                <a class="dropdown-link" href="{{ '/#data-stack' | relative_url }}">Data &amp; Realtime</a>
+                <a class="dropdown-link" href="{{ '/#infra-stack' | relative_url }}">Infrastructure &amp; DevOps</a>
+                <a class="dropdown-link" href="{{ '/#docker-compose' | relative_url }}">Docker Compose Roadmap</a>
+                <a class="dropdown-link dropdown-overview" href="{{ '/#tech-stack' | relative_url }}">Full overview</a>
+              </div>
+            </div>
+            <a class="page-link" href="https://github.com/HelloAllyTech" target="_blank">GitHub</a>
+          </div>
       </nav>
     </div>
   </header>

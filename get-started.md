@@ -64,6 +64,47 @@ Visit each repository's README for detailed setup instructions:
 - [ally-ai-learn](https://github.com/HelloAllyTech/ally-ai-learn) - Python 3.12, LiveKit
 - [infra](https://github.com/HelloAllyTech/infra) - Terraform, Docker
 
+## macOS Development Setup (Optional)
+
+If you're developing on macOS, you can use **Colima** as a lightweight, free alternative to Docker Desktop for container virtualization.
+
+### Why Colima?
+- **Free and open-source** - No licensing costs
+- **Lightweight** - Uses fewer resources than Docker Desktop
+- **Fast** - Quick startup and container operations
+- **Compatible** - Works seamlessly with all Docker commands
+
+### Quick Setup
+
+Our centralized Colima setup is available in the [infra repository](https://github.com/HelloAllyTech/infra/tree/main/colima). You can install it with a single command:
+
+```bash
+# One-time global installation
+curl -fsSL https://raw.githubusercontent.com/HelloAllyTech/infra/main/colima/install.sh | bash
+```
+
+This will:
+- Install Colima and required dependencies
+- Set up the global `docker-switch` command
+- Configure your Docker environment for Colima
+
+### Usage
+
+After installation, you can easily switch between Docker environments:
+
+```bash
+# Switch to Colima (lightweight)
+docker-switch colima
+
+# Switch to Docker Desktop (if you have it installed)
+docker-switch desktop
+```
+
+### Documentation
+
+For complete setup instructions, troubleshooting, and advanced configuration:
+- [Colima Setup Guide](https://github.com/HelloAllyTech/infra/tree/main/colima)
+
 ## Need Help?
 
 - **Documentation**: Each repository has its own README with detailed setup instructions

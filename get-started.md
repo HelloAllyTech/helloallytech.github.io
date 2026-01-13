@@ -21,6 +21,36 @@ Ready to contribute? Here's how to get set up:
 
 3. **Check out our [Contributing Guide](./CONTRIBUTING.html)** for detailed setup instructions for each repo
 
+## Development Environment Setup for Web & Backend
+
+For developers focusing on the web and backend applications (`ally-web` and `ally-be`), we've created a script to get you up and running in minutes.
+
+After running the main `./bootstrap.sh` script from the `infra` repository to clone all project repositories, you can use the `dev_env.sh` script to start the development servers.
+
+**Prerequisites:**
+- You have cloned all the ally repositories, for example by using the `infra/bootstrap.sh` script.
+- You are in the root of the project workspace (the directory that contains `ally-web`, `ally-be`, etc.).
+
+**Start the development environment:**
+
+```bash
+./infra/dev_env.sh
+```
+
+This single command will:
+
+1.  **Start all backend services** in `ally-be` using Docker Compose.
+2.  **Build and start all frontend applications** in `ally-web`.
+3.  **Display the URLs** for the running applications.
+
+Once the script is finished, you can access the applications at:
+
+-   **App (Admin Dashboard):** `http://localhost:8081`
+-   **Admin (Helpline):** `http://localhost:8080`
+-   **Search (Web):** `http://localhost:3000`
+
+To stop the services, you can run `docker compose down` inside the `ally-be` and `ally-web` directories.
+
 ## First Time Here?
 
 Not sure where to start? Here are some suggestions:

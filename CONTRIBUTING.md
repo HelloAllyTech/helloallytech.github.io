@@ -95,6 +95,22 @@ test: add unit tests for authentication
 
 #### Setup Steps
 
+For a full-stack development environment that includes the backend, you can use the unified development script.
+
+**Quick Setup (Web & Backend):**
+
+If you have all the repositories cloned in the same parent directory, you can start both `ally-web` and `ally-be` with a single command from the project root:
+
+```bash
+./infra/dev_env.sh
+```
+
+This will start all necessary Docker containers for both projects.
+
+**Manual Setup (Frontend Only):**
+
+If you want to run only the frontend services:
+
 ```bash
 # 1. Clone the repository
 git clone git@github.com:HelloAllyTech/ally-web.git
@@ -128,6 +144,19 @@ npm run lint               # Check all code
 npm run lint:fix           # Fix linting issues
 npm run format             # Format with Prettier
 npm run format:check       # Check formatting
+```
+
+**Dockerized Testing:**
+
+For running tests within Docker containers, use the `./test-docker.sh` script:
+
+```bash
+./test-docker.sh all         # Run all tests in parallel
+./test-docker.sh web         # Run ally-web tests
+./test-docker.sh helpline    # Run ally-helpline-dashboard tests
+./test-docker.sh admin       # Run ally-admin-dashboard tests
+./test-docker.sh coverage    # Generate coverage report
+./test-docker.sh watch       # Run tests in watch mode
 ```
 
 #### Tech Stack
@@ -248,6 +277,19 @@ npm run build:prod         # Build Android prod release
 
 #### Setup Steps
 
+For a full-stack development environment that includes the frontend, you can use the unified development script.
+
+**Quick Setup (Backend & Web):**
+
+If you have all the repositories cloned in the same parent directory, you can start both `ally-be` and `ally-web` with a single command from the project root:
+
+```bash
+./infra/dev_env.sh
+```
+
+This will start all necessary Docker containers for both projects.
+
+**Manual Setup (Backend Only):**
 ```bash
 # 1. Clone the repository
 git clone git@github.com:HelloAllyTech/ally-be.git
@@ -301,6 +343,17 @@ npm run test               # Run unit tests
 npm run test:cov           # Test coverage
 npm run migration:run      # Run migrations
 npm run migration:show     # View migration status
+```
+
+**Dockerized Testing:**
+
+For running tests within Docker containers, use the `./test-docker.sh` script:
+
+```bash
+./test-docker.sh all         # Run all unit tests
+./test-docker.sh e2e         # Run end-to-end tests
+./test-docker.sh coverage    # Generate coverage report
+./test-docker.sh watch       # Run tests in watch mode
 ```
 
 #### Tech Stack

@@ -91,16 +91,16 @@ The recommended entry point is to `source ally-env.sh`, which registers `ally-*`
 
 - **`_os.sh`** — Shared helper sourced by the scripts above. Sets `ALLY_OS` (`mac`/`linux`/`wsl`/`windows`/`unknown`), exposes `is_mac`/`is_linux`/`is_windows`, `sed_inplace` (BSD vs GNU sed), and `require_os`.
 
-### Current working-tree state (uncommitted)
+### Cross-platform dev scripts (`_os.sh`)
 
-The repo has local, uncommitted changes at migration time:
+The developer scripts are OS-aware via a shared **`_os.sh`** helper (sourced by the scripts above):
 
-- **`_os.sh`** — new untracked file introducing the cross-platform helpers.
-- **`docker-setup.sh`** — largest change (~206 lines): sources `_os.sh` and prints OS-specific install hints for Docker/Compose (Homebrew on macOS, `apt`/`dnf` or `get.docker.com` on Linux, Docker Desktop on Windows).
-- **`dev_env.sh`** — sources `_os.sh`; `TEST_ACCOUNTS` logic changed from overwriting via `sed` to *preserving* an existing local value.
-- **`colima.sh` / `colima-cleanup.sh`** — now source `_os.sh` and guard with `require_os mac`. (Note: `colima.sh` allocates `--disk 150`, while `README.md` still documents 48 GB.)
+- **`_os.sh`** — sets `ALLY_OS` (`mac`/`linux`/`wsl`/`windows`/`unknown`), exposes `is_mac`/`is_linux`/`is_windows`, a BSD-vs-GNU `sed_inplace`, and `require_os` (gracefully skips + exits on the wrong platform).
+- **`docker-setup.sh`** — prints OS-specific install hints for Docker/Compose (Homebrew on macOS, `apt`/`dnf` or `get.docker.com` on Linux, Docker Desktop on Windows) and runs Colima checks only on macOS.
+- **`dev_env.sh`** — preserves an existing local `TEST_ACCOUNTS` value instead of overwriting it.
+- **`colima.sh` / `colima-cleanup.sh`** — guard with `require_os mac`, so they no-op with a helpful message on Linux/Windows.
 
-These changes make the previously macOS-only scripts OS-aware; the committed docs (`README.md`) predate them.
+This makes the previously macOS-only scripts usable on Linux/WSL/Windows as well. (`colima.sh` allocates `--disk 150`, while `README.md` may still document a smaller figure.)
 
 ## Infrastructure & Deployment
 

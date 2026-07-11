@@ -1,123 +1,109 @@
 ---
 title: ally-mobile — Mobile App
 tags: [repo, mobile, react-native, ios, android]
-summary: React Native (0.79.1) iOS/Android app for mental-health counselors, providing live counseling sessions with audio streaming and transcription, peer reviews, and AI voice simulations against the Ally backend.
+summary: React Native iOS/Android app for mental-health counsellors, covering live sessions with transcription, peer reviews, voice-based AI simulations, and Scribe voice-dictation notes.
 ---
 
 # ally-mobile — Mobile App
 
 ## Purpose
 
-`ally-mobile` is the React Native application for counselors on the Ally platform. It supports secure, privacy-first counselor–client sessions with live audio streaming and transcription, detailed call summaries, peer review workflows, AI-driven voice simulations for training, and analytics/gamification (achievements, leaderboards, badges). The repository is open source under the MIT License. The app package version is `1.5.0`; iOS/Android application IDs are `com.helloally.app` (prod) and `com.helloally.app.dev` (dev).
+`ally-mobile` is the React Native app that counsellors use in the field. It supports three core workflows: joining and listening to live counselling sessions with real-time transcription and AI-assisted call summaries; reviewing and commenting on session/simulation transcripts (peer review); and running voice-based AI training simulations against a simulated client. Newer areas add Scribe voice-dictation notes, review read/unread management, simulation pause/resume, a first-login complete-profile gate, and multilingual (i18n) content parity. The app talks to `ally-be` over REST and Socket.IO, and to LiveKit rooms driven by `ally-ai-learn` for simulations.
 
 ## Tech Stack
 
-Sourced from `package.json`:
+Factual from `package.json` (app `version` 1.5.0):
 
-- **Framework:** React Native `0.79.1`, React `19.0.0`
-- **Language:** TypeScript `^5.0.4`
-- **State Management:** Redux Toolkit `@reduxjs/toolkit ^2.7.0` with `react-redux ^9.2.0`
-- **Navigation:** React Navigation v7 — `@react-navigation/native`, `native-stack`, `stack`, `bottom-tabs`, `drawer`
-- **Real-time audio (simulations):** `@livekit/react-native ^2.9.1`, `@livekit/react-native-webrtc ^137.0.1`, `livekit-client ^2.15.2`
-- **WebSocket signaling/transcription (live sessions):** `socket.io-client ^4.8.1`
-- **Audio capture/playback:** `react-native-live-audio-stream`, `react-native-audio-api`, `react-native-sound-player`, `react-native-video`
-- **Firebase:** `@react-native-firebase/app ^22.4.0`, `@react-native-firebase/crashlytics` (crash reporting)
-- **Auth SDKs:** `@react-native-google-signin/google-signin`, `@invertase/react-native-apple-authentication`
-- **Notifications:** `@notifee/react-native`
-- **Config:** `react-native-config` (env vars), consumed via `src/config/env.ts`
-- **UI/charts/animation:** `@shopify/react-native-skia`, `react-native-reanimated`, `@gorhom/bottom-sheet`, `echarts` / `@wuba/react-native-echarts`, `react-native-chart-kit`, `lottie-react-native`, `react-native-svg`
-- **i18n:** `i18next` / `react-i18next`
-- **Storage:** `@react-native-async-storage/async-storage`
-- **Node engine:** `>=18`
+- React Native 0.79.1, React 19.0.0, TypeScript ~5.0.4
+- State: Redux Toolkit (`@reduxjs/toolkit` ^2.7.0) with RTK Query for all API access; `react-redux` ^9.2.0
+- Navigation: React Navigation v7 (`native`, `native-stack`, `stack`, `bottom-tabs`, `drawer`)
+- Realtime voice: `@livekit/react-native` ^2.9.1, `@livekit/react-native-webrtc` ^137.0.1, `livekit-client` ^2.15.2
+- Sockets: `socket.io-client` ^4.8.1 (live-session audio streaming)
+- Firebase: `@react-native-firebase/app` ^22.4.0, `@react-native-firebase/crashlytics`
+- Auth: `@react-native-google-signin/google-signin`, `@invertase/react-native-apple-authentication`
+- Audio: `react-native-live-audio-stream`, `react-native-audio-api`, `react-native-sound-player`, `react-native-fs`
+- i18n: `i18next` ^25.1.3, `react-i18next` ^15.5.1
+- Notifications: `@notifee/react-native`
+- Charts/gamification UI: `@wuba/react-native-echarts` + `echarts`, `react-native-chart-kit`, `react-native-confetti-cannon`, `lottie-react-native`
+- Config: `react-native-config` (env consumed via `src/config/env.ts`)
+- Node engine: `>=18`
 
 ## Architecture & Feature Areas
 
-The app follows a component-based architecture with Redux Toolkit for state, stack/tab/drawer navigation, a global theme provider (`src/theme/`), and custom hooks. Source is organized under `src/`: `assets`, `components`, `config`, `constants`, `contexts`, `hooks`, `localization`, `navigation`, `screens`, `services`, `store`, `theme`, `types`, `utils`.
+Standard React Native layout under `src/`: `screens/`, `components/`, `services/` (RTK Query APIs), `store/` (slices), `hooks/`, `navigation/`, `localization/`, `constants/`, `types/`, `theme/`, `utils/`, `contexts/`.
 
-Navigation is composed of `RootNavigator`, `TabNavigator`, and `DrawerNavigator` (`src/navigation/`). The Redux store (`src/store/`) currently holds `chatSlice`, `creditsSlice`, `summarySlice`, and `userSlice`.
+Navigation is driven by `RootNavigator.tsx`, which switches the stack on `isAuthenticated`. The authenticated stack mounts a `DrawerNavigator` (which contains the tab navigator) plus stack screens for listening, call summary, simulations, reviews, and the complete-profile gate.
 
-Feature areas (from `src/screens/` and `src/services/`):
+**Live sessions & audio streaming.** `ListeningScreen` handles the active session. Audio is captured via `useLiveAudioStream` and streamed over Socket.IO. `RootNavigator` opens two socket connections through `useSocketConnection` — one on the microphone namespace and one on the cloud-telephony namespace — and reacts to `USER_JOINED` events (via `useCounselorChat` / `useNavigationAwareCounselorChat`) to route the counsellor into the live `ListeningScreen`. `useSocketConnection` buffers frames across a transient app background and flushes on resume.
 
-- **Live sessions & audio streaming / transcription** — `ListeningScreen` splits into `MicrophoneListeningScreen` (in-app microphone capture) and `ConferenceListeningScreen` (cloud-telephony/conference audio). These use Socket.IO for live audio streaming and transcription via hooks `useLiveAudioStream`, `useSocket`, and `useSocketConnection`. Related services: `callsApi`, `callTranscriptApi`, `callSummaryApi`, `chatApi`. Post-session review is handled by `CallLog`, `CallSummaryScreen`, and `CaseDetailsScreen`.
-- **Reviews (peer review)** — `ReviewScreen`, `ReviewDetailsScreen`, and `ShareForReviewScreen`, with comment/thread/reaction flows. Services include `reviewsApi`, `reviewThreadsApi`, `reactionsApi`, `generalCommentsApi`, and a parallel "scribe" set (`scribeReviewsApi`, `scribeReviewThreadsApi`, `scribeReactionsApi`, `scribeGeneralCommentsApi`). A `ReviewApiContext` (`src/contexts/`) selects the active review API.
-- **Simulations (AI voice training)** — `SimulationsScreen`, `SimulationDetailsScreen`, `SimulationPathDetailsScreen`, `SimulationAssistantScreen` (the live LiveKit voice session with participant tiles and audio-wave visualization), and `SimulationFeedbackScreen`. Services: `simulationsApi`, `simulationSummaryApi`, `simulationTranscriptApi`. This is the LiveKit-based integration (the training agent lives in sibling repo `ally-ai-learn`).
-- **Auth** — Google Sign-In and Apple authentication SDKs; `authApi` and `userApi` services; a `SplashScreen` and `SuspendedAccountScreen`/`LogoutScreen` for account states.
-- **Analytics & gamification** — `UserAnalyticsScreen`, `AchievementsScreen`, `LeaderboardScreen`, `ReactionsScreen`, `CommunityScreen`; services `analyticsApi`, `badgesApi`, `leaderboardApi`, `reflectionsApi`.
-- **Wellbeing / misc** — `BoxBreathingScreen`, `ProfileSettingsScreen`, `SearchScreen` (`searchApi`, `placesApi`), plus `settingsApi`, `appConfigApi`, `customFieldsApi`, and `notificationService`.
+**Transcription & summaries.** After a call, `CallSummaryScreen` shows the AI summary and transcript, backed by `callSummaryApi`, `callTranscriptApi`, and `settingsApi` (summary field definitions fetched via `useLazyGetSummaryFieldsQuery`). `CallLogScreen` lists past calls. Deep links to a specific call summary are resolved in `RootNavigator` using `utils/deeplink` (`getCallIdFromUrl`, `isSupportedDeepLink`, `navigateToCallSummaryOrLog`).
+
+**Reviews (incl. read/unread management).** Peer review lives in `ReviewScreen`, `ReviewDetailsScreen`, and `ShareForReviewScreen`, plus a parallel Scribe review flow (`ScribeReviewDetailsScreen`) served by `scribeReviewsApi` / `scribeReviewThreadsApi` / `scribeGeneralCommentsApi` / `scribeReactionsApi`. `reviewsApi.ts` provides threaded comments, general comments, comment visibility/edit/delete, and review status updates. Read/unread management is explicit: `getReviews` accepts `sortBy` and `readFilter` params, `markSimulationReviewAsRead` (PATCH) marks a review read, and `getUnreadSimulationReviewCount` feeds an unread badge (cached under the `UnreadReviewCount` tag). A `ReviewApiContext` (`src/contexts/`) lets shared review components target either the standard or Scribe API set. Hooks: `useReviews`, `useToggleReviewPrivacy`, `useHideReviewDetails`, `useReactions`, `usePaginatedComments`, `useCommentActions`.
+
+**Simulations (incl. pause/resume).** Simulation browsing and detail screens (`SimulationsScreen`, `SimulationDetailsScreen`, `SimulationPathDetailsScreen`, `CaseDetailsScreen`) run off `simulationsApi.ts`, which covers scenarios, scenario paths, cases, sessions, upcoming-scenario polling, event checklists, skills, and credits. The live voice session is `SimulationAssistantScreen`, which connects to a LiveKit `Room` (`@livekit/react-native` + `livekit-client`) with an agent served by `ally-ai-learn`. Pause/resume is implemented over a LiveKit control channel: the client sends `pause`/`resume` and the agent acks with `paused`/`resumed` (with an ack timeout fallback). Paused spans are excluded from the displayed timer and scenario time limit via an accumulated `pausedOffsetMs`; authoritative billing/leaderboard paused time is tracked server-side (`scenario_sessions.totalPausedMs`). Session transitions across path/case flows are orchestrated by `useSimulationTransition` (polling for the next scenario, retry, 429 retry modal), with supporting hooks `useStartSimulation`, `useSimulationCredits`, `useSimulationTranscriptDetails`, and `useSimulationSessionRecordingUrl`. Post-session feedback is captured in `SimulationFeedbackScreen`.
+
+**Scribe notes with voice dictation.** `scribeNoteApi.ts` creates manual Scribe notes (an empty DICTATION chat), transcribes dictated audio, and extracts structured field values. `generateNoteFromAudio` uploads the recorded WAV as multipart/form-data (`audio`, a JSON `fields` spec, optional `languageHint`); the audio is processed server-side in memory and never stored. The dictation transcript is persisted separately via `saveNoteTranscript` so it appears in the note's Transcript view. Recording is handled by `useVoiceNoteRecorder` (idle/recording/paused/stopped with start/pause/resume/stop and elapsed-time tracking that excludes paused spans). The UI lives in `CallSummaryScreen/components/VoiceNotePanel/` (`VoiceNotePanel`, `VoiceNoteSection`). Availability is gated by two permission-guarded settings hooks: `useScribeNoteCreationEnabled` and `useScribeVoiceNoteEnabled` (both skip their request unless the user holds `COUNSELOR_ACCESS`; the backend also enforces the per-tenant toggle and returns 403 otherwise).
+
+**Complete-profile gate.** Accounts created in bulk by an admin have no name on first login. `SplashScreen` checks `userData.profileCompleted === false` and redirects to `CompleteProfileScreen` (mounted with gestures disabled). Submitting `useCompleteProfileMutation` (`authApi`) flips `profileCompleted` server-side and re-runs auth routing.
+
+**Auth.** `authApi.ts` supports OTP (`generateOtp` / `verifyOtp`, versioned to v2), Google Sign-In (`useGoogleLogin`), and Apple Sign-In (`useAppleLogin`), with token refresh handled centrally in `services/api.ts` (`baseQueryWithReauth` retries once on 401 using the stored refresh token, else logs out). Tokens live in AsyncStorage; user/permission state is in `userSlice`.
+
+**Analytics & gamification.** `UserAnalyticsScreen`, `AchievementsScreen`, `LeaderboardScreen`, `CommunityScreen`, and `ReactionsScreen` are backed by `analyticsApi`, `badgesApi`, `leaderboardApi`, and `reactionsApi`. Weekly leaderboard reminders are scheduled through `notificationService` + `@notifee/react-native`, gated on the `VIEW_COMMUNITY_LEADERBOARD` permission.
+
+**i18n / language-code injection.** Localization is in `src/localization/` (`i18n.ts`, `dynamic.ts`, and `locales/` bundles for `en`, `hi`, `kn`, `mr`, `ta`). For content endpoints that return backend-generated user-facing text, `services/api.ts` injects the active UI language into the request: the allowlist in `languageCodeEndpoints.ts` (`LANGUAGE_CODE_ENDPOINTS`) drives a `baseQuery` that adds a bare ISO `languageCode` (from `i18n.resolvedLanguage`) into GET params or mutation bodies, so the server returns localized scenarios, cases, reviews, badges, leaderboard, etc. Auth/OTP/upload endpoints are intentionally excluded. An in-app language selector (drawer) plus dynamic remote translations are gated by `LANGUAGE_SELECTOR_FLAG` / `I18N_BASE_URL`. Hooks: `useLanguageDropdown`, `useTranslate`.
 
 ## Integration Points
 
-- **ally-be (backend REST):** All HTTP requests use `API_BASE_URL` + `API_VERSION` (e.g. `/v1/...`) as configured in `.env` and validated in `src/config/env.ts`. The `src/services/*Api.ts` modules wrap these endpoints atop a shared `api.ts` client.
-- **Socket.IO namespaces (live sessions, via ally-be):** `MICROPHONE_SOCKET_PATH=/microphone-chat` for in-app microphone audio streaming, and `CLOUD_TELEPHONY_PATH=/cloud-telephony-chat` for conference/cloud-telephony audio. These paths are appended to `API_BASE_URL` to establish WebSocket connections (see `src/hooks/useSocket.ts`).
-- **LiveKit (simulations):** `SimulationAssistantScreen` connects to LiveKit rooms via `@livekit/react-native` for real-time voice simulations (the agent is served by `ally-ai-learn`).
-- **Deep linking to ally-web:** `ALLY_WEB_URL` is used for deep linking and sharing links to the Ally web app.
-- **Firebase:** Crashlytics reporting and platform config; requires `GoogleService-Info.plist` (iOS) and `google-services.json` (Android).
-
-Required environment variables (from `env/.env.example`; the app throws at startup if any required one is missing, per `src/config/env.ts`):
-
-| Variable | Purpose |
-|----------|---------|
-| `ENVIRONMENT` | `development` \| `production` |
-| `API_BASE_URL` | Base URL for ally-be REST API and WebSockets |
-| `API_VERSION` | API version prefix (e.g. `v1`) |
-| `ALLY_WEB_URL` | ally-web base URL for deep links/sharing |
-| `MICROPHONE_SOCKET_PATH` | Socket.IO path `/microphone-chat` |
-| `CLOUD_TELEPHONY_PATH` | Socket.IO path `/cloud-telephony-chat` |
-| `GOOGLE_WEB_CLIENT_ID` | Google OAuth web/Android client ID |
-| `GOOGLE_IOS_CLIENT_ID` | Google OAuth iOS client ID |
-| `NOTIFICATION_SCHEDULE_DAY` / `_HOUR` / `_MINUTE` | Local notification schedule (defaults Mon 11:00) |
+- **ally-be (REST):** base URL is `API_BASE_URL + /api/` with a `v1`/`v2` version prefix chosen per-endpoint in `services/api.ts`. All feature APIs are RTK Query slices injected into a single `api` instance.
+- **ally-be (Socket.IO):** two namespaces consumed from env — `/microphone-chat` (`MICROPHONE_SOCKET_PATH`) for in-app microphone streaming and `/cloud-telephony-chat` (`CLOUD_TELEPHONY_PATH`) for conference/telephony audio.
+- **LiveKit / ally-ai-learn:** `SimulationAssistantScreen` joins a LiveKit `Room` for the voice simulation; the conversational agent (with pause/resume acks) is served by `ally-ai-learn`.
+- **ally-web (deep linking):** `ALLY_WEB_URL` is used for sharing/deep links; inbound call-summary deep links are parsed and routed in `RootNavigator`.
+- **Required env vars** (`env/.env.example`, typed in `src/config/env.ts`): `ENVIRONMENT`, `API_BASE_URL`, `API_VERSION`, `ALLY_WEB_URL`, `MICROPHONE_SOCKET_PATH`, `CLOUD_TELEPHONY_PATH`, `GOOGLE_WEB_CLIENT_ID`, `GOOGLE_IOS_CLIENT_ID`, `NOTIFICATION_SCHEDULE_DAY` / `_HOUR` / `_MINUTE`, `LANGUAGE_SELECTOR_FLAG`, `I18N_BASE_URL`. Most are asserted required at startup.
 
 ## Local Setup
 
-Prerequisites: Node.js >= 18, Ruby (iOS), Xcode, Android Studio, CocoaPods.
+Prerequisites: Node.js >= 18, Ruby + CocoaPods (iOS), Xcode, Android Studio.
 
 ```bash
-# 1. Install JS dependencies (runs patch-package + husky install via lifecycle scripts)
-npm install
-
-# 2. iOS native dependencies
+npm install                 # installs deps; postinstall runs patch-package
+# iOS native deps
 bundle install
-bundle exec pod install
-
-# 3. Environment config — create .env in repo root from the documented sample
-cp env/.env.example .env   # then fill in values
-
-# 4. Platform secrets (both git-excluded)
-#   iOS:     ios/GoogleService-Info.plist
-#   Android: android/app/google-services.json
-#   Android release signing: provide your own keystore locally (never commit)
-
-# 5. Start Metro bundler
-npm start                  # npx react-native start --reset-cache
-
-# 6. Run the app
-npm run ios                # iOS simulator/device
-npm run android:dev        # Android dev variant (appId com.helloally.app.dev, installDevDebug)
-npm run android:prod       # Android prod variant (appId com.helloally.app, installProdDebug)
-npm run android            # plain react-native run-android
+bundle exec pod install     # from ios/ via bundler
+# Environment
+cp env/.env.example .env     # fill in values; consumed via react-native-config
 ```
 
-Release/build helpers: `npm run build:dev` / `build:prod` (Gradle assemble Dev/Prod Release), `npm run android:clean`, and `npm run bundle:android` / `bundle:ios` to produce JS bundles.
+Platform secrets (git-excluded, provide your own):
+- iOS Firebase: `ios/GoogleService-Info.plist`
+- Android Firebase: `android/app/google-services.json`
+- Android release signing: local keystore + signing config (never commit keystores)
+
+Run:
+
+```bash
+npm start                   # Metro (with --reset-cache)
+npm run ios                 # iOS simulator/device
+npm run android:dev         # Android dev flavor (appId com.helloally.app.dev)
+npm run android:prod        # Android prod flavor (appId com.helloally.app)
+```
+
+Release bundles: `npm run build:dev` / `npm run build:prod` (Android gradle), `npm run bundle:ios` / `npm run bundle:android`.
 
 ## Testing & Code Quality
 
-- **Tests:** Jest (`jest.config.js`, `jest.setup.ts`, `__mocks__/`). Run with `npm test` (`jest --passWithNoTests --forceExit`) or `npm run test:coverage`. Uses `@testing-library/react-native` and `@testing-library/jest-native`. Tests are colocated in `__tests__/` directories across `src/`.
-- **Linting/formatting:** ESLint (`.eslintrc.js`, `npm run lint`), Prettier (`.prettierrc.js`, `npm run format`). Strict import grouping/ordering enforced via `@ianvs/prettier-plugin-sort-imports` and `eslint-plugin-unused-imports`.
-- **Git hooks:** Husky (`.husky/`) + lint-staged (ESLint `--fix` and Prettier on staged `src/**/*.{js,jsx,ts,tsx}`); Commitlint (`commitlint.config.js`) enforces Conventional Commits.
-- **Type checking:** TypeScript (`tsconfig.json`, `tsconfig.tests.json`).
-- **Patches:** `patch-package` runs on `postinstall`; native/library patches live in `patches/`.
+- **Tests:** Jest (`npm test`, `npm run test:coverage`) with `@testing-library/react-native`; `jest.config.js` + `jest.setup.ts`, colocated `__tests__/` folders across `services/`, `hooks/`, `store/`, `screens/`, and `localization/`.
+- **Lint/format:** ESLint (`npm run lint`, RN 0.79 config) and Prettier (`npm run format`), with strict import grouping/sorting via `@ianvs/prettier-plugin-sort-imports`.
+- **Git hooks:** Husky pre-commit runs `lint-staged` (`eslint --fix` + Prettier on staged `src/**/*.{js,jsx,ts,tsx}`); Commitlint enforces Conventional Commits (`commitlint.config.js`).
+- **TypeScript:** `tsconfig.json` with `@/` path aliases (also wired in `babel.config.js`/`metro.config.js`).
 
 ## Key Documentation
 
-- `README.md` — Overview, features, tech stack, project structure, design system, full getting-started and scripts reference.
-- `CONTRIBUTING.md` — Git branch-naming and Conventional Commit conventions, PR guidelines, code review process.
-- `SECURITY.md` — Vulnerability reporting (admin@helloally.ai) and the list of secret files that must never be committed.
-- `CODE_OF_CONDUCT.md` — Community code of conduct.
-- `env/.env.example` — Fully commented reference for every required environment variable.
-- `.github/ISSUE_TEMPLATE/` — `BUG_REPORT.md` and `FEATURE_REQUEST.md` issue templates.
-
-> **Repo status note:** at migration time this checkout was on `master`, 26 commits behind `origin/master` (fast-forwardable), with uncommitted changes limited to `Gemfile.lock` and `package-lock.json` (no source files modified). Docs reflect the current working tree.
-
----
+- `README.md` — features, tech stack, project structure, setup, import conventions, and commit rules.
+- `CONTRIBUTING.md` — branch naming and Conventional Commit conventions.
+- `CLAUDE.md` — points to the canonical Ally Developer Wiki and warns against committing secrets.
+- `AGENTS.md` — agent/contributor working notes for this repo.
+- `SECURITY.md` — vulnerability disclosure process.
+- `CODE_OF_CONDUCT.md` — contributor code of conduct.
+- `.github/ISSUE_TEMPLATE/` — bug report and feature request templates.
 
 *Part of the [Ally Platform](../platform/overview.md). See also: [Architecture](../platform/architecture.md), [ally-be](ally-be.md), [ally-web](ally-web.md).*

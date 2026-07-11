@@ -29,3 +29,8 @@ This is an append-only log of modifications, updates, and indexing runs performe
 
 ## [2026-07-11] link | Point repos at the wiki.
 - Updated/created `AGENTS.md` and `CLAUDE.md` in each code repo to reference this wiki as the canonical source of truth.
+
+## [2026-07-11] reprocess | Refresh docs after repo updates.
+- Updated `repos/infra.md`: cross-platform dev-script work (`_os.sh`) is now committed (was documented as uncommitted).
+- Regenerated `repos/ally-mobile.md` after the repo was brought current (+27 commits: Scribe voice notes, review read/unread, simulation pause/resume, i18n parity, complete-profile gate).
+- Updated `context.md`.

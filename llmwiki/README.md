@@ -1,4 +1,4 @@
-# Ally Developer Wiki — LLMWiki
+# LLMWiki — LLMWiki
 
 LLMWiki is a lightweight, zero-build personal knowledge base engine that bridges the gap between human readers and AI agents. It enables humans to read wiki pages as beautiful, rich, responsive HTML in their browser, while allowing AI agents to read and modify raw Markdown files directly in the codebase.
 
@@ -28,6 +28,8 @@ The agent will organize them into `wiki/context.md`, `agents.md`, and the `wiki/
 ---
 
 ## 📁 Repository Layout
+
+> **Note:** This repository *is* the engine — its root contains the scripts (`setup.py`/`setup.sh`/`setup.bat`, `run`, `search`, `llmwiki.js`, `style.css`) that get cloned into your workspace's `/llmwiki/` folder. The layout below describes the **wiki workspace** that `setup.py` generates around the engine, not this repo.
 
 - `/raw/` — Immutable source documents (articles, PDFs, transcriptions) to be processed.
 - `/wiki/` — Structured, LLM-maintained Markdown pages.
@@ -78,11 +80,11 @@ Run the bootstrapping script to copy the core HTML viewer, agent schemas, and ma
 
 - **On macOS/Linux:**
   ```bash
-  ./llmwiki/setup.sh --name "Ally Developer Wiki"
+  ./llmwiki/setup.sh --name "LLMWiki"
   ```
 - **On Windows (CMD/PowerShell):**
   ```cmd
-  llmwiki\setup.bat --name "Ally Developer Wiki"
+  llmwiki\setup.bat --name "LLMWiki"
   ```
 *(The `--name` parameter is optional and defaults to "LLMWiki")*
 

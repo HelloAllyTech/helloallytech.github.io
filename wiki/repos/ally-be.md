@@ -62,6 +62,7 @@ Feature modules live under `src/<domain>/` (controllers, services, DTOs, and `en
 
 **Learning & sessions**
 - `learn/`, `scenario-path/` — scenario engine, learning pathways, session management.
+- `roleplay-studio/` — Roleplay Studio v2: versioned Scenario Spec + copilot authoring, rehearsal lifecycle (simulated trainees + judge, webhook-driven), evidence-rich critique with persisted proposals, and the **auto-improve loop** (rehearse → critique → apply → re-rehearse on a scratch version lineage until targets are met; trainer reviews the score trajectory + diff before accepting into the draft). See the repo's `ROLEPLAY_STUDIO_V2.md` for the cross-repo reference.
 - `scenario-character/` — client-persona (NPC) definitions.
 - `scenario-report/`, `scenario-session-review/`, `scribe-session-review/` — reporting and threaded review/feedback.
 - `session-event/`, `case/`, `reference-document/` — event tracking, case management, supporting materials.

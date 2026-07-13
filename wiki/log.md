@@ -37,3 +37,6 @@ This is an append-only log of modifications, updates, and indexing runs performe
 
 ## [2026-07-13] update | Roleplay Studio v2 auto-improve loop.
 - Updated `repos/ally-be.md`: documented the new `roleplay-studio/` module capabilities — evidence-rich rehearsal critique with persisted proposals, and the autonomous improve loop (rehearse → critique → apply → re-rehearse with trainer review before draft acceptance).
+
+## [2026-07-13] update | Roleplay Studio v2 goes chat-first.
+- Updated `repos/ally-be.md`: the copilot now drives the full loop from the chat (test-case selection, auto-improve start, in-chat progress narration, auto-apply on success, test-live/publish actions).

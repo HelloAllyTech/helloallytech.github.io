@@ -11,6 +11,7 @@ Welcome to the **Ally Developer Wiki** catalog. This catalog is parsed by the LL
 - [Architecture & Data Flow](platform/architecture.md) — Services, integrations, queues, storage, HIPAA
 - [Tech Stack](platform/tech-stack.md) — The polyglot stack across all layers
 - [Cross-Repo Agent Guide](platform/agent-guide.md) — Conventions, common tasks, and gotchas for agents
+- [Language-Quality Evaluation & RCA](platform/language-quality-eval.md) — Evaluating and fixing voice-agent language quality via LLM-judge error annotation + single-variable RCA
 
 ## Repositories
 - [ally-be](repos/ally-be.md) — Core backend (NestJS)

@@ -40,3 +40,8 @@ This is an append-only log of modifications, updates, and indexing runs performe
 
 ## [2026-07-13] update | Roleplay Studio v2 goes chat-first.
 - Updated `repos/ally-be.md`: the copilot now drives the full loop from the chat (test-case selection, auto-improve start, in-chat progress narration, auto-apply on success, test-live/publish actions).
+
+## [2026-07-15] ingest | Language-Quality Evaluation & RCA framework.
+- Added `platform/language-quality-eval.md` from an internal team note: the four-layer language-capability framework, LLM-judge error typology, objective speech metrics (round-trip WER, script fidelity), and single-variable RCA methodology.
+- Sanitized for public hosting: dropped author/draft header and companion-doc references to repo-internal engineering specs; removed the unfilled per-language findings table (kept the Kannada worked example). No file paths, credentials, or secrets. Detailed specs remain in the `ally-ai` / `ally-be` repos.
+- Linked from `index.md` under Platform.

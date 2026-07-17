@@ -54,9 +54,29 @@ source of truth.
   (even for unknown emails) to avoid user enumeration, and the portal login is rate-limited by IP.
 - Skills/variables/values/runs are system-wide (not tenant-scoped) — this is an internal tool.
 
-## 4. Roadmap
+## 4. Recent improvements
 
-Known improvement areas being tracked: moving run execution off the HTTP request onto the
-platform's SQS worker path (with live status), matrix runs over value sets, automated
-LLM-as-judge evaluators, per-run token/cost tracking, side-by-side run comparison, richer
-results analytics/export, and accessibility/pagination polish on the admin tabs.
+A round of improvements landed across `ally-be`, `ally-web`, and `infra`:
+
+- **Per-skill generation params** — temperature, max output tokens, and an optional system
+  prompt, applied per provider (temperature only where the model supports it).
+- **Token & cost tracking** — completed runs record prompt/completion/total tokens and an
+  estimated USD cost (per-model pricing table); shown in the run detail drawer.
+- **Asynchronous execution** — when a lab-run SQS queue is provisioned, runs are queued
+  (PENDING) and executed by a worker with retry/DLQ handling; the runs log polls for live
+  status. Falls back to synchronous execution when no queue is configured.
+- **Matrix runs** — pick multiple values per variable to run a skill across the cartesian
+  product of a value set (one row per combination, shared batch id), with a **side-by-side
+  batch comparison** view.
+- **Automated (LLM-as-judge) evaluation** — score a completed run's output against a rubric
+  with a judge model, alongside human evaluation.
+- **Results analytics** — CSV/JSON export and a per-question inter-rater agreement indicator.
+- **UX & delivery** — per-skill failure surfacing when creating runs, evaluator invite emails,
+  a focus-trapped shared side panel, and paginated runs; plus the first automated tests for
+  the module (backend services + a frontend spec).
+
+### Still open
+- Migrate the remaining hand-rolled AI Lab drawers onto the shared (focus-trapped) `SidePanel`.
+- Extend pagination to the Skills / Variables / Values / Evaluators tabs.
+- Provision the lab-run SQS queue + DLQ in AWS and set `lab_run_queue` / `lab_run_dlq` so async
+  execution goes live.

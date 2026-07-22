@@ -53,3 +53,7 @@ This is an append-only log of modifications, updates, and indexing runs performe
 - Added `platform/language-quality-eval.md` from an internal team note: the four-layer language-capability framework, LLM-judge error typology, objective speech metrics (round-trip WER, script fidelity), and single-variable RCA methodology.
 - Sanitized for public hosting: dropped author/draft header and companion-doc references to repo-internal engineering specs; removed the unfilled per-language findings table (kept the Kannada worked example). No file paths, credentials, or secrets. Detailed specs remain in the `ally-ai` / `ally-be` repos.
 - Linked from `index.md` under Platform.
+
+## [2026-07-22] update | Roleplay Studio v2 copilot gains an Iterate mode.
+- Updated `repos/ally-be.md`: after building the spec, the trainer can switch the copilot session from Build to Iterate (`copilot_sessions.mode`), live-test the roleplay, and give plain-language feedback; the copilot reasons from the symptom to the spec field that drives it — grounded in the test sessions' Director telemetry (`get_test_session_insights`) — patches only that, and shows a structured "summary of updates made" (`iteration_summary` / `summarize_iteration`).
+- Cross-repo `ROLEPLAY_STUDIO_V2.md` (kept in `ally-be` + `ally-ai-learn`) documents the new Flow 1b — ITERATE, the `iteration_system` prompt (now 8 prompts), and the two Iterate-only tools. No secrets, paths-only.

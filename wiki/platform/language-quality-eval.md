@@ -70,7 +70,7 @@ The framework generalizes an existing **conversation-drift evaluation system** r
 - **Versioning**: scenario configs are fully versioned (diffable against their parent — this is how we auto-derive *which element changed* between experiments); prompt templates are versioned per code; roleplay specs are versioned separately.
 - **Session-logs dashboard**: per-session drill-down with transcript, audio playback, models used, latency, and cost — the natural home for per-turn error badges.
 - **Session audio in object storage** plus batch STT with multi-provider fallback in the AI service — the ingredients for round-trip WER.
-- **Test harnesses**: a rehearsal harness (simulated skilled / poor / adversarial trainees) and a voice-to-voice tester become the *execution engine* for single-variable experiments, without waiting for live traffic.
+- **Test harnesses**: a voice-to-voice tester becomes the *execution engine* for single-variable experiments, without waiting for live traffic.
 
 **What's genuinely new:** the language-quality error typology + judge, the two objective metrics, per-language eval config, pinned-reference / delta readouts with changed-element derivation, the Language dashboard tab, and per-turn annotations in session logs.
 
@@ -91,7 +91,7 @@ So the framework doesn't fight reality:
 2. **Prompt-before-model.** For register / dialect / colloquialness failures the decision rule is mechanical: *is the colloquial directive configured for this language? are style exemplars present?* If either is missing → populate it (a cheap metadata fix, one variable). If both are present and the error persists → a model-capability limit → escalate to the LLM axis. The judge's `persona_specified` / `persona_unspecified` label pre-sorts every error onto one side of this rule.
 3. **Read deltas vs a pinned reference**, with the judge version held constant. Slice per language and dialect — never a global score.
 4. **Isolation check**: a one-variable change should move only its layer; cross-layer movement is a leak to investigate.
-5. **Failures → test cases** → re-run through the rehearsal / voice-to-voice harnesses before deployment.
+5. **Failures → test cases** → re-run through the voice-to-voice harness before deployment.
 
 ## 7. Applying it per language (worked example: Kannada)
 

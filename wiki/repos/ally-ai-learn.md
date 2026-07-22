@@ -72,7 +72,7 @@ The service is composed of a FastAPI app plus LiveKit agent workers. The core of
 - **AWS SQS**: all triggered events are published to `sqs-learn-message-and-event-queue` (`SQS_MESSAGE_EVENT_QUEUE_NAME`) via `app/core/queue/sqs.py` (`SQSQueue`, async through `asyncio.to_thread`). Message schema `CoreEventMessageType` (`message_type: event`, `room_id`, serialized `event_data`, timestamp).
 - **Deferred termination**: auto-termination events are held (`EventSender.deferred_termination_event`) until the agent finishes speaking the termination message, then sent to SQS with `autoTerminationStatus=true` in the shutdown callback — so ally-be doesn't close the room prematurely.
 - **LiveKit**: WebRTC audio to/from LiveKit rooms; UI event feedback is sent over LiveKit **data channels** (not SQS), schema `CustomUIEventMessageType`.
-- **Roleplay Studio v2**: shares the Scenario Spec model with ally-be (owner of the spec, Copilot authoring, rehearsal lifecycle) and ally-web (`ally-admin-dashboard` studio UI); this repo owns the v2 runtime and Actor/Director/Trainee/Judge prompts.
+- **Roleplay Studio v2**: shares the Scenario Spec model with ally-be (owner of the spec + Copilot authoring) and ally-web (`ally-admin-dashboard` studio UI); this repo owns the v2 runtime and the Actor/Director prompts.
 
 ## Local Setup
 

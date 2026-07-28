@@ -13,6 +13,7 @@ Welcome to the **Ally Developer Wiki** catalog. This catalog is parsed by the LL
 - [Cross-Repo Agent Guide](platform/agent-guide.md) — Conventions, common tasks, and gotchas for agents
 - [Language-Quality Evaluation & RCA](platform/language-quality-eval.md) — Evaluating and fixing voice-agent language quality via LLM-judge error annotation + single-variable RCA
 - [AI Lab — Prompt Workbench & Human Evaluation](platform/ai-lab.md) — Author prompt skills, run them against LLMs, and collect structured human evaluations
+- [Scribe Summary Writes — Merge Semantics & Client Rules](platform/scribe-summary-writes.md) — Why scribe notes appeared not to save, the merge-based write contract, and the backend-first deploy rule
 
 ## Product Management
 - [Product Management Best Practices](product/best-practices.md) — **Hub.** House rules for every product decision + the index of subsections (read before building anything user-facing)

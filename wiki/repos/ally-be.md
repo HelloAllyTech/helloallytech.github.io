@@ -177,4 +177,4 @@ Standards: ESLint + Prettier enforced, Husky git hooks (`prepare: husky`), `.pre
 
 ---
 
-*Part of the [Ally Platform](../platform/overview.md). See also: [Architecture](../platform/architecture.md), [ally-ai](ally-ai.md), [ally-ai-learn](ally-ai-learn.md).*
+*Part of the [Ally Platform](../platform/overview.md). See also: [Architecture](../platform/architecture.md), [Scribe Summary Writes](../platform/scribe-summary-writes.md), [ally-ai](ally-ai.md), [ally-ai-learn](ally-ai-learn.md).*

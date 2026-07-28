@@ -109,4 +109,4 @@ Release bundles: `npm run build:dev` / `npm run build:prod` (Android gradle), `n
 - `CODE_OF_CONDUCT.md` — contributor code of conduct.
 - `.github/ISSUE_TEMPLATE/` — bug report and feature request templates.
 
-*Part of the [Ally Platform](../platform/overview.md). See also: [Architecture](../platform/architecture.md), [ally-be](ally-be.md), [ally-web](ally-web.md).*
+*Part of the [Ally Platform](../platform/overview.md). See also: [Architecture](../platform/architecture.md), [Scribe Summary Writes](../platform/scribe-summary-writes.md), [ally-be](ally-be.md), [ally-web](ally-web.md).*

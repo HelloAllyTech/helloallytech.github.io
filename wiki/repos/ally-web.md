@@ -168,4 +168,4 @@ Git hooks (Husky + lint-staged) auto-run ESLint and Prettier on staged files, pl
 
 ---
 
-*Part of the [Ally Platform](../platform/overview.md). See also: [Architecture](../platform/architecture.md), [ally-be](ally-be.md), [ally-mobile](ally-mobile.md).*
+*Part of the [Ally Platform](../platform/overview.md). See also: [Architecture](../platform/architecture.md), [Scribe Summary Writes](../platform/scribe-summary-writes.md), [ally-be](ally-be.md), [ally-mobile](ally-mobile.md).*

@@ -65,3 +65,10 @@ This is an append-only log of modifications, updates, and indexing runs performe
 - Added `platform/language-quality-eval.md` from an internal team note: the four-layer language-capability framework, LLM-judge error typology, objective speech metrics (round-trip WER, script fidelity), and single-variable RCA methodology.
 - Sanitized for public hosting: dropped author/draft header and companion-doc references to repo-internal engineering specs; removed the unfilled per-language findings table (kept the Kannada worked example). No file paths, credentials, or secrets. Detailed specs remain in the `ally-ai` / `ally-be` repos.
 - Linked from `index.md` under Platform.
+
+## [2026-07-28] ingest | Scribe summary write contract & deploy ordering.
+- Added `platform/scribe-summary-writes.md`: the destructive whole-document replace that caused months of "scribe notes won't save" reports, the merge-based write contract that replaced it (key present / null / absent semantics), the four client rules (send only edited keys, diff against the seed baseline, no LLM on a save path), form-seeding rules, and the autosave pattern.
+- Documented the **backend-first deploy rule** and why the reverse order is silent data loss rather than an error; noted that older clients in the field stay compatible by design.
+- Sanitized for public hosting: no environment names, hosting providers, buckets, regions, hostnames, or credentials — the page describes the code contract and ordering rule only.
+- Linked from `index.md` under Platform, and cross-referenced from the ally-be / ally-web / ally-mobile repo pages.
+

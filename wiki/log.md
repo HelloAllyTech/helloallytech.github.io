@@ -8,6 +8,23 @@ summary: A chronological log tracking all wiki updates and modifications.
 
 This is an append-only log of modifications, updates, and indexing runs performed on the wiki. All logs use the parseable prefix format: `## [YYYY-MM-DD] action | description`.
 
+## [2026-07-28] update | Settle the Data Visualisation open questions; promote to Adopted.
+- Answered all three open questions in `product/data-visualisation.md` from the super-admin
+  Analytics remediation: the minimum sample size before a score is stated (**n = 20**, with the
+  "not enough data" treatment), the **approved palette** (semantic scales, grey reserved for
+  context, same-hue ramps for ordered categories, name-hashed colours for open value sets, an
+  8-hue ceiling) and its greyscale / dark-mode / print answers, and the state of **metric parity**
+  between web and mobile (not reconciled, now scoped as a follow-up rather than an open rule).
+- Added two principles the audit earned: **never fabricate a measurement for a period that had
+  none** (gaps, not zeros; any carried-forward value must be visibly marked) and **a panel that
+  cannot honour an active filter must say so**. Both have new checklist gates.
+- Added five anti-patterns observed in the codebase: a zero that means "nothing happened",
+  colour assigned by result-set position, a part and a whole in one stack, two magnitudes on one
+  axis, and comparing across judge versions.
+- Promoted the subsection from **Draft** to **Adopted** (hub table updated), so its checklist is
+  a gate on future chart work rather than guidance.
+- Cross-linked the implementation from `repos/ally-web.md`.
+
 ## [2026-07-28] ingest | Chart & Dashboard Design Principles reference.
 - Added `product/chart-dashboard-principles.md` — a constraints-file reference for building charts and dashboards (perception rules, chart anatomy, clarity/simplicity/colour, persuasion-vs-deception boundaries, chart-type lookup tables, dashboard composition, acceptance checklist, anti-pattern list). `[EXTRAPOLATION]` markers flag the sections that extend the per-chart rules to multi-chart surfaces.
 - Introduced a **Reference pages** concept in the hub: long craft lookups filed under a parent subsection, distinct from subsections themselves. Registered the new page there (parent: Data Visualisation) and in `index.md`; §3 of the hub now covers both cases.

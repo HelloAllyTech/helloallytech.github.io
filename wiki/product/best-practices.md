@@ -30,7 +30,7 @@ appear here **and** under **Product Management** in [`wiki/index.md`](../index.m
 |---|---|---|
 | [UI & Interaction](ui.md) | Screen and component decisions, states, hierarchy, accessibility, i18n, cross-surface consistency | Draft |
 | [Gamification](gamification.md) | Badges, streaks, leaderboards, progress — and when *not* to gamify | Draft |
-| [Data Visualisation](data-visualisation.md) | Charts, dashboards, metrics displays, and the honesty rules for showing numbers | Draft |
+| [Data Visualisation](data-visualisation.md) | Charts, dashboards, metrics displays, and the honesty rules for showing numbers | Adopted |
 | [Prioritisation](prioritisation.md) | Deciding what gets built, in what order, and what gets explicitly dropped | Draft |
 | [User Personas](user-personas.md) | Who we build for — counsellor, learner, trainer/admin, super-admin — and what each one actually needs | Draft |
 

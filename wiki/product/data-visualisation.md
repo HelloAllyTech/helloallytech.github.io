@@ -6,7 +6,7 @@ summary: Rules for showing numbers honestly at Ally — pick the chart from the 
 
 # Data Visualisation
 
-*Part of [Product Management Best Practices](best-practices.md).* **Maturity: Draft.**
+*Part of [Product Management Best Practices](best-practices.md).* **Maturity: Adopted.**
 
 > [!IMPORTANT]
 > **Building an actual chart or dashboard? Open [Chart & Dashboard Design Principles](chart-dashboard-principles.md).**
@@ -57,6 +57,17 @@ carries is a product bug, not a styling choice.
     version.
 12. **Exports must carry their context.** A CSV or PDF that leaves the app without the date
     range, filters and n attached will be misread in a meeting.
+13. **Never fabricate a measurement for a period that had none.** A rate over a zero
+    denominator is undefined, not zero, and an average of no observations is not zero either.
+    Emit a gap. If a value is carried forward or interpolated, it must be visibly marked as
+    such — an unmarked flat line is indistinguishable from a measured plateau, and reads as the
+    good news it isn't. Gap-filling a COUNT or SUM with zero is fine: "nobody practised that
+    week" is a fact.
+14. **A panel that cannot honour an active filter must say so.** If a filter is applied and some
+    aggregate cannot be scoped by it — because its source rows carry no such attribution —
+    return the unscoped figure *and* label it. Silently showing a platform-wide number under a
+    tenant filter is worse than not offering the filter: the reader cannot see that it did not
+    apply.
 
 ## Checklist
 
@@ -73,6 +84,8 @@ Ally-specific gates. For chart craft, also run the fuller per-chart checklist in
 - [ ] Tenant isolation + minimum group size respected in every breakdown and drill-down.
 - [ ] Derived-score panels state their source and version.
 - [ ] Export includes filters, range and n.
+- [ ] Unmeasured periods render as gaps, not zeros; any carried-forward value is marked.
+- [ ] Any panel that could not honour an active filter is labelled as unscoped.
 
 ## Anti-patterns
 
@@ -85,6 +98,14 @@ Ally-specific gates. For chart craft, also run the fuller per-chart checklist in
 - **Tooltip-only truth** — the caveat that only appears on hover never reaches the screenshot
   that ends up in the board deck.
 - **Comparing across rubric or model versions** as if they were the same scale.
+- **A zero that means "nothing happened here"** — a 0% failure rate for a week with no sessions
+  reads as a clean week, and is the most flattering possible way to be wrong.
+- **A colour assigned by result-set position**, so a service changes colour when the filter
+  changes.
+- **A part and a whole stacked in the same bar**, making the bar's height mean different things
+  in different periods.
+- **Two series of different magnitude on one axis**, which flattens whichever one the chart is
+  named after.
 
 ## Ally-specific notes
 
@@ -104,8 +125,70 @@ Ally-specific gates. For chart craft, also run the fuller per-chart checklist in
   consistent encodings across tiles, density tiers by role — is covered in
   [Chart & Dashboard Design Principles](chart-dashboard-principles.md) §15.
 
+## Settled decisions
+
+These were this section's open questions. They are now decided, each with the code that
+implements it — change both together.
+
+### Minimum sample size: **n = 20**
+
+Below 20 observations a derived score is not shown as a number at all; the surface renders
+**"Not enough data"** alongside the actual n and the threshold ("n = 4 evaluated sessions ·
+need 20"). This covers any mean of LLM-judged or self-reported values — quality scores, learner
+ratings, per-dimension error rates.
+
+20 is a judgement call, not a statistical derivation: it is roughly where one outlying session
+stops moving a mean by more than a rounding step. It is deliberately a single number rather than
+a per-metric table, because a threshold nobody can hold in their head is a threshold nobody
+applies.
+
+Counts, sums and volumes have no minimum — they are not estimates of anything.
+
+Implemented as `MIN_N_FOR_SCORE` in [ally-web](../repos/ally-web.md),
+`apps/ally-admin-dashboard/src/pages/Analytics/chartKit.tsx`.
+
+### The approved palette
+
+One palette per surface, with colours assigned by **meaning** rather than by position in a
+result set:
+
+- **Semantic scales** for dimensions that recur across charts — outcome (green good / red bad /
+  gold pending / grey n-a), severity (gold → orange → dark red, ordered), capture method,
+  provenance (live vs backfilled), percentile (one hue, three shades).
+- **Grey is reserved for context** — any series that supports the point without being the point:
+  a backfilled history, a cumulative total, an "all other" bucket.
+- **Ordered categories get a same-hue ramp**, never a rainbow; a rainbow implies a ranking that
+  isn't there.
+- **Unordered categories with an unknown value set** (models, providers) take a colour from a
+  capped 8-hue categorical list, keyed on a hash of the NAME — never by index into the current
+  result set, which makes a colour move when the set changes. A colour that moves encodes
+  nothing, and the reader cannot see that it moved.
+- **Never colour-by-identity on a single-measure chart.** If the category is already on the
+  axis, a second encoding of it is noise.
+- **Eight distinguishable hues is the ceiling.** Past that, group the tail into "Other".
+- **Two different dimensions must not share a colour** on the same surface, or the reader builds
+  a relationship that does not exist.
+
+**Greyscale and colour-blindness:** meaning is never carried by colour alone. Every good/bad
+signal is paired with a sign, an arrow or a word — a delta renders "↓ −1.5", not a red number.
+**Dark mode:** the analytics surface renders in Carbon's White theme regardless of the app theme,
+so these hexes are chosen against a light background only; a chart placed on a dark surface needs
+its own review. **PDF and print** are covered by the greyscale answer.
+
+Implemented as `chartScales.ts` in the same directory.
+
+### Metric parity across surfaces
+
+Not yet reconciled — but scoped rather than open. The headline learner metrics (practice minutes,
+completed simulations, quality score) are computed in [ally-be](../repos/ally-be.md)'s
+`analytics/` module for the web dashboards and separately in
+[ally-mobile](../repos/ally-mobile.md). The definitions have not been diffed. Until they are,
+**do not present a web figure and a mobile figure as the same metric.** This is a follow-up, not
+a rule.
+
 ## Open questions
 
-- What is our documented minimum `n` before a score is shown at all?
-- Is there a single approved palette and does it survive dark mode + PDF export?
-- Do the web and mobile definitions of the headline learner metrics currently match?
+- Should the minimum-n threshold differ for a metric one user acts on (their own score) versus a
+  cohort aggregate? The single threshold is deliberately blunt.
+- What tick density is right for a 30-day daily axis on a narrow viewport? Carbon's
+  auto-rotation stays legible but gets cramped below roughly 700px.

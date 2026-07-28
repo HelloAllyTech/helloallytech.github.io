@@ -17,6 +17,7 @@ This is the canonical, sanitized documentation for **Ally** — a HIPAA-complian
 
 - **New here?** Start with the [Platform Overview](platform/overview.md).
 - **Understand the system:** [Architecture & Data Flow](platform/architecture.md) and [Tech Stack](platform/tech-stack.md).
+- **Build anything user-facing:** [Product Management Best Practices](product/best-practices.md) — the house rules, plus subsections on [UI](product/ui.md), [Gamification](product/gamification.md), [Data Visualisation](product/data-visualisation.md), [Prioritisation](product/prioritisation.md) and [User Personas](product/user-personas.md).
 - **Work on a repo:** the [Repositories](index.md#repositories) section — [ally-be](repos/ally-be.md), [ally-ai](repos/ally-ai.md), [ally-ai-learn](repos/ally-ai-learn.md), [ally-web](repos/ally-web.md), [ally-mobile](repos/ally-mobile.md), [infra](repos/infra.md).
 - **Contribute:** [Developer Setup](contributing/dev-setup.md) and the [Contributing Guide](contributing/guide.md).
 - **AI agents:** the [Cross-Repo Agent Guide](platform/agent-guide.md).
@@ -47,6 +48,9 @@ Read `agents.md` at the repo root, then follow its Ingestion, Query, and Lint fl
 3. Persist session progress in `wiki/context.md`.
 4. Catalog every new page in `wiki/index.md` and log changes in `wiki/log.md`.
 5. Keep pages cross-linked and consistent with the repos they describe.
+6. Before designing or building anything user-facing (UI, gamification, charts,
+   scope calls), read `wiki/product/best-practices.md` and the relevant subsection
+   under `wiki/product/`, and file new product judgement calls back into it.
 ```
 
 ---

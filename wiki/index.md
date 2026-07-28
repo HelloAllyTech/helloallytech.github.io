@@ -14,6 +14,15 @@ Welcome to the **Ally Developer Wiki** catalog. This catalog is parsed by the LL
 - [Language-Quality Evaluation & RCA](platform/language-quality-eval.md) — Evaluating and fixing voice-agent language quality via LLM-judge error annotation + single-variable RCA
 - [AI Lab — Prompt Workbench & Human Evaluation](platform/ai-lab.md) — Author prompt skills, run them against LLMs, and collect structured human evaluations
 
+## Product Management
+- [Product Management Best Practices](product/best-practices.md) — **Hub.** House rules for every product decision + the index of subsections (read before building anything user-facing)
+- [UI & Interaction](product/ui.md) — States before styling, hierarchy, permission-aware UI, latency, accessibility, i18n
+- [Gamification](product/gamification.md) — Badges, streaks, leaderboards, progress — and when not to gamify
+- [Data Visualisation](product/data-visualisation.md) — Charts, dashboards and the honesty rules for showing numbers
+- [Chart & Dashboard Design Principles](product/chart-dashboard-principles.md) — Deep reference under Data Visualisation: perception rules, chart anatomy, chart-type lookup, acceptance checklist, anti-patterns
+- [Prioritisation](product/prioritisation.md) — Choosing what to build, slicing it, and writing down the non-goals
+- [User Personas](product/user-personas.md) — Counsellor, learner, trainer, tenant admin, super-admin
+
 ## Repositories
 - [ally-be](repos/ally-be.md) — Core backend (NestJS)
 - [ally-ai](repos/ally-ai.md) — AI copilot service (FastAPI + Weaviate)

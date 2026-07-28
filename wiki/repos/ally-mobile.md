@@ -10,6 +10,9 @@ summary: React Native iOS/Android app for mental-health counsellors, covering li
 
 `ally-mobile` is the React Native app that counsellors use in the field. It supports three core workflows: joining and listening to live counselling sessions with real-time transcription and AI-assisted call summaries; reviewing and commenting on session/simulation transcripts (peer review); and running voice-based AI training simulations against a simulated client. Newer areas add Scribe voice-dictation notes, review read/unread management, simulation pause/resume, a first-login complete-profile gate, and multilingual (i18n) content parity. The app talks to `ally-be` over REST and Socket.IO, and to LiveKit rooms driven by `ally-ai-learn` for simulations.
 
+> [!NOTE]
+> For product conventions behind these surfaces — cross-surface consistency with the web apps, achievement/leaderboard rules, and the counsellor-in-the-field persona — see [Product Management Best Practices](../product/best-practices.md), particularly [UI & Interaction](../product/ui.md), [Gamification](../product/gamification.md) and [User Personas](../product/user-personas.md).
+
 ## Tech Stack
 
 Factual from `package.json` (app `version` 1.5.0):

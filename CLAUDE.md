@@ -7,6 +7,7 @@ This repository **is** the [Ally Developer Wiki](https://tech.helloally.ai) — 
 - All human-readable content lives in **`wiki/`**. Edit those Markdown files directly.
 - The **`llmwiki/`** folder is the rendering engine — **never modify it** (it lives in a separate upstream repo).
 - When you add or change pages: update the catalog in **`wiki/index.md`** and append an entry to **`wiki/log.md`**. Record durable learnings in `wiki/memory.md` and session state in `wiki/context.md`.
+- **Product work:** before designing or building anything user-facing anywhere in the Ally platform, read **`wiki/product/best-practices.md`** (the hub — house rules + subsection index) and the matching subsection (`wiki/product/ui.md`, `gamification.md`, `data-visualisation.md`, `prioritisation.md`, `user-personas.md`, …). It is an intentionally growing section: file new product judgement calls back into the right subsection, or add a new one per §3 of the hub, then register it in the hub table and `wiki/index.md`.
 - `.nojekyll` keeps GitHub Pages from processing the Markdown; pushing to `main` publishes to **tech.helloally.ai** (the `CNAME`).
 
 ## Content policy (public site)

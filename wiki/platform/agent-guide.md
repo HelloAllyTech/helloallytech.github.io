@@ -8,6 +8,9 @@ summary: Quick-reference for AI assistants and developers working across Ally re
 
 This page helps AI agents (and developers) quickly orient in the Ally workspace and work effectively across repos. It is migrated from the workspace `AGENTS.md`. For per-repo depth, follow the links to each [repo page](../index.md#repositories).
 
+> [!IMPORTANT]
+> **This page tells you how to build. [Product Management Best Practices](../product/best-practices.md) tells you what to build and how it should behave.** Read it — and the matching subsection ([UI](../product/ui.md), [Gamification](../product/gamification.md), [Data Visualisation](../product/data-visualisation.md), [Prioritisation](../product/prioritisation.md), [User Personas](../product/user-personas.md)) — before any task that changes what a user sees, does, earns, or is shown as data. Purely internal work (refactor, migration, infra, tests) is exempt.
+
 ## Repo Quick Reference
 
 ### [ally-be](../repos/ally-be.md) — Core Backend
@@ -78,6 +81,8 @@ chore/<ticket-id>-short-description
 
 ## Common Tasks
 
+> Before starting any user-facing task below, check the relevant [product practice](../product/best-practices.md). Cross-repo work is also the dominant hidden cost in estimates — see [Prioritisation](../product/prioritisation.md).
+
 **Adding a new API endpoint** — ally-be: controller + service + DTOs in the relevant `src/` module; ally-web/mobile: add an RTK Query endpoint in `src/services/`.
 
 **Adding a new AI capability** — ally-ai: prompt templates in `app/prompts/`, service logic in `app/core/`, endpoint in `app/api/v1/endpoints/`; ally-be: integration call in `src/ai/`.
@@ -102,4 +107,4 @@ chore/<ticket-id>-short-description
 
 ---
 
-*See also: [Platform Overview](overview.md), [Architecture](architecture.md), [Contributing Guide](../contributing/guide.md).*
+*See also: [Platform Overview](overview.md), [Architecture](architecture.md), [Contributing Guide](../contributing/guide.md), [Product Management Best Practices](../product/best-practices.md).*

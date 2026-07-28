@@ -21,6 +21,7 @@ This repository (`helloallytech.github.io`, served at **tech.helloally.ai**) is 
 - `index.md` — Catalog / sidebar navigation source.
 - `welcome.md`, `getting-started.md` — Entry pages.
 - `platform/` — Cross-cutting docs: `overview.md`, `architecture.md`, `tech-stack.md`, `agent-guide.md`.
+- `product/` — **Product Management Best Practices**: `best-practices.md` (hub + house rules) plus one page per subsection (`ui.md`, `gamification.md`, `data-visualisation.md`, `prioritisation.md`, `user-personas.md`, …) and longer craft references under a subsection (`chart-dashboard-principles.md`). This folder is designed to grow — new pages go here and get registered in the hub tables and `index.md`.
 - `repos/` — One page per repository: `ally-be`, `ally-ai`, `ally-ai-learn`, `ally-web`, `ally-mobile`, `infra`.
 - `contributing/` — `dev-setup.md`, `guide.md` (SDLC rules).
 - `overview.md`, `memory.md`, `context.md`, `log.md` — Meta/session state.

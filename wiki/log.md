@@ -8,6 +8,23 @@ summary: A chronological log tracking all wiki updates and modifications.
 
 This is an append-only log of modifications, updates, and indexing runs performed on the wiki. All logs use the parseable prefix format: `## [YYYY-MM-DD] action | description`.
 
+## [2026-07-29] update | Cohort-retention rules into Data Visualisation.
+- From building the super-admin Analytics -> Highlights **learner cohort retention** panel
+  (monthly cohorts x months-since-signup, with a 10/50/100 practice-minutes "active user"
+  switcher). Four new principles in `product/data-visualisation.md`: a **definitional point is
+  not a measurement** (a cohort's month 0 is 100% by construction and must say so), an
+  **in-progress period belongs in a table before a line** (flag it in a grid, omit it from a
+  chart), **let the reader switch between competing metric definitions** and compute them all
+  against one denominator in a single pass, plus the matching checklist gates and two
+  anti-patterns (a cohort triangle whose future is drawn as 0%; a retention rate over three
+  people).
+- New settled decision: **minimum group size for a per-person breakdown = 5** — show the size,
+  suppress the rate, never drop the row. Distinct from the existing n = 20, which is about
+  whether a derived score is trustworthy rather than about re-identification.
+- One craft rule into `product/chart-dashboard-principles.md` §8.4: **a colour ramp under printed
+  values must stop short of full saturation**, or the light/dark text switch lands in a band
+  where neither colour clears 4.5:1.
+
 ## [2026-07-28] update | Settle the Data Visualisation open questions; promote to Adopted.
 - Answered all three open questions in `product/data-visualisation.md` from the super-admin
   Analytics remediation: the minimum sample size before a score is stated (**n = 20**, with the

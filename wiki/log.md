@@ -8,6 +8,11 @@ summary: A chronological log tracking all wiki updates and modifications.
 
 This is an append-only log of modifications, updates, and indexing runs performed on the wiki. All logs use the parseable prefix format: `## [YYYY-MM-DD] action | description`.
 
+## [2026-07-29] update | Candidate analytics panels get a staging tab.
+- New "Settled decisions" entry in `product/data-visualisation.md`: a panel that claims to change a decision (principle 9) is staged on the super-admin Analytics → **Testing** tab and judged against real production data before it reaches a surface anyone relies on. Nothing on Highlights is altered to make room, so a candidate that measures the same thing differently (median + IQR against a mean line; a rating-band mix against a mean rating) can be read beside the original — which is the argument for retiring it.
+- Records the three rules that keep staging honest: staged panels honour every rule on the page from the first commit (nulls over zero denominators, sample floors travelling with the data, residuals in grey, the accruing period off the plot, same all-time window and per-chart grain), endpoints are named for what they measure and never for the tab, and the tab is a queue rather than a home.
+- Lists the eleven panels currently under review, including weekly practising learners as a north-star candidate and score-by-Nth-session as the efficacy curve.
+
 ## [2026-07-29] update | Highlights goes all-time, with grouping per chart.
 - Added principles 23–25 to `product/data-visualisation.md`: the window and the grain are separate questions and the grain belongs to the chart (server-side re-graining only — a mean of means and an unrecoverable percentile are why); captions must say so where re-graining changes the definition rather than the resolution (new vs returning); and a window with no predecessor gets no delta.
 - Added the matching checklist gates, five anti-patterns, and a "Settled decisions" entry recording that the super-admin Highlights tab now has no range picker, resolves `range=all` from a measured data floor (rejecting the range where no floor exists rather than answering for the wrong period), fetches one response per grain on screen, and omits the still-accruing period from every plot while keeping it flagged in tables and exports.

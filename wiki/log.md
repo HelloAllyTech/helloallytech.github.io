@@ -8,6 +8,85 @@ summary: A chronological log tracking all wiki updates and modifications.
 
 This is an append-only log of modifications, updates, and indexing runs performed on the wiki. All logs use the parseable prefix format: `## [YYYY-MM-DD] action | description`.
 
+## [2026-07-29] update | Highlights goes all-time, with grouping per chart.
+- Added principles 23–25 to `product/data-visualisation.md`: the window and the grain are separate questions and the grain belongs to the chart (server-side re-graining only — a mean of means and an unrecoverable percentile are why); captions must say so where re-graining changes the definition rather than the resolution (new vs returning); and a window with no predecessor gets no delta.
+- Added the matching checklist gates, five anti-patterns, and a "Settled decisions" entry recording that the super-admin Highlights tab now has no range picker, resolves `range=all` from a measured data floor (rejecting the range where no floor exists rather than answering for the wrong period), fetches one response per grain on screen, and omits the still-accruing period from every plot while keeping it flagged in tables and exports.
+
+## [2026-07-29] update | Scroll-don't-compress rule into Data Visualisation.
+- From a super-admin Analytics report: "New users per period" at daily grain over an all-time window
+  drew fifty dates rotated into one solid grey band under hairline bars. Carbon (like every charting
+  library) does not overflow when given more categories than the container is wide — it **fits** them,
+  silently, and the panel reads as a broken chart rather than as more data than fits.
+- New principle 26 in `product/data-visualisation.md`: give each category a floor of horizontal room,
+  let the plot exceed its card, and scroll the card sideways. Both costs go on the surface — the value
+  axis and legend are in the same SVG as the plot so they scroll out of view with it, and part of the
+  range starts off-screen, which a plot cut off at the card edge otherwise hides. The scroll region is
+  keyboard-reachable or the range is mouse-only. Thinning ticks to every nth label is rejected: it
+  fixes the labels and leaves the marks too thin to compare.
+- Resolves the old open question about tick density on a narrow viewport, now a settled decision:
+  **28px per x-axis category**, one number for every chart form because the tick label is the binding
+  constraint either way. Overflow is measured, not inferred from the count, since whether a plot fits
+  depends on the grid breakpoint its card is in — so the tab stop and the off-screen note appear only
+  when something is genuinely out of view. Accepted cost recorded: Carbon positions its tooltip
+  against the full plot width, so a hover near the scroll window's right edge is clipped.
+- The rule is scoped to the axis the categories are actually on. A horizontal bar chart over an
+  open-ended set (orgs, models) is crowded **vertically**, so it is deliberately left alone and the
+  question of how far to grow such a card's height before the list becomes a table is now an open one.
+- Craft detail in `product/chart-dashboard-principles.md` §11.2 as an ordered preference — coarsen the
+  bucket first (it keeps the whole range in one view), then scroll, then move to a table — plus two
+  anti-patterns.
+- Implemented as `MIN_CATEGORY_WIDTH` + the `ScrollableChart` wrapper in `ally-web`
+  (`apps/ally-admin-dashboard/src/pages/Analytics/chartKit.tsx`, `.analytics-chart-scroll` in
+  `analytics-carbon.scss`), wired into every time-bucketed and open-ended-categorical plot across the
+  Highlights, Scribe, Latency, Language-quality and AI-cost tabs and their expanded views.
+
+## [2026-07-29] update | Count-distribution rules into Data Visualisation.
+- From adding the **roleplay-volume** chart to super-admin Analytics -> Highlights: learners banded
+  by how many roleplays they have completed over their lifetime (0 / 1 / 2 / 3–5 / 6–10 / 11–25 /
+  26–50 / 51+). Two new principles in `product/data-visualisation.md`. **21** — a distribution over
+  people is plotted as **counts**, with the shares in the takeaway and the drill-down table: counts
+  compare honestly at both ends of a skewed axis and leak nothing, so the minimum-group-size floor
+  suppresses only the percentages instead of blanking the panel. **22** — band the quantity the way
+  it reads: a *discrete count* gets bands inclusive at both ends ("3–5" means 3, 4 or 5), a
+  *continuous* quantity keeps lower-inclusive/upper-exclusive and says so; band fine where the
+  decisions are (1 vs 2 is the activation question) and coarse where nothing changes; and band a
+  **lifetime** count over all time, because inside a 30-day window everyone lands in the lowest
+  bands whatever their real depth and the chart would report the length of the window.
+- Principle 17 (residual zero band, greyed as context) already covered the "never completed one"
+  bar and is reused rather than restated.
+- Implemented as `GET /v1/analytics/roleplay-volume` in `ally-be` (`analytics/`, all-time, `tenantId`
+  only) and `RoleplayVolumeCard` in `ally-web`'s admin Analytics -> Highlights tab.
+
+## [2026-07-29] update | Stat-tile definition rule into Data Visualisation.
+- From giving the super-admin Analytics -> Highlights **KPI strip** a one-line definition per tile.
+  A tile of label + number + arrow is not self-describing: "Active orgs 0 ↓ −1" needs the reader to
+  already know that *active* means a completed simulation and that the count is bounded by the
+  range picker. New principle 20 in `product/data-visualisation.md`: the definition goes **below**
+  the value (the number keeps the salience), renders in **every state** including loading and
+  thin-sample (it describes the metric, not the value), and is never a tooltip — a KPI strip is the
+  part of a dashboard most often screenshotted on its own. An unattributable tile (AI cost per sim)
+  carries the principle-14 unscoped label itself, not only on the chart it summarises.
+- Implemented as an optional `description` on `KpiTile` in `ally-web`
+  (`apps/ally-admin-dashboard/src/pages/Analytics/chartKit.tsx`), with the wording of each
+  definition taken from the derivation the corresponding chart already cites. Matching checklist
+  gate and an "undefined KPI strip" anti-pattern added.
+
+## [2026-07-29] update | Population-share rules into Data Visualisation.
+- From building the super-admin Analytics -> Highlights **usage-levels** panel (each month's
+  learners split by practice minutes — 0 / <10 / 10-25 / 25-50 / 50-100 / 100-500 / 500-1000 /
+  1000+ — as a 100%-stacked bar over 12 complete months). Three new principles in
+  `product/data-visualisation.md`: a **"did none of it" band is a residual, not a measured
+  category** (derive it from the chosen denominator, grey it out of the ordered ramp, clamp it at
+  zero), and **a 100%-stacked chart hides its own denominator** so the population has to travel
+  with it. The existing competing-definitions rule earned its second implementation: "percentage
+  of users" ships with an on-panel switcher between every registered learner and only those who
+  ever practised, both computed from one pass over one set of band counts.
+- The n = 5 per-person floor now names its third implementation, `MIN_USAGE_POPULATION`, which
+  re-exports the cohort constant instead of restating the number. Where the floor applies to a
+  denominator the client chooses, the API returns the floor rather than a per-row flag.
+- Two anti-patterns: a share chart whose denominator is a silent choice; the dormant band coloured
+  as the bottom of the usage ramp.
+
 ## [2026-07-29] update | Cohort-retention rules into Data Visualisation.
 - From building the super-admin Analytics -> Highlights **learner cohort retention** panel
   (monthly cohorts x months-since-signup, with a 10/50/100 practice-minutes "active user"
@@ -105,4 +184,3 @@ This is an append-only log of modifications, updates, and indexing runs performe
 - Documented the **backend-first deploy rule** and why the reverse order is silent data loss rather than an error; noted that older clients in the field stay compatible by design.
 - Sanitized for public hosting: no environment names, hosting providers, buckets, regions, hostnames, or credentials — the page describes the code contract and ordering rule only.
 - Linked from `index.md` under Platform, and cross-referenced from the ally-be / ally-web / ally-mobile repo pages.
-

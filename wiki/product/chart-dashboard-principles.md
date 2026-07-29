@@ -390,7 +390,30 @@ A useful practice: build the same information at multiple depths matched to how 
 
 Related rule: **show something simple, leave behind something detailed.** The at-a-glance version and the explorable version are different artefacts serving different needs, and a dashboard can carry both.
 
-### 11.2 What interactivity does not fix `[EXTRAPOLATION]`
+### 11.2 When the categories outnumber the pixels `[EXTRAPOLATION]`
+A charting library handed more categories than its container is wide does not overflow — it fits them
+in. That is the failure mode to watch for, because it is silent: the marks shrink toward hairlines and
+the tick labels rotate into a solid band, and the panel reads as broken rather than as full. Nothing
+about the data was wrong.
+
+Order of preference:
+
+1. **Coarsen the bucket.** Days → weeks → months answers the same question at the resolution the card
+   can actually draw, and is the only option that keeps the whole range in one view. Put the control
+   on the panel (§11) rather than choosing for the reader.
+2. **Give the plot the width it needs and scroll the container.** Set a floor of horizontal room per
+   category, let the plot exceed the card, and scroll sideways. Pay for it honestly: the axis and
+   legend usually live in the same drawing as the plot and leave view with it, and part of the range
+   starts off-screen — say so beside the plot, and make the scroll region keyboard-reachable.
+3. **Move to a table.** Past the point where even a scrolled plot is a chore to read, the reader wants
+   values, not shape (§7.3).
+
+What not to do: thin the tick labels and leave the marks compressed. That fixes the symptom you can
+name and leaves the one you cannot — bars too thin to compare with each other. And check which axis is
+crowded: a long horizontal bar chart is crowded vertically, so a sideways scroll neither relieves it
+nor is honest about what is missing.
+
+### 11.3 What interactivity does not fix `[EXTRAPOLATION]`
 Interaction cannot rescue a default view whose salient element is the wrong one, cannot repair a misleading axis, and cannot substitute for knowing the idea. Every state reachable through interaction is itself a chart and is subject to every rule above — including states produced by filtering down to very few data points, and states at the smallest breakpoint. Audit the default view and the extremes.
 
 ---
@@ -555,6 +578,9 @@ Reject on sight:
 - Legend listing ordered categories out of order.
 - Colour coupling that encodes nothing.
 - A chart that requires narration to be understood.
+- Categories compressed until the marks are hairlines and the labels are a smear, rather than the plot
+  being widened, the bucket coarsened, or the data moved to a table.
+- A plot cut off at its container's edge with nothing saying the range continues.
 - The same dimension encoded differently in two tiles of one dashboard.
 
 ---

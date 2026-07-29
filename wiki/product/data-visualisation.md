@@ -389,6 +389,44 @@ its own review. **PDF and print** are covered by the greyscale answer.
 
 Implemented as `chartScales.ts` in the same directory.
 
+### A candidate panel is staged on its own tab, not trialled on the leadership surface
+
+Analytics → **Testing** (super-admin, reserved to the elevated tier) is where a panel proves it
+changes a decision before it appears anywhere a reader relies on. The rule it settles: **you do not
+find out whether a chart is worth having by putting it in front of the people who act on the
+dashboard.** Principle 9 says every panel must name the decision it changes or be cut — and the only
+honest way to test that claim is against real production data, which a mock cannot supply and a
+staging seed cannot either.
+
+What staging does and does not license:
+
+- **Nothing on the production surface is altered to make room.** Highlights keeps every panel and
+  every KPI tile it had. Where a candidate measures the same thing differently — a median with its
+  interquartile range against a mean line, a rating-band mix against a mean rating — the two are
+  deliberately readable side by side, because that comparison on live data is the argument for
+  retiring the original.
+- **Staged is not exempt.** A candidate honours every rule on this page from the first commit: null
+  over a zero denominator, sample floors travelling with the data, residuals in context grey, the
+  accruing period off the plot, the same all-time window and per-chart grain as Highlights. A panel
+  that graduates should need no rework, and a panel that is allowed to cut corners while "only in
+  testing" is a panel whose numbers nobody can judge.
+- **Endpoints are named for what they measure, never for the tab.** `/v1/analytics/skill-growth`,
+  not `/v1/analytics/testing/*` — the first chart to graduate would otherwise drag a rename across
+  two repos.
+- **The tab is a queue, not a home.** Panels leave it in one of two directions. A candidate nobody
+  has moved or cut is a decision that has not been made.
+
+Implemented as `tabs/TestingTab.tsx` + `testingChart.ts` + `OrgHealthCard.tsx` in
+[ally-web](../repos/ally-web.md) (gated by `isSuperDuperAdminRole` in the tab registry, so the tab is
+absent rather than present-and-refusing), against ten read-only endpoints in
+[ally-be](../repos/ally-be.md)'s `analytics/` module.
+
+**Under review at time of writing:** weekly practising learners as a north-star candidate, the
+signup→first-session activation funnel, time to first practice, score by Nth completed session,
+quality and satisfaction as distributions, competency volume against proficiency, track drop-off by
+item format, the coaching loop, language mix, Scribe adoption breadth, and a per-org health table.
+Which of these earn a place on Highlights — and what they replace — is open.
+
 ### Metric parity across surfaces
 
 Not yet reconciled — but scoped rather than open. The headline learner metrics (practice minutes,

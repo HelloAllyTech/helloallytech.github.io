@@ -68,6 +68,20 @@ carries is a product bug, not a styling choice.
     return the unscoped figure *and* label it. Silently showing a platform-wide number under a
     tenant filter is worse than not offering the filter: the reader cannot see that it did not
     apply.
+15. **A definitional point is not a measurement, and must be declared where the screenshot
+    carries it.** A cohort is 100% of itself at month 0; a funnel's first stage is 100% by
+    construction. Anchors like these are legitimate — they give the reader a baseline — but the
+    moment one is plotted next to measured points it starts reading as one. Say so in the caption,
+    not in a tooltip.
+16. **An in-progress period is provisional, and belongs in a table before it belongs on a line.**
+    The current month/week is still accruing; its figure can only rise. In a grid, show it and
+    flag it. On a line chart, leave it off — there is no way to draw "not finished yet", so an
+    unfinished period renders as a fall the reader will explain to themselves.
+17. **When a metric has several defensible definitions, let the reader switch between them —
+    and compute them all in one pass.** "Active user" is a choice, not a fact. Offer the
+    definitions in a control on the panel, return every variant from a single query against a
+    single denominator, and switch client-side. Definitions fetched separately drift apart; a
+    definition buried in a spec gets argued about in the meeting instead of on the screen.
 
 ## Checklist
 
@@ -86,6 +100,12 @@ Ally-specific gates. For chart craft, also run the fuller per-chart checklist in
 - [ ] Export includes filters, range and n.
 - [ ] Unmeasured periods render as gaps, not zeros; any carried-forward value is marked.
 - [ ] Any panel that could not honour an active filter is labelled as unscoped.
+- [ ] Any definitional 100% (cohort month 0, funnel stage 1) is labelled as a definition.
+- [ ] The in-progress period is flagged in tables and omitted from lines.
+- [ ] Where the metric has competing definitions, the switcher is on the panel and every
+      definition shares one denominator.
+- [ ] Per-person breakdowns (cohort rows, per-org rows) respect the minimum group size: size
+      shown, rate suppressed below it.
 
 ## Anti-patterns
 
@@ -104,6 +124,9 @@ Ally-specific gates. For chart craft, also run the fuller per-chart checklist in
   changes.
 - **A part and a whole stacked in the same bar**, making the bar's height mean different things
   in different periods.
+- **A cohort triangle whose future is drawn as 0%** — the empty upper-right corner is "not yet",
+  and filling it flatters nothing so much as it misleads.
+- **A retention percentage over a cohort of three**, which is both noise and a name.
 - **Two series of different magnitude on one axis**, which flattens whichever one the chart is
   named after.
 
@@ -146,6 +169,22 @@ Counts, sums and volumes have no minimum — they are not estimates of anything.
 
 Implemented as `MIN_N_FOR_SCORE` in [ally-web](../repos/ally-web.md),
 `apps/ally-admin-dashboard/src/pages/Analytics/chartKit.tsx`.
+
+### Minimum group size for a per-person breakdown: **n = 5**
+
+Distinct from the n = 20 above, which governs whether a *derived score* is trustworthy. This one
+governs whether a **rate over identifiable people** may be shown at all. A row that says "50% of
+the 2 learners who joined in March" names an individual to anyone who knows the org — and under a
+tenant filter, most rows are small.
+
+The rule: below 5, show the group's **size** and suppress its **percentages**. A count is not an
+estimate of anything and leaks nothing on its own; the reader can see the row exists and see why
+it has no number. Do not drop the row — dropping it understates the total and hides the tail.
+
+Deliberately the same number in every per-person breakdown so there is one floor to remember.
+Implemented as `MIN_ORG_GROUP_SIZE` (per-org rows) and `MIN_COHORT_SIZE` (cohort rows) in
+[ally-be](../repos/ally-be.md)'s `analytics/` repositories; the API returns a `belowFloor` flag
+rather than making each client re-derive it.
 
 ### The approved palette
 

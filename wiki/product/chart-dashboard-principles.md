@@ -277,6 +277,7 @@ Use grey for:
 - **Maximum-contrast pairs** (e.g. black and blue) do not necessarily make either one pop.
 - **Meaningless colour coupling is actively harmful.** The visual system will subconsciously build cohesion among same-coloured items and suppress everything else. If the colour grouping is arbitrary, you have manufactured a false relationship the viewer cannot see themselves doing.
 - **Every series in a bright colour** means no series stands out.
+- **A ramp that runs to full saturation under printed values.** If cells carry their numbers (a heatmap, a cohort grid), a ramp reaching opaque forces a light/dark text switch somewhere in the middle — and there is a band around the switch where *neither* text colour clears 4.5:1. Stop the ramp short (roughly 0.55 alpha over a light tile) so one text colour stays legible across the whole scale. The number is the value; the colour only supports it.
 
 ---
 

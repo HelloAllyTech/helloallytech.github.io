@@ -74,6 +74,7 @@ Feature modules live under `src/<domain>/` (controllers, services, DTOs, and `en
 - `aws/`, `queue/`, `message-broker/`, `redis/` — AWS wrappers, SQS setup, Redis pub/sub, Redis client.
 - `audit/` — HIPAA-compliant CloudWatch audit logging.
 - `analytics/` — Metabase integration and tenant-specific dashboards.
+- `analytics-agent/` — the **Analytics Agent**: natural-language analytics questions turned into read-only SQL. Owns the trust boundary (table allowlist, denied columns, single-SELECT guard, `READ ONLY` transaction with a statement timeout and row cap) and calls ally-ai to plan the query and narrate the result. Gated on the elevated super-duper-admin tier. See [Analytics Agent](../platform/analytics-agent.md).
 - `badge/`, `community/` — gamification and leaderboards.
 - `language/`, `dynamic-i18n/` — translation service and internationalization.
 - `scheduler/`, `health/`, `rate-limit/`, `notification/`, `database/` — background jobs, health checks, throttling, SES notifications, TypeORM data source/migrations/seeds.

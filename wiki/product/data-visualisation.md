@@ -164,6 +164,27 @@ carries is a product bug, not a styling choice.
     are actually on — a horizontal bar chart with forty orgs is crowded **vertically**, and a
     sideways scroll neither helps it nor is honest about what is missing.
 
+27. **A machine-proposed chart is a hypothesis, and the data gets the last word.** When the chart
+    form is chosen at run time — by an LLM narrating a result set it saw as text, or by any
+    heuristic over shapes — it is proposing from the *question*, not from the values. Validate
+    before rendering, in code: does every named column exist in the result, are there enough rows
+    to be a plot rather than two points and a line, is this the whole result or the first page of
+    it? Each of those fails **silently** if unchecked — a chart naming a missing column draws
+    empty axes (which reads as a broken panel, not as absent data), and a plot of the first N rows
+    of a larger result reads as the whole population. And treat **"no chart" as a first-class
+    answer** rather than a fallback: a single number and a five-row table are better read as text,
+    so a surface that must always draw something will draw something decorative. Where the plot
+    ends up narrower than the table beside it, say how many rows are missing from it, under the
+    chart.
+28. **A number produced by a generated query has to show the query.** Where the derivation itself is
+    written per-question rather than reviewed once and shipped, provenance (principle 11) is not
+    enough — the model and prompt version do not tell a reader *what was counted*. Show the query,
+    plus a one-line plain-English statement of what it counts and which filters it applied, and
+    show it for the query that was **refused or failed** too, since that is the only way anyone can
+    tell a bad question from a bad answer. Never rewrite a query to make it pass a rule and then
+    display the rewritten one: the query on screen must be the query that produced the number, or
+    showing it is theatre.
+
 ## Checklist
 
 Ally-specific gates. For chart craft, also run the fuller per-chart checklist in
@@ -203,6 +224,10 @@ Ally-specific gates. For chart craft, also run the fuller per-chart checklist in
       line and in the export.
 - [ ] Where the grain changes the definition (new vs returning), the caption says so.
 - [ ] An all-time surface shows no deltas, and says where the range picker went.
+- [ ] A run-time-chosen chart is validated against the actual result (columns present, enough rows,
+      not a truncated sample) before it renders, and "no chart" is an allowed outcome.
+- [ ] Where a number came from a generated query, the query is on the surface — including when it
+      was refused or failed — with a plain-English statement of what it counts.
 
 ## Anti-patterns
 
@@ -443,3 +468,9 @@ a rule.
 - A horizontal bar chart over an open-ended category set (orgs, models) crowds **vertically**, and
   the scroll answer below does not apply to it. Growing the card's height with the category count is
   the obvious fix and nobody has decided how far it may grow before the list belongs in a table.
+- **A chart drawn because a chart was expected** — axes rendered over a column that is not in the
+  result, or over the first page of a larger one, because the surface had a chart slot to fill.
+- **A generated number with a hidden derivation** — an answer written per-question whose query is
+  not shown, so a reader who doubts it has nowhere to look and no way to tell a misread question
+  from a wrong query.
+

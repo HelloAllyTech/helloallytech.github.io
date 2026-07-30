@@ -189,3 +189,10 @@ This is an append-only log of modifications, updates, and indexing runs performe
 - Documented the **backend-first deploy rule** and why the reverse order is silent data loss rather than an error; noted that older clients in the field stay compatible by design.
 - Sanitized for public hosting: no environment names, hosting providers, buckets, regions, hostnames, or credentials — the page describes the code contract and ordering rule only.
 - Linked from `index.md` under Platform, and cross-referenced from the ally-be / ally-web / ally-mobile repo pages.
+
+## [2026-07-30] ingest | Analytics Agent (natural-language questions over platform data).
+- Added `platform/analytics-agent.md`: the new super-duper-admin **Analytics Agent** sub-tab of the admin Analytics page — plan → guard → execute → narrate, why planning and narration are separate LLM calls, the planner's clarify/refuse intents, the three-layer trust boundary (table allowlist, denied columns, READ ONLY + statement_timeout + row cap), why the schema catalogue is introspected rather than hand-written, chart validation and the missing-measurement rules, browser-held conversation state, cost labels, and the explicit non-goals.
+- Recorded the product judgement calls this feature forced against the wiki's existing rules: charts dropped when the rows cannot honestly carry them, nulls rendered as gaps rather than zeros, truncated results labelled as lower bounds, provenance on every answer, and the four non-answers as four distinct screens.
+- Sanitized for public hosting: describes the pipeline, policy and reasoning only — no table/column inventories, model ids, environment names, hostnames, or credentials. The allowlist and denied-column policy live in the ally-be code.
+- Linked from `index.md` under Platform, and cross-referenced from the ally-be / ally-ai / ally-web repo pages.
+

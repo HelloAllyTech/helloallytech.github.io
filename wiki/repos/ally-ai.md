@@ -38,6 +38,7 @@ The app is a FastAPI application (`app/main.py`) whose lifespan initializes the 
 - `/drift` — response-drift scoring
 - `/language-quality` — language quality scoring
 - `/round-trip-wer` — round-trip word error rate for transcription quality
+- `/analytics-agent` — two stateless transforms behind the admin Analytics Agent tab: `/plan` (question + schema catalogue → one read-only SELECT, or a clarifying question) and `/answer` (result rows → prose, caveats and a chart specification). No database access; ally-be runs the query. See [Analytics Agent](../platform/analytics-agent.md).
 
 **Core business logic** (`app/core/`):
 
@@ -48,6 +49,7 @@ The app is a FastAPI application (`app/main.py`) whose lifespan initializes the 
 - `vector_db/` — Weaviate client (`weaviate_client.py`) and collection helpers
 - `reference_documents/` — reference document retrieval (distance-threshold based)
 - `drift/`, `language_quality/`, `round_trip/` — LLM-judge modules (each with `judge.py`, `prompt.py`, `schemas.py`; `round_trip` also has `wer.py`)
+- `analytics_agent/` — the analytics agent's planner and narrator (`agent.py`, `prompt.py`, `schemas.py`). The schema catalogue arrives on the request from ally-be rather than being defined here, so the tables the model is shown and the tables the guard permits cannot drift apart.
 - `text_generations/` — OpenAI text-generation client/service and structured-output models
 - `storage/` — `s3_service.py` for S3 access
 - `queue/` — SQS clients, message models, processors, and the transcription request worker (see Integration Points)

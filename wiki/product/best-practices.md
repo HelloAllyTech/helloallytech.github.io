@@ -33,6 +33,7 @@ appear here **and** under **Product Management** in [`wiki/index.md`](../index.m
 | [Data Visualisation](data-visualisation.md) | Charts, dashboards, metrics displays, and the honesty rules for showing numbers | Adopted |
 | [Prioritisation](prioritisation.md) | Deciding what gets built, in what order, and what gets explicitly dropped | Draft |
 | [User Personas](user-personas.md) | Who we build for — counsellor, learner, trainer/admin, super-admin — and what each one actually needs | Draft |
+| [AI-Product Patterns](ai-product-patterns.md) | Features where a model proposes and a person decides — disclosure, provenance, human-in-the-loop, recording the "no" | Draft |
 
 **Maturity** is one of `Draft` (written, not yet battle-tested), `Adopted` (the team follows
 it), or `Deprecated` (kept for history; says what replaced it). Not-yet-written topics are
@@ -133,7 +134,6 @@ these speculatively produces filler.
 - Experimentation & A/B testing (what is even testable at our traffic)
 - Feedback loops: support tickets, session reviews, trainer interviews
 - Release comms & change management for existing tenants
-- AI-product patterns: disclosure, confidence, correction and human-in-the-loop
 - Sunsetting and deprecating features
 
 ---

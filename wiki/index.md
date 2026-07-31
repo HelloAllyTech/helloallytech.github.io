@@ -24,6 +24,7 @@ Welcome to the **Ally Developer Wiki** catalog. This catalog is parsed by the LL
 - [Chart & Dashboard Design Principles](product/chart-dashboard-principles.md) — Deep reference under Data Visualisation: perception rules, chart anatomy, chart-type lookup, acceptance checklist, anti-patterns
 - [Prioritisation](product/prioritisation.md) — Choosing what to build, slicing it, and writing down the non-goals
 - [User Personas](product/user-personas.md) — Counsellor, learner, trainer, tenant admin, super-admin
+- [AI-Product Patterns](product/ai-product-patterns.md) — Model proposes, person decides: provenance, human-in-the-loop review, validated classification, recording the "no"
 
 ## Repositories
 - [ally-be](repos/ally-be.md) — Core backend (NestJS)

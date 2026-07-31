@@ -21,6 +21,8 @@ The applications integrate with the `ally-be` backend (REST + Socket.IO) and wit
 > This page documents *how the frontend is built*. For *how it should behave* — required screen states, permission-aware UI, chart honesty rules, and the personas each dashboard serves — see [Product Management Best Practices](../product/best-practices.md), particularly [UI & Interaction](../product/ui.md) and [Data Visualisation](../product/data-visualisation.md) (**Adopted** — its checklist is a gate, not guidance).
 >
 > The super-admin Analytics surface is where those chart rules are implemented rather than just stated. `apps/ally-admin-dashboard/src/pages/Analytics/` holds the shared kit every chart routes through: `chartKit.tsx` (the `ChartCard` wrapper that requires a provenance line and handles the loading / error / empty / thin-data states, the axis factories, and `MIN_N_FOR_SCORE`) and `chartScales.ts` (the approved palette, keyed on meaning). Adding a chart means using those factories — `colorScale` is a required argument specifically so a chart cannot fall back to a palette whose colours mean nothing.
+>
+> Two tabs on that page show model output rather than measurements — Analytics Agent and Suggestions (`pages/Analytics/tabs/suggestions/`) — and those follow [AI-Product Patterns](../product/ai-product-patterns.md): provenance pinned per card, a human review step before anything is filed onto the roadmap, a bounded progress narrative instead of an open-ended spinner, and rejections recorded with a reason so the generator does not re-propose them.
 
 ## Tech Stack
 

@@ -73,6 +73,8 @@ Dashboard for mental health counselors. Features: real-time chat, LiveKit voice 
 ### ally-admin-dashboard — Admin Dashboard (Vite+React, port 8081)
 Administrative console for super admins built on RTK Query. Features: Simulation Studio (create/edit/publish voice simulation scenarios, cover-image upload to S3, event mapping, voice config, LiveKit live preview), session-event management, user/tenant management, permission-based access control (`PrivateLayout` guards routes), and simulation-credit monitoring. Uses OTP-based login with automatic token refresh (`baseApi.ts`). Reads `VITE_API_BASE_URL` and `VITE_LIVEKIT_URL`. Permissions are enumerated in `src/constants/permissions.ts` (e.g. `edit:scenario`, `edit:user`, `edit:livekit`, `edit:session-events`, `view:admin:scenario`).
 
+The **Analytics** page carries a tab registry (`src/pages/Analytics/`); its **Analytics Agent** tab is a chat surface for asking analytics questions in English, and is the one tab with a gate of its own — hidden for a plain super-admin, matching the backend's elevated-tier check. See [Analytics Agent](../platform/analytics-agent.md).
+
 ## Integration Points
 
 - **REST → ally-be**: All apps call the `ally-be` backend over REST (`axios` in the landing app; RTK Query in the dashboards). The admin dashboard documents concrete endpoints, including:

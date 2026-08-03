@@ -86,6 +86,17 @@ Feature modules live under `src/<domain>/` (controllers, services, DTOs, and `en
 
 **Auth model** — the REST API is versioned (`/api/v1/...`). Supported methods: JWT (access/refresh flow), email OTP (v2), Google OAuth, Magic Link, and `X-API-Key` for service-to-service calls. Multi-tenancy is enforced at the entity level, with fine-grained RBAC via groups and permission guards. See `DATA_SCHEMA.md` for the full store map (105 TypeORM tables plus Weaviate, Redis, SQS, S3, LiveKit).
 
+**Roles** — there is no `role` column on `users`. A role *is* a row in `groups` whose `name` is a `UserRole` value, joined through `user_groups`; permissions are unioned across every role a user holds. The ten roles are `CLIENT`, `COUNSELOR`, `LEARNER`, `SIMULATION_REVIEWER`, `SCRIBE_REVIEWER`, `ADMIN`, `MULTI_TENANT_ADMIN`, `SUPER_ADMIN`, `SUPER_DUPER_ADMIN`, and `INTERNAL`.
+
+The last three are platform-level and are listed together in `SUPER_ADMIN_ROLES` (`src/common/constants/user.constants.ts`), which every name-based super-admin gate compares against — role guards, the tenant-skip on user creation, exclusion from tenant user lists. `SUPER_DUPER_ADMIN` is the elevated tier, adding the super-admin management surface and roadmap editing. `INTERNAL` is Ally staff: a permission-for-permission clone of `SUPER_ADMIN`, added so staff can be given the console without being listed or managed as super admins, and reached at `/admin` on the consumer app rather than the standalone dashboard (see [ally-web](ally-web.md)).
+
+Two things routinely catch people out here:
+
+- **Group grants do not inherit.** The `...SUPER_ADMIN_PERMISSIONS` spreads in `permissions.constants.ts` are TypeScript only; the `group_permissions` rows are static once written. A new permission granted to `SUPER_ADMIN` must be granted to `SUPER_DUPER_ADMIN` and `INTERNAL` in the same migration.
+- **`GET /users/me` reports one `role`, chosen by a priority list** (`SUPER_DUPER_ADMIN` > `SUPER_ADMIN` > `ADMIN` > `COUNSELOR` > first row). That is lossy for anyone holding a platform role next to a tenant one — `INTERNAL` is deliberately absent from the list, because hoisting it would change what the consumer app sees for staff who are also org admins. The response therefore also carries a `roles` array; **gate on `roles`, not `role`.**
+
+Role and permission lookups are cached in Redis (`user:roles:<id>`, `user:groups:<id>`, `group:permissions:<groupId>`) with a 30-minute TTL. A raw SQL migration cannot bust that cache, so migrations that change grants should be followed by a flush of those key patterns.
+
 ## Integration Points
 
 - **ally-ai** — reached at `AI_SERVICE_API_URL`; outbound calls authenticate with `AI_SERVICE_OUTBOUND_API_KEY`. ally-ai owns the Weaviate vector DB (`Conversation`, `ReferenceDocument` collections). SQS and LiveKit bridge the two services.

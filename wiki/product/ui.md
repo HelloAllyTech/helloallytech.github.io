@@ -86,6 +86,11 @@ language with 40% longer labels.
 - **Toast-only errors** for failures the user must act on — they vanish before they're read.
 - **English-shaped layouts.** Fixed-width labels and truncation that make other languages
   unreadable.
+- **The shrink-to-fit dialog.** A modal or panel whose width is left to the content
+  (`w-auto`, `min-w-…` with no definite width) grows sideways as content is added — a
+  multi-select of roles or tags becomes one endless row, wrapping never engages, and the
+  dialog reflows every time the user picks something. Containers get a definite width;
+  content wraps and the container grows *down*.
 - **A new drawer for every feature** until nobody can find anything.
 
 ## Ally-specific notes

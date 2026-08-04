@@ -47,6 +47,18 @@ language with 40% longer labels.
 10. **Accessibility is table stakes**: keyboard reachable, visible focus, adequate contrast,
     real labels on inputs, touch targets large enough, and never colour as the only carrier of
     meaning (this last one also governs [Data Visualisation](data-visualisation.md)).
+11. **A row you hide is a row nobody can edit.** Filtering records out of a management list is
+    a legitimate default, but it removes every action attached to them — so pair the exclusion
+    with a way back in: an opt-in filter for the role that is allowed to see them, or a second
+    surface that owns those records outright. Otherwise the only route left is the API, and
+    the product has a hole nobody can see. (Ally case: platform-role accounts are excluded from
+    the admin Users list, which also made their roles unmanageable — so Ally staff could not be
+    given consumer-app access without a hand-rolled API call.)
+12. **When one editor can't manage the whole record, say what it won't touch.** If a form owns
+    a subset of a record's fields and another surface owns the rest, show the untouched values
+    as read-only in the form, name the surface that does own them, and re-send them on save.
+    A "replace the whole set" endpoint behind a partial editor silently deletes what the editor
+    never showed.
 
 ## Checklist
 
@@ -58,6 +70,8 @@ language with 40% longer labels.
 - [ ] Works at the narrowest supported width, and with a realistically large dataset.
 - [ ] Reuses shared components/tokens; no new hardcoded colours or spacing.
 - [ ] Nothing PHI-bearing rendered where the persona shouldn't see it.
+- [ ] Every record a list hides is still reachable and editable somewhere in the product.
+- [ ] Any partial editor of a record names what it doesn't own — and preserves it on save.
 
 ## Anti-patterns
 
@@ -67,6 +81,8 @@ language with 40% longer labels.
 - **Role-string gating.** `if (user.role === 'ADMIN')` collapses multi-role users and silently
   breaks the counsellor-who-is-also-a-learner case.
 - **Silent permission failures.** Rendering a button that returns 403 on click.
+- **The invisible record.** An exclusion filter that quietly becomes the reason a whole class of
+  account can never be edited again — the list is the only door, and it was locked.
 - **Toast-only errors** for failures the user must act on — they vanish before they're read.
 - **English-shaped layouts.** Fixed-width labels and truncation that make other languages
   unreadable.

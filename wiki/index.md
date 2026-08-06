@@ -15,6 +15,7 @@ Welcome to the **Ally Developer Wiki** catalog. This catalog is parsed by the LL
 - [AI Lab — Prompt Workbench & Human Evaluation](platform/ai-lab.md) — Author prompt skills, run them against LLMs, and collect structured human evaluations
 - [Scribe Summary Writes — Merge Semantics & Client Rules](platform/scribe-summary-writes.md) — Why scribe notes appeared not to save, the merge-based write contract, and the backend-first deploy rule
 - [Analytics Agent — Natural-Language Questions Over Platform Data](platform/analytics-agent.md) — Ask an analytics question in English: the plan → guard → execute → narrate pipeline and the three-layer trust boundary for generated SQL
+- [Login `allowedRoles` — Client-Supplied Filter & Role-Retirement Test Case](platform/login-allowed-roles.md) — Why auth calls carry a client-sent role list, how retiring a role locked every consumer user out of login, and the regression test that guards it
 
 ## Product Management
 - [Product Management Best Practices](product/best-practices.md) — **Hub.** House rules for every product decision + the index of subsections (read before building anything user-facing)

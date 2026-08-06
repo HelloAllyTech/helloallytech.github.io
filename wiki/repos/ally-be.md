@@ -97,6 +97,8 @@ Two things routinely catch people out here:
 - **Group grants do not inherit.** The `...SUPER_ADMIN_PERMISSIONS` spreads in `permissions.constants.ts` are TypeScript only; the `group_permissions` rows are static once written. A new permission granted to `SUPER_ADMIN` must be granted to `SUPER_DUPER_ADMIN` in the same migration.
 - **`GET /users/me` reports one `role`, chosen by a priority list** (`SUPER_DUPER_ADMIN` > `SUPER_ADMIN` > `ADMIN` > `COUNSELOR` > first row). That is lossy for anyone holding a platform role next to a tenant one — `MULTI_TENANT_ADMIN`, for instance, is absent from the list, so a user who also holds `ADMIN` reports `ADMIN` and gets bounced by the admin console's role gate. Adding a role to the priority list is rarely the fix, since the same field feeds the consumer app. The response therefore also carries a `roles` array; **gate on `roles`, not `role`.**
 
+Which roles may sign in on a given surface is decided by a client-supplied `allowedRoles` list on every auth call, intersected with the roles the account holds — see [Login `allowedRoles`](../platform/login-allowed-roles.md) for the contract, the outage that retiring a role caused, and the test case to run before removing one.
+
 Role and permission lookups are cached in Redis (`user:roles:<id>`, `user:groups:<id>`, `group:permissions:<groupId>`) with a 30-minute TTL. A raw SQL migration cannot bust that cache, so migrations that change grants should be followed by a flush of those key patterns.
 
 ## Integration Points

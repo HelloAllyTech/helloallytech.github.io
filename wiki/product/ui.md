@@ -59,6 +59,26 @@ language with 40% longer labels.
     as read-only in the form, name the surface that does own them, and re-send them on save.
     A "replace the whole set" endpoint behind a partial editor silently deletes what the editor
     never showed.
+13. **A link to another surface is gated on what that surface admits, not on what this one
+    knows.** When one app offers a way into another, the visibility rule must be a copy of the
+    *destination's* own entry condition, kept next to a comment saying so — otherwise the two
+    drift and you ship a link that dead-ends in the other app's "you can't sign in" screen.
+    Gate on the destination's admission list, hide the link when the destination URL isn't
+    configured for the environment, and make it look like it leaves: an anchor with the
+    external-link affordance, visually separated from in-app navigation. Note that the entry
+    condition is usually a *role* question, not a permission one — so this is the rare case
+    where principle 5's "gate on the permission set" does not apply. (Ally case: the consumer
+    app's "Ally Admin" link mirrors the admin console's login `allowedRoles` —
+    `SUPER_ADMIN`/`SUPER_DUPER_ADMIN`/`MULTI_TENANT_ADMIN` — and excludes tenant `ADMIN`, which
+    that login refuses. Holding a super admin's *permissions* is not the test; admission is by
+    role name.)
+14. **Derive role checks from the full role set, never the collapsed one.** `GET /users/me`
+    reports both `roles[]` and a single `role` chosen by a backend priority list. That list
+    can't express a multi-role account and omits some roles entirely, so the collapsed value
+    silently misreports exactly the people a cross-surface feature is for — an account holding
+    `[LEARNER, MULTI_TENANT_ADMIN]` arrives reporting `role: "LEARNER"`. Read `roles`, keep
+    `role` only as a fallback for payloads that predate it. This is the concrete form of the
+    "role-string gating" anti-pattern below.
 
 ## Checklist
 
@@ -72,6 +92,9 @@ language with 40% longer labels.
 - [ ] Nothing PHI-bearing rendered where the persona shouldn't see it.
 - [ ] Every record a list hides is still reachable and editable somewhere in the product.
 - [ ] Any partial editor of a record names what it doesn't own — and preserves it on save.
+- [ ] Any link into another surface is gated on that surface's own entry condition, hidden when
+      its URL is unconfigured, and verified with a multi-role account whose collapsed `role`
+      disagrees with its `roles[]`.
 
 ## Anti-patterns
 

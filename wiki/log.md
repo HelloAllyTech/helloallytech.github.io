@@ -8,6 +8,9 @@ summary: A chronological log tracking all wiki updates and modifications.
 
 This is an append-only log of modifications, updates, and indexing runs performed on the wiki. All logs use the parseable prefix format: `## [YYYY-MM-DD] action | description`.
 
+## [2026-08-06] update | UI & Interaction: cross-surface links and full-role-set gating.
+- Two principles (13, 14) plus a checklist item, from building the consumer app's "Ally Admin" link into the admin console. **13:** a link into another surface is gated on a copy of *that* surface's own entry condition (mirroring the admin console's login `allowedRoles`), hidden when the destination URL isn't configured for the environment, and shaped like it leaves — anchor, external affordance, separated from in-app nav. **14:** derive role checks from `roles[]`, never the collapsed `role`, which the backend picks by a priority list that omits some roles and so misreports exactly the multi-role accounts a cross-surface feature targets.
+
 ## [2026-07-31] add | New subsection: AI-Product Patterns.
 - New `product/ai-product-patterns.md`, taken off the backlog because the Analytics → Suggestions feature (a model reads a window of platform analytics and proposes roadmap items) forced every question on it. Twelve principles for features where **a model proposes and a person decides**: the reviewed value is what gets stored, provenance is pinned per artefact rather than per run, and a classification that is not in the live set stores `null` rather than a default.
 - Records the two rules that came out of building it. "Nothing to propose" is a first-class answer and lists are never padded to a target count — and an empty successful result must be distinguishable from a failed run, or a broken pipeline reads as a healthy product with no ideas. Also: inputs the model could not see are named on the surface, since a silently truncated payload produces a confident claim about data that was never sent.

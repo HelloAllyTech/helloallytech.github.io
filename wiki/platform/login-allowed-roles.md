@@ -2,6 +2,7 @@
 title: Login allowedRoles — Client-Supplied Filter, and the Role-Retirement Test Case
 tags: [platform, auth, roles, deployment, sdlc, testing]
 summary: Why every auth call carries a client-supplied allowedRoles list, how retiring a role from the backend enum once locked every consumer-app user out of login, and the regression test case that now guards it.
+last_reconciled: 2026-08-06
 ---
 
 # Login `allowedRoles` — Client-Supplied Filter, and the Role-Retirement Test Case

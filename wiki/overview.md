@@ -2,6 +2,7 @@
 title: Overview
 tags: [meta, structure]
 summary: Repository overview and active directories layout description.
+last_reconciled: 2026-07-28
 ---
 
 # Workspace Overview

@@ -16,6 +16,7 @@ Welcome to the **Ally Developer Wiki** catalog. This catalog is parsed by the LL
 - [Scribe Summary Writes — Merge Semantics & Client Rules](platform/scribe-summary-writes.md) — Why scribe notes appeared not to save, the merge-based write contract, and the backend-first deploy rule
 - [Analytics Agent — Natural-Language Questions Over Platform Data](platform/analytics-agent.md) — Ask an analytics question in English: the plan → guard → execute → narrate pipeline and the three-layer trust boundary for generated SQL
 - [Login `allowedRoles` — Client-Supplied Filter & Role-Retirement Test Case](platform/login-allowed-roles.md) — Why auth calls carry a client-sent role list, how retiring a role locked every consumer user out of login, and the regression test that guards it
+- [Platform Stats](platform/stats.md) — **Generated.** Current counts of entities, migrations, modules, providers — so prose never has to state a number
 
 ## Product Management
 - [Product Management Best Practices](product/best-practices.md) — **Hub.** House rules for every product decision + the index of subsections (read before building anything user-facing)
@@ -38,6 +39,11 @@ Welcome to the **Ally Developer Wiki** catalog. This catalog is parsed by the LL
 ## Contributing
 - [Developer Setup](contributing/dev-setup.md) — Clone repos and run the full local stack
 - [Contributing Guide](contributing/guide.md) — SDLC rules, code standards, PR process
+- [Release Process](contributing/release-process.md) — Shared production-release process: versioning, pipeline, troubleshooting
+- [Documentation System](contributing/docs-system.md) — How docs are routed, deduplicated, enforced in CI, and kept current
+
+## Generated Indexes
+- [Routing Index](ROUTING.md) — **Generated.** One line per page: what to read for a task, and how big it is. Copied into every code repo.
 
 ## Meta Context
 - [Overview](overview.md) — Directory overview and structure

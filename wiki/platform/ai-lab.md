@@ -2,6 +2,7 @@
 title: AI Lab — Prompt Workbench & Human Evaluation
 tags: [platform, ai-lab, prompts, evaluation, human-eval, admin]
 summary: The admin AI Lab — author prompt Skills with variables, execute Runs against Anthropic/OpenAI, and collect structured human evaluations of the outputs.
+last_reconciled: 2026-07-17
 ---
 
 # AI Lab — Prompt Workbench & Human Evaluation

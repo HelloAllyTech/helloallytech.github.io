@@ -2,6 +2,7 @@
 title: Data Visualisation
 tags: [product, best-practices, data-viz, charts, dashboards, analytics, metrics]
 summary: Rules for showing numbers honestly at Ally — pick the chart from the question, never hide sample size or uncertainty, and design the dashboard around a decision.
+last_reconciled: 2026-07-30
 ---
 
 # Data Visualisation

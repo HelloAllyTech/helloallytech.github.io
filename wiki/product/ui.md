@@ -2,6 +2,7 @@
 title: UI & Interaction
 tags: [product, best-practices, ui, ux, design, accessibility, i18n]
 summary: How Ally screens should behave — states before styling, hierarchy, permission-aware UI, latency as a design problem, accessibility and localisation.
+last_reconciled: 2026-08-06
 ---
 
 # UI & Interaction

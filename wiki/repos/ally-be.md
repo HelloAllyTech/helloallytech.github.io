@@ -2,6 +2,7 @@
 title: ally-be — Core Backend
 tags: [repo, backend, nestjs, api]
 summary: ally-be is the multi-tenant NestJS backend that owns Ally's primary PostgreSQL database and orchestrates auth, real-time voice sessions, the audio/transcription pipeline, AI-driven feedback, and analytics for the counselor-training platform.
+last_reconciled: 2026-08-06
 ---
 
 # ally-be — Core Backend

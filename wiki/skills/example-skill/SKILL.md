@@ -1,6 +1,7 @@
 ---
 name: example-skill
 description: An example custom agent skill template showing how to layout rules, references, loops, and scheduled tasks.
+last_reconciled: 2026-07-11
 ---
 
 # Example Agent Skill Template

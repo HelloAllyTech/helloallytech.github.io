@@ -2,6 +2,7 @@
 title: Developer Setup
 tags: [contributing, setup, onboarding, environment]
 summary: How to clone all Ally repositories and start the full local development environment.
+last_reconciled: 2026-07-11
 ---
 
 # Developer Setup

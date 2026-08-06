@@ -2,6 +2,7 @@
 title: Platform Overview
 tags: [platform, overview, ecosystem, mission]
 summary: What Ally is, its mission, and the multi-repo ecosystem that makes up the platform.
+last_reconciled: 2026-07-28
 ---
 
 # Ally Platform Overview

@@ -2,6 +2,7 @@
 title: Gamification
 tags: [product, best-practices, gamification, badges, leaderboards, motivation]
 summary: When and how to use badges, streaks, progress and leaderboards in a clinical-adjacent training product — and the cases where gamifying actively harms the outcome.
+last_reconciled: 2026-07-28
 ---
 
 # Gamification

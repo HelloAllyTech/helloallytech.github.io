@@ -2,6 +2,7 @@
 title: AI-Product Patterns
 tags: [product, best-practices, ai, llm, human-in-the-loop, disclosure, provenance]
 summary: How Ally builds features where a model proposes and a person decides — disclosure, provenance, human-in-the-loop review, recording the "no", and never letting an unvalidated model answer become stored data.
+last_reconciled: 2026-07-31
 ---
 
 # AI-Product Patterns

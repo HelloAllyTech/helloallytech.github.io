@@ -2,6 +2,7 @@
 title: Getting Started
 tags: [guide, help, setup]
 summary: A guide outlining how humans and agents operate this knowledge base.
+last_reconciled: 2026-07-28
 ---
 
 # Getting Started

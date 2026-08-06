@@ -2,6 +2,7 @@
 title: ally-mobile — Mobile App
 tags: [repo, mobile, react-native, ios, android]
 summary: React Native iOS/Android app for mental-health counsellors, covering live sessions with transcription, peer reviews, voice-based AI simulations, and Scribe voice-dictation notes.
+last_reconciled: 2026-07-28
 ---
 
 # ally-mobile — Mobile App

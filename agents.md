@@ -36,7 +36,14 @@ When the user asks you to interact with this wiki, you must follow the guideline
 3. **File Back (Compounding)**: If the answer is complex, involves synthesis across multiple files, or presents a useful comparison table, **file it back into the wiki** as a new markdown page (e.g. under a `/wiki/comparisons/` or `/wiki/synthesis/` subdirectory). Link it to `/wiki/index.md` and log the creation.
 
 ### 3. Lint Flow (Consistency & Health Check)
-Periodically (or when asked), run a lint pass to keep the wiki healthy. Identify and address:
+
+**Most of this is now automated.** `scripts/wiki_lint.py` runs weekly via
+`.github/workflows/wiki-health.yml` and keeps a rolling issue up to date. Run it yourself
+any time with `python3 scripts/wiki_lint.py`. It checks frontmatter completeness,
+`last_reconciled` staleness, orphan pages, broken relative links, counts hard-coded in
+prose, and whether the generated indexes are current.
+
+What the script cannot judge, and you still should:
 1. **Contradictions**: Discrepancies between older summaries and newer claims. Flag these to the user or reconcile them.
 2. **Stale Claims**: Superseded facts that are no longer accurate based on newer documents.
 3. **Orphan Pages**: Pages in `/wiki/` that have no inbound links from the rest of the wiki (or are missing from `wiki/index.md`).

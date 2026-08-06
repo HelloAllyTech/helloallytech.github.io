@@ -1,7 +1,8 @@
 ---
 title: Memory
 tags: [meta, memory, learnings]
-summary: A compiled record of long-term agent memories and persistent takeaways.
+summary: Hard-won gotchas — read before touching auth, roles, permissions, migrations, or shared frontend modules. Each entry is a bug that already cost us.
+last_reconciled: 2026-08-06
 ---
 
 # Agent Memory

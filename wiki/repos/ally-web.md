@@ -77,23 +77,6 @@ Administrative console for super admins built on RTK Query. Features: Simulation
 
 The **Analytics** page carries a tab registry (`src/pages/Analytics/`); its **Analytics Agent** tab is a chat surface for asking analytics questions in English, and is the one tab with a gate of its own — hidden for a plain super-admin, matching the backend's elevated-tier check. See [Analytics Agent](../platform/analytics-agent.md).
 
-#### Two surfaces, one build
-
-This app ships to two mount points from one codebase:
-
-| Surface | Mount point | Who signs in |
-| --- | --- | --- |
-| **standalone** | `/` on the admin dashboard's own origin | `SUPER_ADMIN`, `SUPER_DUPER_ADMIN`, `MULTI_TENANT_ADMIN` |
-| **embedded** | `/admin` on the consumer app's origin | the three above **plus** `INTERNAL` |
-
-`INTERNAL` is Ally staff — the backend grants it a permission-for-permission clone of `SUPER_ADMIN` (see [ally-be](ally-be.md)), so the console behaves identically. What the role buys is *where* it is reached: staff open it from the consumer app they already use, and never appear in (or are managed by) the super-admin management screens.
-
-One knob decides the surface — the Vite `base` option, set from `VITE_ADMIN_BASE_PATH` (`npm run build:admin:embedded`). Vite echoes it back as `import.meta.env.BASE_URL`, which `src/constants/surface.ts` turns into the router basename, the prefix for URLs built outside the router, and the answer to "is this the embedded surface?". Mount point and the app's idea of the mount point therefore cannot drift.
-
-Because both apps then share an origin (and so a `localStorage`, under distinct token keys), the embedded console adopts an existing consumer session on startup rather than asking for a second login. Any signed-in consumer user has a session to adopt, so `PrivateLayout` also carries a whole-console gate that turns away roles the surface does not serve.
-
-Serving the embedded bundle needs a path route on the consumer distribution, which lives outside the repo. The repo's `docs/embedded-admin-console.md` sets out what that routing must do, and notes the one caveat worth knowing: `allowedRoles` is sent by the client, so "INTERNAL only signs in via `/admin`" is a routing convention rather than a server-side boundary. It is not a privilege question — the two roles carry identical permissions either way.
-
 ## Integration Points
 
 - **REST → ally-be**: All apps call the `ally-be` backend over REST (`axios` in the landing app; RTK Query in the dashboards). The admin dashboard documents concrete endpoints, including:
@@ -183,7 +166,6 @@ Git hooks (Husky + lint-staged) auto-run ESLint and Prettier on staged files, pl
 - `apps/ally-admin-dashboard/README.md` — Admin dashboard features, full API endpoint list, permissions, path aliases.
 - `libs/ui-shared/README.md` — Shared UI library (Nx-generated).
 - `libs/ui-shared/src/lib/*/*.md` — Component guides: `INFINITE_SCROLL.md`, `GENERIC_TABLE.md`, `RESOURCE_SEARCH.md`.
-- `docs/embedded-admin-console.md` — The admin console at `/admin` on the consumer app: building each surface, the routing the deployment must provide, and session sharing.
 - `docs/colima.md` — Colima (Docker Desktop alternative) setup.
 - `docs/prompts-meta.md` — Prompt display names via `.meta.json`.
 - `docs/posthog-implementation-guide.md`, `docs/new-posthog-event-adding-guide.md`, `docs/current-posthog-events-traking-list.md` — PostHog analytics implementation and event tracking.

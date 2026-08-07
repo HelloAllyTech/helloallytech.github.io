@@ -45,7 +45,7 @@ jobs:
           app-id: ${{ secrets.DOCS_BOT_APP_ID }}
           private-key: ${{ secrets.DOCS_BOT_PRIVATE_KEY }}
           owner: HelloAllyTech
-          repositories: ally-be,ally-ai,ally-ai-learn,ally-web
+          repositories: helloallytech.github.io,ally-be,ally-ai,ally-ai-learn,ally-web
       - uses: actions/checkout@v4
         if: github.event_name != 'pull_request'
         continue-on-error: true
@@ -94,10 +94,13 @@ jobs:
       # On a PR the report is advisory — it appears in the job summary and stops there.
       # Blocking a docs PR on pre-existing drift elsewhere in the wiki would just teach
       # people to ignore the check.
+      # The App token, not GITHUB_TOKEN: org policy forbids GitHub Actions from creating
+      # pull requests, and we would rather keep that restriction than widen it org-wide.
+      # The issue step below stays on GITHUB_TOKEN — the App has no Issues permission.
       - name: Open a PR if generated pages drifted
         if: github.event_name != 'pull_request'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
           set -euo pipefail
           python3 scripts/gen-routing.py
@@ -111,7 +114,10 @@ jobs:
           git checkout -b "$BRANCH"
           git add wiki/ROUTING.md wiki/manifest.json wiki/platform/stats.md
           git commit -m "chore: regenerate wiki routing index and platform stats"
-          git push -u origin "$BRANCH"
+          # The branch name is date-stamped, so a second run on the same day would other-
+          # wise be rejected as non-fast-forward. The content is generated; force is safe.
+          git push -u origin "$BRANCH" --force
+          gh pr view "$BRANCH" >/dev/null 2>&1 && { echo "PR already open for $BRANCH."; exit 0; }
           gh pr create \
             --title "chore: regenerate wiki indexes and platform stats" \
             --body "The generated pages had fallen behind the code and page frontmatter.

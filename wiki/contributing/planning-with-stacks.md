@@ -55,19 +55,30 @@ Cite only chunks you actually applied. If 2–3 queries return nothing relevant,
 — "Stacks searched (`x`, `y`, `z`) — nothing applicable" — and move on. A silent skip and a
 genuine miss look identical to a reviewer.
 
-## Stacks vs. the wiki's own practices
+## Stacks replaced the in-wiki product practices
 
-They are different things and both apply:
+Until 2026-08-07 this wiki carried its own **Product Management Best Practices** section — a hub
+plus seven pages of house rules, written from decisions this team had made. That section is
+**deprecated**; Stacks is now where product guidance comes from, and judgement calls made during
+a task go into the Stacks corpus rather than back into `wiki/product/`.
 
-- **[Product Management Best Practices](../product/best-practices.md)** is *our* house rules,
-  written from decisions this team has already made. It is binding, and it lives in this wiki.
-- **Stacks** is a broader corpus of general guidance. It is advisory — it informs the plan, it
-  does not overrule a practice we have already settled.
+The old pages are still readable and still linked. Treat them as **history, not rules**:
 
-Where Stacks contradicts a settled Ally practice, the wiki wins. Where Stacks surfaces something
-genuinely better than what the wiki says, that is a product judgement call: file it back into the
-matching subsection in the same change, per §3 of the hub. That is how the corpus improves our
-house rules instead of quietly competing with them.
+- Nothing in them is a gate any more — including the Data Visualisation checklist, which used to
+  be enforced as one.
+- Where they contradict current Stacks guidance, Stacks wins.
+- They are not deleted because several platform pages cite their principles by number
+  ([Analytics Agent](../platform/analytics-agent.md) references *Data Visualisation* 13 and
+  27–28 and *UI & Interaction* 4–5), and because they record why Ally works the way it does —
+  which is context a general corpus does not have.
+
+That last point is worth being deliberate about. The deprecated pages hold Ally-specific
+findings — Carbon's chart-overflow behaviour, the `roles[]`-vs-collapsed-`role` gating trap, the
+minimum-group-size rule for tenant-isolated metrics — that a general product-management corpus
+has no reason to contain. **If a query returns nothing and you suspect the answer is one of
+those, check the deprecated page before re-deriving it.** Anything you find there that is still
+true and still load-bearing belongs in Stacks; putting it back into the wiki is not the path any
+more.
 
 ## Configuration
 

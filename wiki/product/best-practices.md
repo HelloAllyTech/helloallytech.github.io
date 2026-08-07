@@ -1,44 +1,53 @@
 ---
 title: Product Management Best Practices
 tags: [product, best-practices, hub, ux, design, prioritisation, agents]
-summary: The hub for Ally's product-management conventions — the house rules that apply to every product decision, plus a growing set of subsections (UI, Gamification, Data Visualisation, Prioritisation, User Personas, …).
+summary: DEPRECATED 2026-08-07, superseded by the Stacks MCP — kept for history. The former hub for Ally's product-management conventions — the house rules that apply to every product decision, plus a growing set of subsections (UI, Gamification, Data Visualisation, Prioritisation, User Personas, …).
 ---
 
 # Product Management Best Practices
 
-This section is the **product-side counterpart to the engineering docs**. The rest of this
-wiki explains *how the system is built*; this section explains *how we decide what to build
+> [!WARNING]
+> **Deprecated — 2026-08-07. Superseded by the Stacks MCP.**
+>
+> Product guidance is no longer maintained in this wiki. It is retrieved from the external
+> **Stacks** corpus at planning time: *before writing an implementation plan, call the stacks
+> MCP's `search_chunks` tool with 2–3 queries covering the task's main topics, and incorporate
+> relevant returned guidance, citing chunk titles.* See
+> [Planning with the Stacks MCP](../contributing/planning-with-stacks.md).
+>
+> **Do not add new principles here** — new product judgement calls go into Stacks. Nothing on
+> these pages is a gate any more, including the [Data Visualisation](data-visualisation.md)
+> checklist, which was previously enforced as one.
+
+**These pages are kept as history, not deleted.** Platform pages cite them by principle number
+— [Analytics Agent](../platform/analytics-agent.md) alone references *Data Visualisation* 13 and
+27–28 and *UI & Interaction* 4–5 — so the numbering has to stay stable for those citations to
+resolve. Read them as a record of decisions this team made up to August 2026, and treat anything
+that contradicts current Stacks guidance as superseded.
+
+This section was the **product-side counterpart to the engineering docs**. The rest of this
+wiki explains *how the system is built*; this section explained *how we decided what to build
 and how it should behave for the people using it*.
-
-> [!IMPORTANT]
-> **Agents: read this before you write product-facing code.** If a task changes what a user
-> sees, does, earns, is shown as data, or is asked to prioritise — open the relevant
-> subsection below **before** designing the change, and say in your plan which practice you
-> applied. If the task is purely internal (refactor, migration, infra, test), skip it.
-
-Everything here is a **team convention**, not a law of nature. Conventions are meant to be
-argued with and edited — but changed deliberately, in this wiki, not silently in a PR.
 
 ---
 
 ## 1. Subsections
 
-The section grows over time. This table is the canonical list — every subsection page must
-appear here **and** under **Product Management** in [`wiki/index.md`](../index.md).
+All subsections are **Deprecated** as of 2026-08-07 — superseded by Stacks. The table is kept so
+the pages stay reachable and their inbound citations resolve.
 
 | Subsection | Covers | Maturity |
 |---|---|---|
-| [UI & Interaction](ui.md) | Screen and component decisions, states, hierarchy, accessibility, i18n, cross-surface consistency | Draft |
-| [Gamification](gamification.md) | Badges, streaks, leaderboards, progress — and when *not* to gamify | Draft |
-| [Data Visualisation](data-visualisation.md) | Charts, dashboards, metrics displays, and the honesty rules for showing numbers | Adopted |
-| [Prioritisation](prioritisation.md) | Deciding what gets built, in what order, and what gets explicitly dropped | Draft |
-| [User Personas](user-personas.md) | Who we build for — counsellor, learner, trainer/admin, super-admin — and what each one actually needs | Draft |
-| [AI-Product Patterns](ai-product-patterns.md) | Features where a model proposes and a person decides — disclosure, provenance, human-in-the-loop, recording the "no" | Draft |
+| [UI & Interaction](ui.md) | Screen and component decisions, states, hierarchy, accessibility, i18n, cross-surface consistency | Deprecated → Stacks |
+| [Gamification](gamification.md) | Badges, streaks, leaderboards, progress — and when *not* to gamify | Deprecated → Stacks |
+| [Data Visualisation](data-visualisation.md) | Charts, dashboards, metrics displays, and the honesty rules for showing numbers | Deprecated → Stacks |
+| [Prioritisation](prioritisation.md) | Deciding what gets built, in what order, and what gets explicitly dropped | Deprecated → Stacks |
+| [User Personas](user-personas.md) | Who we build for — counsellor, learner, trainer/admin, super-admin — and what each one actually needs | Deprecated → Stacks |
+| [AI-Product Patterns](ai-product-patterns.md) | Features where a model proposes and a person decides — disclosure, provenance, human-in-the-loop, recording the "no" | Deprecated → Stacks |
 
-**Maturity** is one of `Draft` (written, not yet battle-tested), `Adopted` (the team follows
-it), or `Deprecated` (kept for history; says what replaced it). Not-yet-written topics are
-tracked in the **Backlog of subsections** below — this is an expanding section, so an idea listed
-there is an invitation, not a gap.
+**Maturity** was one of `Draft` (written, not yet battle-tested), `Adopted` (the team follows
+it), or `Deprecated` (kept for history; says what replaced it). Every page in this section is now
+`Deprecated`; Data Visualisation was the one page that had reached `Adopted`.
 
 ### Reference pages
 
@@ -86,13 +95,19 @@ not contradict these.
    re-litigated in review. See [Prioritisation](prioritisation.md).
 10. **Instrument the decision.** If a feature ships without a way to tell whether it worked,
     the next prioritisation conversation about it will be pure opinion.
-11. **File it back.** If you make a product judgement call that isn't covered here, add it to
-    the relevant subsection in the same change. This section only stays useful if it
-    compounds.
+11. ~~**File it back.**~~ *Superseded.* Product judgement calls no longer come back here — they
+    go into the Stacks corpus. See
+    [Planning with the Stacks MCP](../contributing/planning-with-stacks.md).
 
 ---
 
 ## 3. How to add or update a subsection
+
+> [!WARNING]
+> **Closed.** This section takes no new subsections and no new principles. Product judgement
+> calls now go into the Stacks corpus — see
+> [Planning with the Stacks MCP](../contributing/planning-with-stacks.md). The process below is
+> retained only to document how these pages were built.
 
 Follow the standard wiki [Ingestion Flow](../getting-started.md) plus these specifics:
 
@@ -123,8 +138,9 @@ nobody applies.
 
 ## 4. Backlog of subsections
 
-Candidate topics, unwritten. Pick one up when a real decision forces the question — writing
-these speculatively produces filler.
+**Abandoned** — these were never written here and will not be. They are left as a record of the
+topics the team had identified as gaps; each is worth checking against Stacks when the question
+next comes up.
 
 - Onboarding & first-run experience
 - Notifications, nudges & interruption budget

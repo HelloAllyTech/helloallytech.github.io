@@ -119,7 +119,13 @@ jobs:
           # The branch name is date-stamped, so a second run on the same day would other-
           # wise be rejected as non-fast-forward. The content is generated; force is safe.
           git push -u origin "$BRANCH" --force
-          gh pr view "$BRANCH" >/dev/null 2>&1 && { echo "PR already open for $BRANCH."; exit 0; }
+          # --state open matters: `gh pr view <branch>` also matches merged and closed
+          # PRs, so once a day's branch had been merged every later sweep skipped
+          # creating a PR and reported success while surfacing nothing.
+          if [ -n "$(gh pr list --head "$BRANCH" --state open --json number --jq '.[0].number // empty')" ]; then
+            echo "A PR is already open for $BRANCH."
+            exit 0
+          fi
           PR_URL="$(gh pr create \
             --title "chore: regenerate wiki indexes and platform stats" \
             --body "The generated pages had fallen behind the code and page frontmatter.

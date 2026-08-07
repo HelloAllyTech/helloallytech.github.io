@@ -34,33 +34,45 @@ jobs:
       - name: Check out the code repos for counting
         if: github.event_name != 'pull_request'
         run: mkdir -p checkouts
+
+      # Read-only for this job; the PR and issue steps below deliberately stay on the
+      # default GITHUB_TOKEN, which cannot reach outside this repo.
+      - name: Mint a read token for the code repos
+        id: app-token
+        if: github.event_name != 'pull_request'
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.DOCS_BOT_APP_ID }}
+          private-key: ${{ secrets.DOCS_BOT_PRIVATE_KEY }}
+          owner: HelloAllyTech
+          repositories: ally-be,ally-ai,ally-ai-learn,ally-web
       - uses: actions/checkout@v4
         if: github.event_name != 'pull_request'
         continue-on-error: true
         with:
           repository: helloallytech/ally-be
-          token: ${{ secrets.DOCS_SYNC_TOKEN }}
+          token: ${{ steps.app-token.outputs.token }}
           path: checkouts/ally-be
       - uses: actions/checkout@v4
         if: github.event_name != 'pull_request'
         continue-on-error: true
         with:
           repository: helloallytech/ally-ai
-          token: ${{ secrets.DOCS_SYNC_TOKEN }}
+          token: ${{ steps.app-token.outputs.token }}
           path: checkouts/ally-ai
       - uses: actions/checkout@v4
         if: github.event_name != 'pull_request'
         continue-on-error: true
         with:
           repository: helloallytech/ally-ai-learn
-          token: ${{ secrets.DOCS_SYNC_TOKEN }}
+          token: ${{ steps.app-token.outputs.token }}
           path: checkouts/ally-ai-learn
       - uses: actions/checkout@v4
         if: github.event_name != 'pull_request'
         continue-on-error: true
         with:
           repository: helloallytech/ally-web
-          token: ${{ secrets.DOCS_SYNC_TOKEN }}
+          token: ${{ steps.app-token.outputs.token }}
           path: checkouts/ally-web
 
       - name: Regenerate platform stats

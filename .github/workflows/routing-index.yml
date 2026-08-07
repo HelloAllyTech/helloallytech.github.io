@@ -45,16 +45,28 @@ jobs:
       - name: Regenerate index
         run: python3 scripts/gen-routing.py
 
+      # A short-lived installation token, scoped to just this matrix repo. Not a PAT: the
+      # PRs are authored by ally-docs-bot[bot], so nobody's contribution graph carries
+      # work they didn't do, and a human can still approve them.
+      - name: Mint a token for the target repo
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.DOCS_BOT_APP_ID }}
+          private-key: ${{ secrets.DOCS_BOT_PRIVATE_KEY }}
+          owner: HelloAllyTech
+          repositories: ${{ matrix.repo }}
+
       - name: Check out target repo
         uses: actions/checkout@v4
         with:
           repository: helloallytech/${{ matrix.repo }}
-          token: ${{ secrets.DOCS_SYNC_TOKEN }}
+          token: ${{ steps.app-token.outputs.token }}
           path: target
 
       - name: Copy index and open a PR if it changed
         env:
-          GH_TOKEN: ${{ secrets.DOCS_SYNC_TOKEN }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
           TARGET: ${{ matrix.repo }}
         run: |
           set -euo pipefail

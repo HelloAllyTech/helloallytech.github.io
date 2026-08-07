@@ -35,11 +35,21 @@ jobs:
         with:
           python-version: "3.12"
 
+      # Needs read on the code repos as well as write here, so it cannot be the default
+      # GITHUB_TOKEN. It merges other people's wiki PRs, so it must not be a human's PAT
+      # either — that would record a person as approving docs they never read.
+      - name: Mint a token for the wiki and the code repos
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.DOCS_BOT_APP_ID }}
+          private-key: ${{ secrets.DOCS_BOT_PRIVATE_KEY }}
+          owner: HelloAllyTech
+          repositories: helloallytech.github.io,ally-be,ally-ai,ally-ai-learn,ally-web
+
       - name: Reconcile wiki PRs against their source PRs
         env:
-          # Needs read on the code repos as well as write here, so it cannot be the
-          # default GITHUB_TOKEN.
-          GH_TOKEN: ${{ secrets.DOCS_SYNC_TOKEN }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
           python3 scripts/wiki_pr_lifecycle.py \
             ${{ inputs.dry-run && '--dry-run' || '' }}

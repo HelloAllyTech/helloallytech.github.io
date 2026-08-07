@@ -58,8 +58,19 @@ def gh_json(*args: str):
 def open_wiki_prs() -> list[dict]:
     return gh_json(
         "pr", "list", "--repo", WIKI_REPO, "--state", "open",
-        "--limit", "100", "--json", "number,title,body,createdAt,isDraft,comments",
+        "--limit", "100",
+        "--json", "number,title,body,createdAt,isDraft,comments,isCrossRepository",
     ) or []
+
+
+def branch_args(pr: dict) -> list[str]:
+    """`--delete-branch`, unless the branch lives in someone's fork.
+
+    Most contributors have no write access here and open their wiki PR from a fork. We
+    cannot delete a branch in their personal repo, and gh treats the refusal as an error —
+    which would abort the whole reconciliation pass over one tidy-up we never needed.
+    """
+    return [] if pr.get("isCrossRepository") else ["--delete-branch"]
 
 
 def source_of(body: str):
@@ -135,14 +146,14 @@ def main() -> int:
             if act:
                 if pr.get("isDraft"):
                     gh("pr", "ready", num, "--repo", WIKI_REPO)
-                gh("pr", "merge", num, "--repo", WIKI_REPO, "--squash", "--delete-branch")
+                gh("pr", "merge", num, "--repo", WIKI_REPO, "--squash", *branch_args(pr))
             merged += 1
 
         elif state == "abandoned":
             print("  source closed unmerged → closing wiki PR")
             if act:
                 gh(
-                    "pr", "close", num, "--repo", WIKI_REPO, "--delete-branch",
+                    "pr", "close", num, "--repo", WIKI_REPO, *branch_args(pr),
                     "--comment",
                     f"Closing: the source PR {source['url']} was closed without "
                     "merging, so these docs describe a change that never shipped."

@@ -2,7 +2,7 @@
 title: Platform Stats
 tags: [platform, reference, generated]
 summary: Generated counts of the things prose keeps getting wrong — entities, migrations, modules, providers. Regenerated weekly; never hand-edited.
-last_reconciled: 2026-08-06
+last_reconciled: 2026-08-07
 ---
 
 # Platform Stats
@@ -29,4 +29,4 @@ counts. If you catch yourself typing a number a script could count, link here in
 | Applications | `ally-web` | 3 |
 | Shared libraries | `ally-web` | 1 |
 
-_Counted on 2026-08-06._
+_Counted on 2026-08-07._

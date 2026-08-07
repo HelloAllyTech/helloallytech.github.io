@@ -137,6 +137,12 @@ The script commits under **your** git identity, inherited from the code repo you
 from. If it cannot find one it stops rather than substituting a placeholder — documentation
 should count as its author's contribution.
 
+**You do not need write access to the wiki repo.** Write access there is limited to the org
+owners. If you do not have it, the script forks the repo to your account the first time,
+pushes the branch there, and opens the PR against the wiki from your fork. The command is
+the same either way, and the PR, the `Source:` trailer and the lifecycle coupling all behave
+identically — a fork PR is merged by the bot exactly like any other.
+
 ### Lifecycle coupling
 
 A workflow in the wiki repo reads the `Source:` trailer and keeps the wiki PR in step with

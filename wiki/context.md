@@ -40,3 +40,5 @@ New top-level `wiki/product/` section — **Product Management Best Practices**:
 - No custom project skills existed to migrate (only `settings.local.json` files); `skills/` holds just the example skill.
 - `raw/` is empty — drop source documents there for future ingestion.
 - Re-run a lint pass when repos change significantly (see `agents.md` Lint Flow).
+
+<!-- hold-for-review verification, will be closed -->

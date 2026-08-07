@@ -3,6 +3,7 @@
 This repository **is** the [Ally Developer Wiki](https://tech.helloally.ai) — the canonical, public documentation for the Ally platform, built on [LLMWiki](https://github.com/ajeygore/llmwiki).
 
 ## How to work here
+- **Before writing an implementation plan**, call the stacks MCP's `search_chunks` tool with 2–3 queries covering the task's main topics, and incorporate relevant returned guidance, citing chunk titles. The `stacks` server is declared in this repo's committed `.mcp.json` and reads `STACKS_API_KEY` from the environment (never commit a key). The rule, setup and citation format live at `wiki/contributing/planning-with-stacks.md`. Trivial mechanical changes are exempt.
 - Read **`agents.md`** at the repo root — it is the authoritative guide for maintaining this wiki (Ingestion, Query, and Lint flows).
 - All human-readable content lives in **`wiki/`**. Edit those Markdown files directly.
 - The **`llmwiki/`** folder is the rendering engine — **never modify it** (it lives in a separate upstream repo).

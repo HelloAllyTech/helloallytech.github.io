@@ -9,7 +9,10 @@ summary: Quick-reference for AI assistants and developers working across Ally re
 This page helps AI agents (and developers) quickly orient in the Ally workspace and work effectively across repos. It is migrated from the workspace `AGENTS.md`. For per-repo depth, follow the links to each [repo page](../index.md#repositories).
 
 > [!IMPORTANT]
-> **This page tells you how to build. [Product Management Best Practices](../product/best-practices.md) tells you what to build and how it should behave.** Read it — and the matching subsection ([UI](../product/ui.md), [Gamification](../product/gamification.md), [Data Visualisation](../product/data-visualisation.md), [Prioritisation](../product/prioritisation.md), [User Personas](../product/user-personas.md)) — before any task that changes what a user sees, does, earns, or is shown as data. Purely internal work (refactor, migration, infra, tests) is exempt.
+> **Before writing an implementation plan, call the stacks MCP's `search_chunks` tool with 2–3 queries covering the task's main topics, and incorporate relevant returned guidance, citing chunk titles.** The `stacks` server is declared in every repo's committed `.mcp.json` and reads your `STACKS_API_KEY` from the environment — see [Planning with the Stacks MCP](../contributing/planning-with-stacks.md) for setup, query technique, and how to cite. Trivial mechanical changes are exempt.
+
+> [!IMPORTANT]
+> **This page tells you how to build. [Product Management Best Practices](../product/best-practices.md) tells you what to build and how it should behave.** Read it — and the matching subsection ([UI](../product/ui.md), [Gamification](../product/gamification.md), [Data Visualisation](../product/data-visualisation.md), [Prioritisation](../product/prioritisation.md), [User Personas](../product/user-personas.md)) — before any task that changes what a user sees, does, earns, or is shown as data. Purely internal work (refactor, migration, infra, tests) is exempt. Where Stacks guidance contradicts a practice settled here, the wiki wins.
 
 ## Repo Quick Reference
 
@@ -81,7 +84,7 @@ chore/<ticket-id>-short-description
 
 ## Common Tasks
 
-> Before starting any user-facing task below, check the relevant [product practice](../product/best-practices.md). Cross-repo work is also the dominant hidden cost in estimates — see [Prioritisation](../product/prioritisation.md).
+> Before starting any user-facing task below, check the relevant [product practice](../product/best-practices.md), and run the [Stacks search](../contributing/planning-with-stacks.md) that precedes every implementation plan. Cross-repo work is also the dominant hidden cost in estimates — see [Prioritisation](../product/prioritisation.md).
 
 **Adding a new API endpoint** — ally-be: controller + service + DTOs in the relevant `src/` module; ally-web/mobile: add an RTK Query endpoint in `src/services/`.
 

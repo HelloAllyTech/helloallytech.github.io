@@ -38,6 +38,7 @@ Welcome to the **Ally Developer Wiki** catalog. This catalog is parsed by the LL
 ## Contributing
 - [Developer Setup](contributing/dev-setup.md) — Clone repos and run the full local stack
 - [Contributing Guide](contributing/guide.md) — SDLC rules, code standards, PR process
+- [Planning with the Stacks MCP](contributing/planning-with-stacks.md) — Search the guidance corpus before writing any implementation plan, and cite what you use
 
 ## Meta Context
 - [Overview](overview.md) — Directory overview and structure

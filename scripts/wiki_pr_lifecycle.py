@@ -1,13 +1,17 @@
 #!/usr/bin/env python3
-"""Keep each wiki PR in step with the code PR that spawned it.
+"""Keep each wiki PR in step with the code change that spawned it.
 
-A wiki PR opened by scripts/wiki-pr.sh carries a `Source: <code PR url>` trailer. This
-walks the open ones and reconciles them against their source:
+A wiki PR opened by scripts/wiki-pr.sh carries a `Source:` trailer naming either a code PR
+or a commit — most changes on this platform are pushed straight to the default branch, so
+both have to work. This walks the open wiki PRs and reconciles them against their source:
 
-    source merged            -> mark ready, merge
-    source closed unmerged   -> close
-    source open > 7 days     -> nudge both, once
-    no source trailer        -> leave alone (hand-written wiki PR)
+    source PR merged             -> mark ready, merge
+    source commit on default     -> mark ready, merge
+    source PR closed unmerged    -> close
+    source pending > 7 days      -> nudge, once
+    no source trailer            -> leave alone (hand-written wiki PR)
+
+A commit source has no counterpart to nudge, so those nudges land on the wiki PR only.
 
 Runs on a schedule rather than off webhooks so a missed event self-heals on the next pass.
 
@@ -28,7 +32,8 @@ from datetime import datetime, timedelta, timezone
 
 WIKI_REPO = "helloallytech/helloallytech.github.io"
 SOURCE_TRAILER = re.compile(
-    r"^\s*Source:\s*(https://github\.com/([^/\s]+)/([^/\s]+)/pull/(\d+))\s*$",
+    r"^\s*Source:\s*(https://github\.com/([^/\s]+)/([^/\s]+)/"
+    r"(?:pull/(\d+)|commit/([0-9a-f]{7,40})))\s*$",
     re.MULTILINE | re.IGNORECASE,
 )
 NUDGE_MARKER = "<!-- wiki-pr-lifecycle:nudged -->"
@@ -61,18 +66,44 @@ def source_of(body: str):
     m = SOURCE_TRAILER.search(body or "")
     if not m:
         return None
-    return {"url": m.group(1), "repo": f"{m.group(2)}/{m.group(3)}", "number": m.group(4)}
+    source = {"url": m.group(1), "repo": f"{m.group(2)}/{m.group(3)}"}
+    if m.group(4):
+        source.update(kind="pr", ref=m.group(4))
+    else:
+        source.update(kind="commit", ref=m.group(5))
+    return source
 
 
-def source_state(source: dict) -> dict | None:
+def verdict(source: dict) -> str | None:
+    """`landed`, `abandoned` or `pending` — or None if the source cannot be read."""
+    if source["kind"] == "pr":
+        try:
+            state = gh_json(
+                "pr", "view", source["ref"], "--repo", source["repo"],
+                "--json", "state,mergedAt,url",
+            )
+        except RuntimeError as exc:
+            print(f"  ! could not read {source['url']}: {exc}", file=sys.stderr)
+            return None
+        if state.get("mergedAt"):
+            return "landed"
+        return "abandoned" if state.get("state") == "CLOSED" else "pending"
+
+    # A commit source has landed once it is reachable from the default branch. Comparing
+    # default...sha reports the sha as `behind` when it is an ancestor, `identical` when it
+    # is the tip, and `ahead`/`diverged` while it still sits on a side branch.
     try:
-        return gh_json(
-            "pr", "view", source["number"], "--repo", source["repo"],
-            "--json", "state,mergedAt,url",
+        default = gh(
+            "repo", "view", source["repo"],
+            "--json", "defaultBranchRef", "-q", ".defaultBranchRef.name",
+        ).strip()
+        compared = gh_json(
+            "api", f"repos/{source['repo']}/compare/{default}...{source['ref']}",
         )
     except RuntimeError as exc:
         print(f"  ! could not read {source['url']}: {exc}", file=sys.stderr)
         return None
+    return "landed" if compared.get("status") in ("identical", "behind") else "pending"
 
 
 def already_nudged(pr: dict) -> bool:
@@ -95,19 +126,19 @@ def main() -> int:
             continue
 
         print(f"wiki #{num} ← {source['url']}")
-        state = source_state(source)
+        state = verdict(source)
         if not state:
             continue
 
-        if state.get("mergedAt"):
-            print("  source merged → merging wiki PR")
+        if state == "landed":
+            print("  source landed → merging wiki PR")
             if act:
                 if pr.get("isDraft"):
                     gh("pr", "ready", num, "--repo", WIKI_REPO)
                 gh("pr", "merge", num, "--repo", WIKI_REPO, "--squash", "--delete-branch")
             merged += 1
 
-        elif state.get("state") == "CLOSED":
+        elif state == "abandoned":
             print("  source closed unmerged → closing wiki PR")
             if act:
                 gh(
@@ -124,25 +155,34 @@ def main() -> int:
             age = now - created
             if age > STALE_AFTER and not already_nudged(pr):
                 days = age.days
-                print(f"  source open {days}d → nudging")
+                print(f"  source pending {days}d → nudging")
                 if act:
+                    waiting_on = (
+                        f"the source PR {source['url']}"
+                        if source["kind"] == "pr"
+                        else f"commit {source['ref'][:7]} to reach "
+                        f"{source['repo']}'s default branch ({source['url']})"
+                    )
                     gh(
                         "pr", "comment", num, "--repo", WIKI_REPO, "--body",
                         f"{NUDGE_MARKER}\nThis wiki PR has been open **{days} days** "
-                        f"waiting on {source['url']}.\n\nDocs that sit in an unmerged PR "
-                        "are the drift this coupling exists to prevent — land the source "
-                        "PR, or close both." + FOOTER,
+                        f"waiting on {waiting_on}.\n\nDocs that sit in an unmerged PR "
+                        "are the drift this coupling exists to prevent — land the source, "
+                        "or close both." + FOOTER,
                     )
-                    gh(
-                        "pr", "comment", source["number"], "--repo", source["repo"],
-                        "--body",
-                        f"{NUDGE_MARKER}\nThe wiki PR for this change "
-                        f"(https://github.com/{WIKI_REPO}/pull/{num}) has been waiting "
-                        f"**{days} days** to merge alongside it." + FOOTER,
-                    )
+                    # A commit has no PR to comment on; the wiki-side nudge is the whole
+                    # nudge in that case.
+                    if source["kind"] == "pr":
+                        gh(
+                            "pr", "comment", source["ref"], "--repo", source["repo"],
+                            "--body",
+                            f"{NUDGE_MARKER}\nThe wiki PR for this change "
+                            f"(https://github.com/{WIKI_REPO}/pull/{num}) has been waiting "
+                            f"**{days} days** to merge alongside it." + FOOTER,
+                        )
                 nudged += 1
             else:
-                print("  source still open → waiting")
+                print("  source still pending → waiting")
 
     print(
         f"\nmerged={merged} closed={closed} nudged={nudged} "

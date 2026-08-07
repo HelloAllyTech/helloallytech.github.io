@@ -112,23 +112,40 @@ daily. The path is now one command:
 ```bash
 git clone --depth=1 https://github.com/helloallytech/helloallytech.github.io .wiki-tmp
 # edit .wiki-tmp/wiki/**
-.wiki-tmp/scripts/wiki-pr.sh "<url of your code PR>"
+.wiki-tmp/scripts/wiki-pr.sh "<url of your code PR>"   # PR flow
+.wiki-tmp/scripts/wiki-pr.sh HEAD                      # trunk-based: the commit you pushed
 ```
 
 `.wiki-tmp/` is gitignored in every code repo, so nothing leaks into the code branch. The
-script branches, commits, pushes, opens a **draft** wiki PR stamped with `Source: <code PR>`,
-and prints the `Wiki-PR:` trailer to paste into your PR body — which is what satisfies the
-guard in §3.
+script branches, commits, pushes, and opens a **draft** wiki PR stamped with a `Source:`
+trailer.
+
+**Both source kinds are first-class**, because most changes here go straight to the default
+branch rather than through a PR:
+
+| Source | Trailer | What you do next |
+|---|---|---|
+| a code PR | `Source: …/pull/<n>` | paste the printed `Wiki-PR:` line into the PR body — that is what satisfies the guard in §3 |
+| a commit | `Source: …/commit/<sha>` | nothing; a direct push has no description to carry a trailer |
+
+The script commits under **your** git identity, inherited from the code repo you ran it
+from. If it cannot find one it stops rather than substituting a placeholder — documentation
+should count as its author's contribution.
 
 ### Lifecycle coupling
 
-A workflow in the wiki repo reads that `Source:` trailer and keeps the two PRs in step:
+A workflow in the wiki repo reads the `Source:` trailer and keeps the wiki PR in step with
+whatever spawned it:
 
-- code PR **merges** → wiki PR marked ready and merged
-- code PR **closes unmerged** → wiki PR closed
-- code PR **open > 7 days** → nudge on both
+- source PR **merges**, or source commit **reaches the default branch** → wiki PR marked
+  ready and merged
+- source PR **closes unmerged** → wiki PR closed
+- source **pending > 7 days** → nudge (on both PRs; a commit has nothing to nudge, so the
+  wiki PR alone)
 
-So docs land in the same beat as the code, instead of drifting into a stale open PR.
+So docs land in the same beat as the code, instead of drifting into a stale open PR. A wiki
+PR with no `Source:` trailer at all is left alone — which also means it will never be marked
+ready, so hand-written wiki PRs must be merged by hand.
 
 ---
 

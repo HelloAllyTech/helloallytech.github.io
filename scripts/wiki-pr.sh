@@ -10,35 +10,90 @@
 #   git clone --depth=1 https://github.com/helloallytech/helloallytech.github.io .wiki-tmp
 #   # edit .wiki-tmp/wiki/**
 #   .wiki-tmp/scripts/wiki-pr.sh "https://github.com/helloallytech/ally-be/pull/123"
+#   .wiki-tmp/scripts/wiki-pr.sh HEAD     # a commit you just pushed to the default branch
 #
-# Prints the `Wiki-PR:` trailer to paste into your code PR description. That trailer is
-# what satisfies the docs guard, and what couples the two PRs' lifecycles.
+# Two thirds of the commits on this platform go straight to the default branch, so a source
+# is as often a commit as a pull request. Both are accepted:
+#
+#   PR source     — prints a `Wiki-PR:` trailer to paste into the PR body, which satisfies
+#                   the docs guard; the wiki PR merges when the source PR merges.
+#   commit source — nothing to paste (a direct push has no description); the wiki PR merges
+#                   on the next lifecycle pass once the commit is on the default branch.
 #
 # Spec: https://tech.helloally.ai/#/wiki/contributing/docs-system.md
 
 set -euo pipefail
 
-SOURCE_PR="${1:-}"
+SOURCE_ARG="${1:-}"
+SRC_DIR="$PWD"                  # the code repo we were invoked from, before we cd away
 WIKI_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-die() { printf '\033[31merror:\033[0m %s\n' "$*" >&2; exit 1; }
+die()  { printf '\033[31merror:\033[0m %s\n' "$*" >&2; exit 1; }
 info() { printf '\033[36m%s\033[0m\n' "$*"; }
+warn() { printf '\033[33mwarning:\033[0m %s\n' "$*" >&2; }
 
-if [[ -z "$SOURCE_PR" ]]; then
-  die "pass the URL of the code PR these docs belong to:
-    $(basename "${BASH_SOURCE[0]}") \"https://github.com/helloallytech/<repo>/pull/<n>\""
+src_git() { git -C "$SRC_DIR" "$@" 2>/dev/null; }
+
+if [[ -z "$SOURCE_ARG" ]]; then
+  me="$(basename "${BASH_SOURCE[0]}")"
+  die "pass the code PR or the commit these docs belong to:
+    $me \"https://github.com/helloallytech/<repo>/pull/<n>\"
+    $me HEAD            # or a commit SHA, if you pushed straight to the default branch"
 fi
 
-if [[ ! "$SOURCE_PR" =~ ^https://github\.com/[^/]+/[^/]+/pull/[0-9]+/?$ ]]; then
-  die "that doesn't look like a PR URL: $SOURCE_PR"
+# --------------------------------------------------------------------- resolve the source
+
+if [[ "$SOURCE_ARG" =~ ^https://github\.com/([^/]+)/([^/]+)/pull/([0-9]+)/?$ ]]; then
+  SOURCE_KIND="pr"
+  SOURCE_OWNER="${BASH_REMATCH[1]}"
+  SOURCE_REPO="${BASH_REMATCH[2]}"
+  SOURCE_REF="${BASH_REMATCH[3]}"
+  SOURCE_URL="https://github.com/${SOURCE_OWNER}/${SOURCE_REPO}/pull/${SOURCE_REF}"
+  SOURCE_LABEL="${SOURCE_REPO}#${SOURCE_REF}"
+  BRANCH="docs/from-${SOURCE_REPO}-pr-${SOURCE_REF}"
+
+elif [[ "$SOURCE_ARG" =~ ^https://github\.com/([^/]+)/([^/]+)/commit/([0-9a-fA-F]{7,40})/?$ ]]; then
+  SOURCE_KIND="commit"
+  SOURCE_OWNER="${BASH_REMATCH[1]}"
+  SOURCE_REPO="${BASH_REMATCH[2]}"
+  SOURCE_REF="${BASH_REMATCH[3]}"
+  SOURCE_URL="https://github.com/${SOURCE_OWNER}/${SOURCE_REPO}/commit/${SOURCE_REF}"
+  SOURCE_LABEL="${SOURCE_REPO}@${SOURCE_REF:0:7}"
+  BRANCH="docs/from-${SOURCE_REPO}-commit-${SOURCE_REF:0:7}"
+
+else
+  # A revision — HEAD, a tag, a bare SHA. Resolve it against the repo we were invoked from.
+  src_git rev-parse --git-dir >/dev/null \
+    || die "\"$SOURCE_ARG\" is not a PR URL, and $SRC_DIR is not a git repo, so there is
+    nothing to resolve it against. Run this from your code repo."
+
+  SOURCE_REF="$(src_git rev-parse --verify "${SOURCE_ARG}^{commit}" || true)"
+  [[ -n "$SOURCE_REF" ]] || die "\"$SOURCE_ARG\" is neither a PR URL nor a commit in $SRC_DIR."
+
+  ORIGIN="$(src_git remote get-url origin || true)"
+  [[ -n "$ORIGIN" ]] || die "$SRC_DIR has no 'origin' remote, so I cannot tell which repo
+    commit ${SOURCE_REF:0:7} belongs to. Pass the full commit URL instead."
+
+  SLUG="$(printf '%s' "$ORIGIN" | sed -E 's#^(git@github\.com:|https://github\.com/)##; s#\.git$##')"
+  SOURCE_OWNER="${SLUG%%/*}"
+  SOURCE_REPO="${SLUG##*/}"
+  SOURCE_KIND="commit"
+  SOURCE_URL="https://github.com/${SOURCE_OWNER}/${SOURCE_REPO}/commit/${SOURCE_REF}"
+  SOURCE_LABEL="${SOURCE_REPO}@${SOURCE_REF:0:7}"
+  BRANCH="docs/from-${SOURCE_REPO}-commit-${SOURCE_REF:0:7}"
+
+  # The lifecycle bot resolves the commit through the GitHub API, so an unpushed commit
+  # leaves the wiki PR waiting forever. Say so now rather than letting it sit.
+  if [[ -z "$(src_git branch -r --contains "$SOURCE_REF" 2>/dev/null)" ]]; then
+    warn "commit ${SOURCE_REF:0:7} is not on any remote branch yet — push it, or the wiki
+    PR will wait indefinitely for a commit GitHub cannot see."
+  fi
 fi
+
+# ------------------------------------------------------------------------ stage the change
 
 cd "$WIKI_ROOT"
 [[ -d wiki ]] || die "no wiki/ directory here — is $WIKI_ROOT really the wiki clone?"
-
-SOURCE_REPO="$(printf '%s' "$SOURCE_PR" | awk -F/ '{print $5}')"
-SOURCE_NUM="$(printf '%s' "$SOURCE_PR" | awk -F/ '{print $7}' | tr -d '/')"
-BRANCH="docs/from-${SOURCE_REPO}-pr-${SOURCE_NUM}"
 
 # A shallow clone can't push a branch history; deepen before we try.
 if [[ -f .git/shallow ]]; then
@@ -58,14 +113,27 @@ fi
 info "Changed:"
 git status --porcelain wiki | sed 's/^/  /'
 
-git config user.name  >/dev/null 2>&1 || git config user.name  "ally-docs"
-git config user.email >/dev/null 2>&1 || git config user.email "ally-docs@users.noreply.github.com"
+# Never commit someone's documentation under a placeholder identity. `.wiki-tmp/` is a fresh
+# clone, so a contributor who configures git per-repo — or any container or agent session —
+# used to land here as "ally-docs", an address no GitHub account owns, silently costing them
+# the credit. Inherit from the code repo; if there is nothing to inherit, stop.
+if ! git config user.email >/dev/null 2>&1; then
+  SRC_NAME="$(src_git config user.name  || true)"
+  SRC_EMAIL="$(src_git config user.email || true)"
+  [[ -n "$SRC_EMAIL" ]] || die "no git identity configured, here or in $SRC_DIR.
+    Set one so this lands as your contribution:
+      git config --global user.name  \"Your Name\"
+      git config --global user.email \"you@example.com\""
+  git config user.name  "$SRC_NAME"
+  git config user.email "$SRC_EMAIL"
+  info "Committing as $SRC_NAME <$SRC_EMAIL> (inherited from $SRC_DIR)"
+fi
 
 git checkout -b "$BRANCH" 2>/dev/null || git checkout "$BRANCH"
 git add wiki
-git commit --quiet -m "docs: update wiki for ${SOURCE_REPO}#${SOURCE_NUM}
+git commit --quiet -m "docs: update wiki for ${SOURCE_LABEL}
 
-Source: ${SOURCE_PR}"
+Source: ${SOURCE_URL}"
 
 info "Pushing $BRANCH…"
 for attempt in 1 2 3 4; do
@@ -74,12 +142,19 @@ for attempt in 1 2 3 4; do
   sleep $((2 ** attempt))
 done
 
-BODY="Documentation for ${SOURCE_REPO}#${SOURCE_NUM}.
+if [[ "$SOURCE_KIND" == "pr" ]]; then
+  COUPLING="This PR is coupled to its source: it is marked ready and merged when the source
+PR merges, and closed if the source PR is closed unmerged."
+else
+  COUPLING="This PR is coupled to its source commit: it is marked ready and merged once that
+commit is on the source repo's default branch."
+fi
 
-Source: ${SOURCE_PR}
+BODY="Documentation for ${SOURCE_LABEL}.
 
-This PR is coupled to its source: it is marked ready and merged when the source PR merges,
-and closed if the source PR is closed unmerged. See
+Source: ${SOURCE_URL}
+
+${COUPLING} See
 [the docs system](https://tech.helloally.ai/#/wiki/contributing/docs-system.md).
 
 ---
@@ -87,20 +162,32 @@ _Generated by [Claude Code](https://claude.ai/code)_"
 
 if command -v gh >/dev/null 2>&1; then
   PR_URL="$(gh pr create --draft \
-    --title "docs: update wiki for ${SOURCE_REPO}#${SOURCE_NUM}" \
+    --title "docs: update wiki for ${SOURCE_LABEL}" \
     --body "$BODY" --head "$BRANCH" 2>/dev/null || gh pr view "$BRANCH" --json url -q .url)"
 else
   info "gh not installed — open the PR manually:"
   echo "  https://github.com/helloallytech/helloallytech.github.io/compare/$BRANCH?expand=1"
-  echo "  and include this line in the body:  Source: ${SOURCE_PR}"
+  echo "  and include this line in the body:  Source: ${SOURCE_URL}"
   PR_URL="<paste the wiki PR url here>"
 fi
 
-cat <<EOF
+if [[ "$SOURCE_KIND" == "pr" ]]; then
+  cat <<EOF
 
 ────────────────────────────────────────────────────────────
-Paste this into the description of ${SOURCE_PR}:
+Paste this into the description of ${SOURCE_URL}:
 
 Wiki-PR: ${PR_URL}
 ────────────────────────────────────────────────────────────
 EOF
+else
+  cat <<EOF
+
+────────────────────────────────────────────────────────────
+${PR_URL}
+
+Nothing to paste — a direct push has no description to carry a trailer. This wiki PR
+merges by itself once ${SOURCE_REF:0:7} is on ${SOURCE_REPO}'s default branch.
+────────────────────────────────────────────────────────────
+EOF
+fi

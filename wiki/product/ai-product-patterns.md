@@ -1,12 +1,19 @@
 ---
 title: AI-Product Patterns
 tags: [product, best-practices, ai, llm, human-in-the-loop, disclosure, provenance]
-summary: How Ally builds features where a model proposes and a person decides — disclosure, provenance, human-in-the-loop review, recording the "no", and never letting an unvalidated model answer become stored data.
+summary: DEPRECATED 2026-08-07, superseded by the Stacks MCP — kept for history. How Ally builds features where a model proposes and a person decides — disclosure, provenance, human-in-the-loop review, recording the "no", and never letting an unvalidated model answer become stored data.
 ---
 
 # AI-Product Patterns
 
-*Part of [Product Management Best Practices](best-practices.md).* **Maturity: Draft.**
+*Part of [Product Management Best Practices](best-practices.md).* **Maturity: Deprecated (2026-08-07) — was Draft.**
+
+> [!WARNING]
+> **Deprecated — superseded by the Stacks MCP.** Product guidance is now retrieved from the
+> external Stacks corpus at planning time; see
+> [Planning with the Stacks MCP](../contributing/planning-with-stacks.md). This page is kept for
+> history and because other pages cite its principles by number — do not add new principles here,
+> and treat anything that conflicts with current Stacks guidance as superseded.
 
 ## Why this matters for Ally
 

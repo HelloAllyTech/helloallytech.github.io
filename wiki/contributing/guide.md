@@ -36,7 +36,7 @@ Commitlint / Husky hooks enforce this in the TypeScript repos.
 
 ## Development Workflow
 
-0. **If the change is user-facing, read the product practice first** — [Product Management Best Practices](../product/best-practices.md) and the subsection that matches the work ([UI](../product/ui.md), [Gamification](../product/gamification.md), [Data Visualisation](../product/data-visualisation.md), [Prioritisation](../product/prioritisation.md), [User Personas](../product/user-personas.md)). Internal-only changes skip this.
+0. **Before you plan, search Stacks.** Call the stacks MCP's `search_chunks` tool with 2–3 queries covering the task's main topics, and incorporate relevant returned guidance, citing chunk titles — see [Planning with the Stacks MCP](planning-with-stacks.md). This is where product guidance now comes from; the in-wiki [Product Management Best Practices](../product/best-practices.md) section was deprecated on 2026-08-07. Trivial mechanical changes (rename, dependency bump, typo) skip this.
 1. **Create a feature branch** following the naming convention.
 2. **Make your changes** following the code standards for that repo.
 3. **Test thoroughly** — run tests (`npm test` / `poetry run pytest`) and linters (`npm run lint` / `poetry run flake8 app/`).
@@ -71,7 +71,7 @@ Same format as commit messages: `<type>: short summary`.
 ### PR Description
 Include: a **Summary**, a **Changes** list, **Testing** notes (unit/integration/manual), **Related Issues** (`Closes #123`), and screenshots for UI changes. Use a checklist (style, self-review, comments, docs updated, no new warnings, tests pass).
 
-For user-facing PRs, also confirm the relevant checklist from [Product Management Best Practices](../product/best-practices.md) — e.g. the empty/loading/error/permission-denied states for [UI](../product/ui.md), or sample-size honesty for [Data Visualisation](../product/data-visualisation.md).
+For user-facing PRs, name the Stacks guidance the plan applied (by chunk title) so a reviewer can trace the product decisions — see [Planning with the Stacks MCP](planning-with-stacks.md).
 
 ### Review
 1. Submit the PR with a clear title and description.

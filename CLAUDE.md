@@ -3,11 +3,12 @@
 This repository **is** the [Ally Developer Wiki](https://tech.helloally.ai) — the canonical, public documentation for the Ally platform, built on [LLMWiki](https://github.com/ajeygore/llmwiki).
 
 ## How to work here
+- **Before writing an implementation plan**, call the stacks MCP's `search_chunks` tool with 2–3 queries covering the task's main topics, and incorporate relevant returned guidance, citing chunk titles. The `stacks` server is declared in this repo's committed `.mcp.json` and reads `STACKS_API_KEY` from the environment (never commit a key). The rule, setup and citation format live at `wiki/contributing/planning-with-stacks.md`. Trivial mechanical changes are exempt.
 - Read **`agents.md`** at the repo root — it is the authoritative guide for maintaining this wiki (Ingestion, Query, and Lint flows).
 - All human-readable content lives in **`wiki/`**. Edit those Markdown files directly.
 - The **`llmwiki/`** folder is the rendering engine — **never modify it** (it lives in a separate upstream repo).
 - When you add or change pages: update the catalog in **`wiki/index.md`** and append an entry to **`wiki/log.md`**. Record durable learnings in `wiki/memory.md` and session state in `wiki/context.md`.
-- **Product work:** before designing or building anything user-facing anywhere in the Ally platform, read **`wiki/product/best-practices.md`** (the hub — house rules + subsection index) and the matching subsection (`wiki/product/ui.md`, `gamification.md`, `data-visualisation.md`, `prioritisation.md`, `user-personas.md`, …). It is an intentionally growing section: file new product judgement calls back into the right subsection, or add a new one per §3 of the hub, then register it in the hub table and `wiki/index.md`.
+- **Product work:** product guidance comes from the external **Stacks** MCP at planning time (see the first bullet), not from this wiki. **`wiki/product/` is deprecated as of 2026-08-07 and frozen** — do not add principles to it, do not add subsections, and do not renumber existing principles (`wiki/platform/analytics-agent.md` cites them by number). Deprecation banners and `Deprecated` maturity lines are already in place on every page; leave them.
 - `.nojekyll` keeps GitHub Pages from processing the Markdown; pushing to `main` publishes to **tech.helloally.ai** (the `CNAME`).
 
 ## Content policy (public site)

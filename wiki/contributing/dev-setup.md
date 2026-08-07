@@ -49,6 +49,16 @@ To stop everything: `./infra/dev_cleanup.sh` (or `docker compose down` inside th
 - **TypeScript repos** (ally-be, ally-web, ally-mobile): copy `.env.example` / `docker.env.example`.
 - **Never commit `.env` files.** Required keys per service are listed in each [repo page](../index.md#repositories) and in the repo's env sample.
 
+## Agent Tooling — the Stacks MCP
+
+Every Ally repo commits a `.mcp.json` at its root declaring the `stacks` MCP server, which agents
+must search before writing an implementation plan. The file carries no credential — it expands
+`${STACKS_API_KEY}` from your environment at connect time.
+
+Once, per machine: get a key from the platform team, add `export STACKS_API_KEY="…"` to your
+`~/.zshrc`, open a fresh shell, and approve the `stacks` server the first time an agent session
+prompts for it. Full rule and troubleshooting: [Planning with the Stacks MCP](planning-with-stacks.md).
+
 ## General Requirements
 
 - Git and SSH access to the HelloAllyTech repositories.

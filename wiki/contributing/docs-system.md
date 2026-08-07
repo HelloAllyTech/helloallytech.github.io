@@ -120,6 +120,11 @@ git clone --depth=1 https://github.com/helloallytech/helloallytech.github.io .wi
 script branches, commits, pushes, and opens a **draft** wiki PR stamped with a `Source:`
 trailer.
 
+`main` in the wiki repo is protected: every change lands through a pull request, including
+the bot's. No approval is required — the seam exists so a change to a **public** site is
+visible and revertible, not to add a rubber stamp. Force-pushes and branch deletion are
+off.
+
 **Both source kinds are first-class**, because most changes here go straight to the default
 branch rather than through a PR:
 

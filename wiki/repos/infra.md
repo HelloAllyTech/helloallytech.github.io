@@ -2,6 +2,7 @@
 title: infra — Infrastructure & Dev Environment
 tags: [repo, infra, ansible, terraform, docker, devops]
 summary: The infra repo provisions Ally's Hetzner baremetal, Incus containers, and AWS services via Ansible + Terraform, and holds the shell scripts developers use to bootstrap repos and run the local stack.
+last_reconciled: 2026-07-11
 ---
 
 # infra — Infrastructure & Dev Environment

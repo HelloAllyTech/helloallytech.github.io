@@ -2,6 +2,7 @@
 title: Contributing Guide
 tags: [contributing, sdlc, workflow, standards]
 summary: Branch naming, commit conventions, code standards, and the pull-request process shared across all Ally repositories.
+last_reconciled: 2026-07-28
 ---
 
 # Contributing Guide
@@ -16,7 +17,9 @@ Thank you for contributing to Ally! This guide covers the shared SDLC rules — 
 
 **Branch types:** `feat` (new feature), `fix` (bug fix), `chore` (maintenance/deps), `refactor`, `docs`, `test`, `style` (formatting), `perf`, `build`, `ci`, `revert`, `hotfix`.
 
-Examples: `feat/add-user-authentication`, `fix/login-error-handling`, `docs/update-setup-guide`. Some repos prefix with a ticket id (`feat/<ticket-id>-short-description`) — check the target repo's `CONTRIBUTING.md`.
+Examples: `feat/add-user-authentication`, `fix/login-error-handling`, `docs/update-setup-guide`.
+
+**Rules:** hyphens (not underscores) between words, lowercase, short and descriptive. Do **not** embed a ticket id in the branch name — reference the ticket in the PR description instead. This is the single canonical statement of the convention for every repo; `commitlint`/Husky enforce the matching commit format in the TypeScript repos.
 
 ## Commit Messages
 

@@ -2,6 +2,7 @@
 title: Tech Stack
 tags: [platform, tech-stack, tooling]
 summary: The polyglot technology stack used across Ally's frontend, mobile, backend, AI, and infrastructure layers.
+last_reconciled: 2026-07-11
 ---
 
 # Tech Stack

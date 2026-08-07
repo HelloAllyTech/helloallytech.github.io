@@ -2,6 +2,7 @@
 title: Product Management Best Practices
 tags: [product, best-practices, hub, ux, design, prioritisation, agents]
 summary: DEPRECATED 2026-08-07, superseded by the Stacks MCP — kept for history. The former hub for Ally's product-management conventions — the house rules that apply to every product decision, plus a growing set of subsections (UI, Gamification, Data Visualisation, Prioritisation, User Personas, …).
+last_reconciled: 2026-07-31
 ---
 
 # Product Management Best Practices

@@ -2,6 +2,7 @@
 title: User Personas
 tags: [product, best-practices, personas, users, research, roles]
 summary: DEPRECATED 2026-08-07, superseded by the Stacks MCP — kept for history. Who Ally is built for — counsellor, learner, trainer/admin, tenant admin, super-admin — as working sketches tied to real permission roles, plus the rules for keeping personas honest.
+last_reconciled: 2026-07-28
 ---
 
 # User Personas

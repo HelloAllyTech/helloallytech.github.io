@@ -2,6 +2,7 @@
 title: ally-ai-learn — Voice Training Agent
 tags: [repo, ai, livekit, langgraph, voice, python]
 summary: A LiveKit-based voice AI agent (FastAPI + LangGraph) that simulates mental-health client conversations, detecting counseling skills in real time, scoring them, and publishing events to ally-be via AWS SQS.
+last_reconciled: 2026-07-21
 ---
 
 # ally-ai-learn — Voice Training Agent

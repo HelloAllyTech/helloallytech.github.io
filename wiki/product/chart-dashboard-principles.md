@@ -2,6 +2,7 @@
 title: Chart & Dashboard Design Principles
 tags: [product, best-practices, data-viz, charts, dashboards, reference, agents]
 summary: DEPRECATED 2026-08-07, superseded by the Stacks MCP — kept for history. A constraints-file reference for building charts and dashboards — perception rules, chart anatomy, clarity/simplicity/colour rules, persuasion-vs-deception boundaries, a chart-type lookup, an acceptance checklist, and an anti-pattern list.
+last_reconciled: 2026-07-29
 ---
 
 # Chart & Dashboard Design Principles

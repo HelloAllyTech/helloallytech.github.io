@@ -2,6 +2,7 @@
 title: ally-web — Web Applications
 tags: [repo, frontend, nx, nextjs, react, vite]
 summary: An Nx monorepo containing Ally's three user-facing web applications — a Next.js landing/resource site (port 3000), a Vite+React helpline dashboard for counselors (port 8080), and a Vite+React admin dashboard for super admins (port 8081) — plus a shared UI library.
+last_reconciled: 2026-08-06
 ---
 
 # ally-web — Web Applications

@@ -11,6 +11,24 @@ This repository **is** the [Ally Developer Wiki](https://tech.helloally.ai) — 
 - **Product work:** product guidance comes from the external **Stacks** MCP at planning time (see the first bullet), not from this wiki. **`wiki/product/` is deprecated as of 2026-08-07 and frozen** — do not add principles to it, do not add subsections, and do not renumber existing principles (`wiki/platform/analytics-agent.md` cites them by number). Deprecation banners and `Deprecated` maturity lines are already in place on every page; leave them.
 - `.nojekyll` keeps GitHub Pages from processing the Markdown; pushing to `main` publishes to **tech.helloally.ai** (the `CNAME`).
 
+## Generated files — never hand-edit
+`wiki/ROUTING.md`, `wiki/manifest.json` and `wiki/platform/stats.md` are produced by
+`scripts/`. Edit the source instead: page frontmatter for the first two, the code itself
+for the third. CI fails a PR whose generated files are stale — run
+`python3 scripts/gen-routing.py` and commit.
+
+Every page needs frontmatter with `title`, `tags`, `summary` **and `last_reconciled`** —
+`ROUTING.md` is built from those keys, so a page without them is invisible to agents.
+
+Before adding a number to a page, check whether `scripts/gen-stats.py` could count it.
+Prose states invariants; `platform/stats.md` states counts.
+
+## The docs machinery
+`wiki/contributing/docs-system.md` is the spec for how all of this fits together —
+routing, `.docs-map.yml`, the CI guard, `scripts/wiki-pr.sh`, PR lifecycle coupling and
+the weekly health sweep. Read it before changing anything under `scripts/` or
+`.github/workflows/`.
+
 ## Content policy (public site)
 This site is **public**. Document architecture, SDLC rules, deployment, and environment *concepts*, but **never** commit secrets, credentials, IP addresses, internal hostnames/domains, or cloud region details.
 

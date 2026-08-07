@@ -2,6 +2,7 @@
 title: Cross-Repo Agent Guide
 tags: [platform, agents, conventions, reference]
 summary: Quick-reference for AI assistants and developers working across Ally repos — per-repo entry points, cross-repo conventions, common tasks, and gotchas.
+last_reconciled: 2026-07-28
 ---
 
 # Cross-Repo Agent Guide
@@ -19,9 +20,9 @@ This page helps AI agents (and developers) quickly orient in the Ally workspace 
 
 ### [ally-be](../repos/ally-be.md) — Core Backend
 - **Stack**: NestJS 11 / TypeScript 5.9 / Node 24 / PostgreSQL 14 / Redis 7 / TypeORM
-- **Entry**: `src/main.ts` → `src/app.module.ts` (43 modules)
+- **Entry**: `src/main.ts` → `src/app.module.ts` (current counts: [Platform Stats](stats.md))
 - **Key modules**: auth, learn, livekit, ai, chat, audio-ingest, conversational-guardrails, badge, community, prompt, tenant, user, authorization, scenario-report
-- **DB migrations**: `src/database/migrations/` (211+ files, TypeORM); seeds in `src/database/seeds/`
+- **DB migrations**: `src/database/migrations/` (TypeORM, `synchronize: false`, never edit a merged one); seeds in `src/database/seeds/` are idempotent
 - **WebSocket gateways**: `microphone-chat.gateway.ts`, `cloud-telephony.gateway.ts`, `scenario-report.gateway.ts`
 - **API docs**: Swagger at `/api-docs`
 - **Key patterns**: RTK Query-style API services, EventEmitter for async, Redis pub/sub, RBAC guards, tenant isolation decorators
@@ -39,9 +40,9 @@ This page helps AI agents (and developers) quickly orient in the Ally workspace 
 - **Stack**: FastAPI + LiveKit Agents / Python 3.12 / Poetry / LangGraph / multi-provider TTS/STT/LLM
 - **Entry**: `app/main.py` (FastAPI), `app/worker.py` (LiveKit agent)
 - **Graph pipeline**: `app/core/graph/` (LangGraph: process_events → resolve_branching → generate_response/detect_behaviors → apply_voice → send_feedback)
-- **Event system**: `app/core/events/` (9 event types incl. SENTENCE_SIMILARITY, SEMANTIC_SIMILARITY, BINARY_CLASSIFIER, TIME, SCORE, COMBINATION, HELPER_*)
+- **Event system**: `app/core/events/` — one package per event type (SENTENCE_SIMILARITY, SEMANTIC_SIMILARITY, BINARY_CLASSIFIER, TIME, SCORE, COMBINATION, HELPER_*); the authoritative list is `docs/04-event-types-reference.md`, current count in [Platform Stats](stats.md)
 - **Provider factories**: `app/tts/factory.py`, `app/stt/factory.py`, `app/llms/factory.py`
-- **Prompts**: `app/prompts/` (system, branching, prosody, events); extensive `docs/` (01–13 numbered guides)
+- **Prompts**: `app/prompts/` (system, branching, prosody, events); extensive numbered `docs/`, indexed by intent in `docs/readme.md`
 - **Key patterns**: Factory pattern for providers, LiveKit agent lifecycle (configure/initialize/start), event orchestration with eligibility constraints
 
 ### [ally-web](../repos/ally-web.md) — Web Frontend Monorepo
@@ -54,7 +55,7 @@ This page helps AI agents (and developers) quickly orient in the Ally workspace 
 ### [ally-mobile](../repos/ally-mobile.md) — Mobile App
 - **Stack**: React Native 0.79 / TypeScript 5 / React 19 / Redux Toolkit + RTK Query
 - **Entry**: `index.js` → `src/App.tsx`; navigation via React Navigation 7 (native-stack + bottom-tabs + drawer)
-- **Services**: RTK Query in `src/services/` (30+ API files); 45+ custom hooks in `src/hooks/`
+- **Services**: RTK Query slices in `src/services/`; custom hooks in `src/hooks/`
 - **Real-time**: Socket.IO + LiveKit React Native; `react-native-live-audio-stream` for recording
 - **Key patterns**: Dual listening modes (microphone + conference), AsyncStorage for tokens, Firebase Crashlytics
 
@@ -67,12 +68,7 @@ This page helps AI agents (and developers) quickly orient in the Ally workspace 
 ## Cross-Repo Conventions
 
 ### Branch Naming
-```
-feature/<ticket-id>-short-description
-fix/<ticket-id>-short-description
-chore/<ticket-id>-short-description
-```
-(Individual repos' `CONTRIBUTING.md` may specify `feat/…`; check the target repo.)
+`<type>/<short-description>` — e.g. `feat/add-user-profile`, `fix/login-error`. Canonical rules and the full type list live in the [Contributing Guide](../contributing/guide.md#branch-naming); don't restate them elsewhere.
 
 ### API Versioning
 - All REST APIs use the `/api/v1/` prefix.

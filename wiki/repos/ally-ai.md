@@ -2,6 +2,7 @@
 title: ally-ai — AI Copilot Service
 tags: [repo, ai, fastapi, weaviate, python]
 summary: ally-ai (internally "Lifeline AI") is the FastAPI AI copilot service that provides conversation analysis, summaries, transcription, drift/language-quality scoring, and Weaviate-backed semantic search for the Ally counselor-training platform.
+last_reconciled: 2026-07-30
 ---
 
 # ally-ai — AI Copilot Service

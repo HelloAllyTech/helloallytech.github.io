@@ -2,6 +2,7 @@
 title: Analytics Agent — Natural-Language Questions Over Platform Data
 tags: [platform, analytics, agent, text-to-sql, admin, super-duper-admin, llm, security]
 summary: The Analytics Agent tab — ask an analytics question in English, get a narrated answer with the SQL that produced it. How the plan → guard → execute → narrate pipeline works, and the three-layer trust boundary that makes generated SQL safe to run.
+last_reconciled: 2026-07-30
 ---
 
 # Analytics Agent — Natural-Language Questions Over Platform Data

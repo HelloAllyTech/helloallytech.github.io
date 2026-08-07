@@ -2,6 +2,7 @@
 title: Prioritisation
 tags: [product, best-practices, prioritisation, roadmap, scope, tradeoffs]
 summary: DEPRECATED 2026-08-07, superseded by the Stacks MCP — kept for history. How Ally decides what to build next — problem before solution, explicit non-goals, thin vertical slices, and honest treatment of the maintenance and platform work that never wins a scoring model.
+last_reconciled: 2026-07-28
 ---
 
 # Prioritisation

@@ -2,6 +2,7 @@
 title: Language-Quality Evaluation & RCA
 tags: [platform, evaluation, language-quality, voice, llm-judge, rca]
 summary: How we evaluate and fix the language quality of voice roleplay agents — categorized error annotation by LLM judge, two objective speech metrics, and single-variable root-cause analysis.
+last_reconciled: 2026-07-21
 ---
 
 # Language-Quality Evaluation & RCA

@@ -2,6 +2,7 @@
 title: Scribe Summary Writes — Merge Semantics & Client Rules
 tags: [platform, scribe, data-integrity, deployment, sdlc]
 summary: Why scribe session notes appeared not to save, the merge-based write contract that replaced the destructive one, and the backend-first deploy rule every scribe client depends on.
+last_reconciled: 2026-07-28
 ---
 
 # Scribe Summary Writes — Merge Semantics & Client Rules

@@ -2,6 +2,7 @@
 title: Architecture & Data Flow
 tags: [platform, architecture, integration, queues, storage]
 summary: How Ally's services connect — data flow, integration points, message queues, storage, and authentication across the platform.
+last_reconciled: 2026-07-11
 ---
 
 # Architecture & Data Flow
@@ -72,7 +73,7 @@ The counselor-facing surfaces ([ally-web](../repos/ally-web.md), [ally-mobile](.
 
 ## Storage
 
-- **PostgreSQL** — primary DB for ally-be (TypeORM; see [ally-be](../repos/ally-be.md), whose `DATA_SCHEMA.md` maps 105 tables).
+- **PostgreSQL** — primary DB for ally-be (TypeORM; see [ally-be](../repos/ally-be.md), whose `DATA_SCHEMA.md` maps every table; current counts in [Platform Stats](stats.md)).
 - **Redis** — caching, pub/sub, rate limiting, and sessions.
 - **Weaviate** — vector DB for ally-ai (embeddings, semantic search over reference documents).
 - **AWS S3** — audio files, transcription results, media assets, and env files.

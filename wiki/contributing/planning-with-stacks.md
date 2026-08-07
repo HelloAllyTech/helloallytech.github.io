@@ -2,6 +2,7 @@
 title: Planning with the Stacks MCP
 tags: [contributing, agents, planning, mcp, workflow]
 summary: Every implementation plan starts with a Stacks MCP search — how to run the queries, how to cite what comes back, and how to configure the server.
+last_reconciled: 2026-08-07
 ---
 
 # Planning with the Stacks MCP

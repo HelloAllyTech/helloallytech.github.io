@@ -8,6 +8,9 @@ summary: A chronological log tracking all wiki updates and modifications.
 
 This is an append-only log of modifications, updates, and indexing runs performed on the wiki. All logs use the parseable prefix format: `## [YYYY-MM-DD] action | description`.
 
+## [2026-08-06] update | UI & Interaction: a truncated list needs a control, not just a count.
+- Principle 15, a checklist item and the "count-only footer" anti-pattern, filed from the admin Product Roadmap board: it rendered the first 50 of 507 opportunities and reported "50 of 507" with no pager, so 457 rows and every action attached to them lived only in the API. The rule pairs the count with the control — visible range, position in the set, prev/next — and records the two consequences of an offset only being meaningful against the result set it was taken from: every search/filter/sort change returns to the first page in the same state update (or the first request goes out at the stale offset), and page-scoped selections are dropped with it. Also requires the control to stay reachable when a shrinking list leaves the current page empty, so the escape isn't a reload.
+
 ## [2026-08-06] update | UI & Interaction: cross-surface links and full-role-set gating.
 - Two principles (13, 14) plus a checklist item, from building the consumer app's "Ally Admin" link into the admin console. **13:** a link into another surface is gated on a copy of *that* surface's own entry condition (mirroring the admin console's login `allowedRoles`), hidden when the destination URL isn't configured for the environment, and shaped like it leaves — anchor, external affordance, separated from in-app nav. **14:** derive role checks from `roles[]`, never the collapsed `role`, which the backend picks by a priority list that omits some roles and so misreports exactly the multi-role accounts a cross-surface feature targets.
 

@@ -46,7 +46,7 @@ For the detailed data flow, integration points, message queues, and storage, see
 
 - **Contributors**: start with the [Developer Setup](../contributing/dev-setup.md) and the [Contributing Guide](../contributing/guide.md).
 - **AI agents / assistants**: read the cross-repo [Agent Guide](agent-guide.md) for conventions, common tasks, and gotchas.
-- **Anyone shaping the product** (features, UI, scope): read [Product Management Best Practices](../product/best-practices.md) — the conventions for *what* we build and how it should behave, as opposed to how the system is built.
+- **Anyone shaping the product** (features, UI, scope): search the Stacks corpus before planning — [Planning with the Stacks MCP](../contributing/planning-with-stacks.md). The in-wiki [Product Management Best Practices](../product/best-practices.md) section it replaced is deprecated and kept for history only.
 
 ## License
 

@@ -26,7 +26,7 @@
         "environment"
       ],
       "last_reconciled": "2026-07-11",
-      "words": 466,
+      "words": 554,
       "url": "https://tech.helloally.ai/#/wiki/contributing/dev-setup.md",
       "skip_reason": ""
     },
@@ -57,8 +57,24 @@
         "standards"
       ],
       "last_reconciled": "2026-07-28",
-      "words": 673,
+      "words": 704,
       "url": "https://tech.helloally.ai/#/wiki/contributing/guide.md",
+      "skip_reason": ""
+    },
+    {
+      "path": "contributing/planning-with-stacks.md",
+      "title": "Planning with the Stacks MCP",
+      "summary": "Every implementation plan starts with a Stacks MCP search — how to run the queries, how to cite what comes back, and how to configure the server.",
+      "tags": [
+        "contributing",
+        "agents",
+        "planning",
+        "mcp",
+        "workflow"
+      ],
+      "last_reconciled": "2026-08-07",
+      "words": 877,
+      "url": "https://tech.helloally.ai/#/wiki/contributing/planning-with-stacks.md",
       "skip_reason": ""
     },
     {
@@ -97,7 +113,7 @@
       "summary": "",
       "tags": [],
       "last_reconciled": "",
-      "words": 569,
+      "words": 625,
       "url": "https://tech.helloally.ai/#/wiki/index.md",
       "skip_reason": "human navigation catalog — ROUTING.md supersedes it for agents"
     },
@@ -110,7 +126,7 @@
         "log"
       ],
       "last_reconciled": "",
-      "words": 4708,
+      "words": 5453,
       "url": "https://tech.helloally.ai/#/wiki/log.md",
       "skip_reason": "append-only history — read only when auditing what changed"
     },
@@ -124,7 +140,7 @@
         "learnings"
       ],
       "last_reconciled": "2026-08-06",
-      "words": 1156,
+      "words": 1244,
       "url": "https://tech.helloally.ai/#/wiki/memory.md",
       "skip_reason": ""
     },
@@ -137,7 +153,7 @@
         "structure"
       ],
       "last_reconciled": "2026-07-28",
-      "words": 270,
+      "words": 285,
       "url": "https://tech.helloally.ai/#/wiki/overview.md",
       "skip_reason": ""
     },
@@ -152,7 +168,7 @@
         "reference"
       ],
       "last_reconciled": "2026-07-28",
-      "words": 902,
+      "words": 996,
       "url": "https://tech.helloally.ai/#/wiki/platform/agent-guide.md",
       "skip_reason": ""
     },
@@ -253,7 +269,7 @@
         "mission"
       ],
       "last_reconciled": "2026-07-28",
-      "words": 429,
+      "words": 432,
       "url": "https://tech.helloally.ai/#/wiki/platform/overview.md",
       "skip_reason": ""
     },
@@ -304,7 +320,7 @@
     {
       "path": "product/ai-product-patterns.md",
       "title": "AI-Product Patterns",
-      "summary": "How Ally builds features where a model proposes and a person decides — disclosure, provenance, human-in-the-loop review, recording the \"no\", and never letting an unvalidated model answer become stored data.",
+      "summary": "DEPRECATED 2026-08-07, superseded by the Stacks MCP — kept for history. How Ally builds features where a model proposes and a person decides — disclosure, provenance, human-in-the-loop review, recording the \"no\", and never letting an unvalidated model answer become stored data.",
       "tags": [
         "product",
         "best-practices",
@@ -315,14 +331,14 @@
         "provenance"
       ],
       "last_reconciled": "2026-07-31",
-      "words": 1625,
+      "words": 1695,
       "url": "https://tech.helloally.ai/#/wiki/product/ai-product-patterns.md",
       "skip_reason": ""
     },
     {
       "path": "product/best-practices.md",
       "title": "Product Management Best Practices",
-      "summary": "The hub for Ally's product-management conventions — the house rules that apply to every product decision, plus a growing set of subsections (UI, Gamification, Data Visualisation, Prioritisation, User Personas, …).",
+      "summary": "DEPRECATED 2026-08-07, superseded by the Stacks MCP — kept for history. The former hub for Ally's product-management conventions — the house rules that apply to every product decision, plus a growing set of subsections (UI, Gamification, Data Visualisation, Prioritisation, User Personas, …).",
       "tags": [
         "product",
         "best-practices",
@@ -333,14 +349,14 @@
         "agents"
       ],
       "last_reconciled": "2026-07-31",
-      "words": 1196,
+      "words": 1337,
       "url": "https://tech.helloally.ai/#/wiki/product/best-practices.md",
       "skip_reason": ""
     },
     {
       "path": "product/chart-dashboard-principles.md",
       "title": "Chart & Dashboard Design Principles",
-      "summary": "A constraints-file reference for building charts and dashboards — perception rules, chart anatomy, clarity/simplicity/colour rules, persuasion-vs-deception boundaries, a chart-type lookup, an acceptance checklist, and an anti-pattern list.",
+      "summary": "DEPRECATED 2026-08-07, superseded by the Stacks MCP — kept for history. A constraints-file reference for building charts and dashboards — perception rules, chart anatomy, clarity/simplicity/colour rules, persuasion-vs-deception boundaries, a chart-type lookup, an acceptance checklist, and an anti-pattern list.",
       "tags": [
         "product",
         "best-practices",
@@ -351,14 +367,14 @@
         "agents"
       ],
       "last_reconciled": "2026-07-29",
-      "words": 7110,
+      "words": 7166,
       "url": "https://tech.helloally.ai/#/wiki/product/chart-dashboard-principles.md",
       "skip_reason": ""
     },
     {
       "path": "product/data-visualisation.md",
       "title": "Data Visualisation",
-      "summary": "Rules for showing numbers honestly at Ally — pick the chart from the question, never hide sample size or uncertainty, and design the dashboard around a decision.",
+      "summary": "DEPRECATED 2026-08-07, superseded by the Stacks MCP — kept for history. Rules for showing numbers honestly at Ally — pick the chart from the question, never hide sample size or uncertainty, and design the dashboard around a decision.",
       "tags": [
         "product",
         "best-practices",
@@ -369,14 +385,14 @@
         "metrics"
       ],
       "last_reconciled": "2026-07-30",
-      "words": 5588,
+      "words": 5658,
       "url": "https://tech.helloally.ai/#/wiki/product/data-visualisation.md",
       "skip_reason": ""
     },
     {
       "path": "product/gamification.md",
       "title": "Gamification",
-      "summary": "When and how to use badges, streaks, progress and leaderboards in a clinical-adjacent training product — and the cases where gamifying actively harms the outcome.",
+      "summary": "DEPRECATED 2026-08-07, superseded by the Stacks MCP — kept for history. When and how to use badges, streaks, progress and leaderboards in a clinical-adjacent training product — and the cases where gamifying actively harms the outcome.",
       "tags": [
         "product",
         "best-practices",
@@ -386,14 +402,14 @@
         "motivation"
       ],
       "last_reconciled": "2026-07-28",
-      "words": 730,
+      "words": 800,
       "url": "https://tech.helloally.ai/#/wiki/product/gamification.md",
       "skip_reason": ""
     },
     {
       "path": "product/prioritisation.md",
       "title": "Prioritisation",
-      "summary": "How Ally decides what to build next — problem before solution, explicit non-goals, thin vertical slices, and honest treatment of the maintenance and platform work that never wins a scoring model.",
+      "summary": "DEPRECATED 2026-08-07, superseded by the Stacks MCP — kept for history. How Ally decides what to build next — problem before solution, explicit non-goals, thin vertical slices, and honest treatment of the maintenance and platform work that never wins a scoring model.",
       "tags": [
         "product",
         "best-practices",
@@ -403,14 +419,14 @@
         "tradeoffs"
       ],
       "last_reconciled": "2026-07-28",
-      "words": 777,
+      "words": 847,
       "url": "https://tech.helloally.ai/#/wiki/product/prioritisation.md",
       "skip_reason": ""
     },
     {
       "path": "product/ui.md",
       "title": "UI & Interaction",
-      "summary": "How Ally screens should behave — states before styling, hierarchy, permission-aware UI, latency as a design problem, accessibility and localisation.",
+      "summary": "DEPRECATED 2026-08-07, superseded by the Stacks MCP — kept for history. How Ally screens should behave — states before styling, hierarchy, permission-aware UI, latency as a design problem, accessibility and localisation.",
       "tags": [
         "product",
         "best-practices",
@@ -421,14 +437,14 @@
         "i18n"
       ],
       "last_reconciled": "2026-08-06",
-      "words": 1389,
+      "words": 1735,
       "url": "https://tech.helloally.ai/#/wiki/product/ui.md",
       "skip_reason": ""
     },
     {
       "path": "product/user-personas.md",
       "title": "User Personas",
-      "summary": "Who Ally is built for — counsellor, learner, trainer/admin, tenant admin, super-admin — as working sketches tied to real permission roles, plus the rules for keeping personas honest.",
+      "summary": "DEPRECATED 2026-08-07, superseded by the Stacks MCP — kept for history. Who Ally is built for — counsellor, learner, trainer/admin, tenant admin, super-admin — as working sketches tied to real permission roles, plus the rules for keeping personas honest.",
       "tags": [
         "product",
         "best-practices",
@@ -438,7 +454,7 @@
         "roles"
       ],
       "last_reconciled": "2026-07-28",
-      "words": 1030,
+      "words": 1100,
       "url": "https://tech.helloally.ai/#/wiki/product/user-personas.md",
       "skip_reason": ""
     },
@@ -486,7 +502,7 @@
         "api"
       ],
       "last_reconciled": "2026-08-06",
-      "words": 1821,
+      "words": 1838,
       "url": "https://tech.helloally.ai/#/wiki/repos/ally-be.md",
       "skip_reason": ""
     },
@@ -502,7 +518,7 @@
         "android"
       ],
       "last_reconciled": "2026-07-28",
-      "words": 1365,
+      "words": 1381,
       "url": "https://tech.helloally.ai/#/wiki/repos/ally-mobile.md",
       "skip_reason": ""
     },
@@ -519,7 +535,7 @@
         "vite"
       ],
       "last_reconciled": "2026-08-06",
-      "words": 1439,
+      "words": 1457,
       "url": "https://tech.helloally.ai/#/wiki/repos/ally-web.md",
       "skip_reason": ""
     },
@@ -569,7 +585,7 @@
         "general"
       ],
       "last_reconciled": "2026-07-28",
-      "words": 401,
+      "words": 418,
       "url": "https://tech.helloally.ai/#/wiki/welcome.md",
       "skip_reason": ""
     }

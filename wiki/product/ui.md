@@ -1,13 +1,20 @@
 ---
 title: UI & Interaction
 tags: [product, best-practices, ui, ux, design, accessibility, i18n]
-summary: How Ally screens should behave — states before styling, hierarchy, permission-aware UI, latency as a design problem, accessibility and localisation.
+summary: DEPRECATED 2026-08-07, superseded by the Stacks MCP — kept for history. How Ally screens should behave — states before styling, hierarchy, permission-aware UI, latency as a design problem, accessibility and localisation.
 last_reconciled: 2026-08-06
 ---
 
 # UI & Interaction
 
-*Part of [Product Management Best Practices](best-practices.md).* **Maturity: Draft.**
+*Part of [Product Management Best Practices](best-practices.md).* **Maturity: Deprecated (2026-08-07) — was Draft.**
+
+> [!WARNING]
+> **Deprecated — superseded by the Stacks MCP.** Product guidance is now retrieved from the
+> external Stacks corpus at planning time; see
+> [Planning with the Stacks MCP](../contributing/planning-with-stacks.md). This page is kept for
+> history and because other pages cite its principles by number — do not add new principles here,
+> and treat anything that conflicts with current Stacks guidance as superseded.
 
 ## Why this matters for Ally
 
@@ -81,6 +88,19 @@ language with 40% longer labels.
     `role` only as a fallback for payloads that predate it. This is the concrete form of the
     "role-string gating" anti-pattern below.
 
+15. **A truncated list needs a control, not just a count.** When a list is paged server-side,
+    the count is what makes the truncation visible — and without a pager beside it, that count
+    is just a notice that the rest is unreachable ("50 of 507" and nothing to click). Ship the
+    two together: the *visible range* rather than the page size (`Showing 51–100 of 507`), the
+    position in the set, and prev/next. Two rules follow from the offset being meaningful only
+    against the result set it was taken from: every search, filter and sort change returns to
+    the first page (reset it in the same update that changes the filter, or the first request
+    goes out at the stale offset), and any page-scoped selection is dropped with it. And keep
+    the control reachable when the current page is *empty* — a list that shrinks underneath a
+    high offset must still offer the way back, or the only escape is a reload. (Ally case: the
+    admin Product Roadmap board rendered page 1 of 507 opportunities and reported "50 of 507"
+    with no pager, so 457 rows — and every action attached to them — existed only in the API.)
+
 ## Checklist
 
 - [ ] All six states specified and implemented (empty / loading / slow / partial / error / denied).
@@ -96,6 +116,9 @@ language with 40% longer labels.
 - [ ] Any link into another surface is gated on that surface's own entry condition, hidden when
       its URL is unconfigured, and verified with a multi-role account whose collapsed `role`
       disagrees with its `roles[]`.
+- [ ] Any server-truncated list ships its pager in the same change, shows the visible range,
+      returns to the first page on every search/filter/sort change, and stays escapable when the
+      current page comes back empty.
 
 ## Anti-patterns
 
@@ -107,6 +130,9 @@ language with 40% longer labels.
 - **Silent permission failures.** Rendering a button that returns 403 on click.
 - **The invisible record.** An exclusion filter that quietly becomes the reason a whole class of
   account can never be edited again — the list is the only door, and it was locked.
+- **The count-only footer.** Reporting "50 of 507" with no pager beside it. The footer names the
+  truncation and then strands the reader on page one; the rows past the first page are visible
+  only to whoever writes the API call.
 - **Toast-only errors** for failures the user must act on — they vanish before they're read.
 - **English-shaped layouts.** Fixed-width labels and truncation that make other languages
   unreadable.

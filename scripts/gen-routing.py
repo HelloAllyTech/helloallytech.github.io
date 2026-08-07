@@ -35,7 +35,7 @@ NOT_FOR_TASKS = {
 }
 
 SECTIONS = [
-    ("Read before building anything user-facing", ("product/",)),
+    ("Product practice — DEPRECATED 2026-08-07, superseded by the Stacks MCP; history only", ("product/",)),
     ("Platform & architecture", ("platform/",)),
     ("Per-repo pages", ("repos/",)),
     ("Contributing & setup", ("contributing/",)),
@@ -44,7 +44,7 @@ SECTIONS = [
     ("Start here", ("welcome.md", "getting-started.md", "overview.md")),
 ]
 
-SUMMARY_WORD_CAP = 16
+SUMMARY_WORD_CAP = 15
 
 
 def parse_frontmatter(text: str) -> tuple[dict, str]:
@@ -74,7 +74,15 @@ def first_heading(body: str) -> str:
     return m.group(1).strip() if m else ""
 
 
+# A deprecation notice belongs on the section header once, not on every line under it.
+# Stripping it here buys back the words for what the page actually says.
+DEPRECATION_PREFIX = re.compile(
+    r"^DEPRECATED[^—]*—\s*kept for history\.\s*", re.IGNORECASE
+)
+
+
 def clip(summary: str, cap: int = SUMMARY_WORD_CAP) -> str:
+    summary = DEPRECATION_PREFIX.sub("", summary)
     words = summary.split()
     if len(words) <= cap:
         return summary.rstrip(".")

@@ -19,7 +19,9 @@ This repository is an **LLMWiki** knowledge base. It is designed to be maintaine
 
 ## Operating Guidelines for Agents
 
-When the user asks you to interact with this wiki, you must follow the guidelines for the respective operational flow:
+When the user asks you to interact with this wiki, you must follow the guidelines for the respective operational flow.
+
+> **Ally house rule (applies to every repo, not just this one):** before writing an implementation plan, call the stacks MCP's `search_chunks` tool with 2–3 queries covering the task's main topics, and incorporate relevant returned guidance, citing chunk titles. See `wiki/contributing/planning-with-stacks.md`.
 
 ### 1. Ingestion Flow (Adding a Source)
 1. **Read and Extract**: Read the raw source provided by the user (usually located under a `/raw/` folder, or provided directly in the prompt). Summarize the key claims and information.

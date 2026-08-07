@@ -22,7 +22,7 @@ This repository (`helloallytech.github.io`, served at **tech.helloally.ai**) is 
 - `index.md` — Catalog / sidebar navigation source.
 - `welcome.md`, `getting-started.md` — Entry pages.
 - `platform/` — Cross-cutting docs: `overview.md`, `architecture.md`, `tech-stack.md`, `agent-guide.md`.
-- `product/` — **Product Management Best Practices**: `best-practices.md` (hub + house rules) plus one page per subsection (`ui.md`, `gamification.md`, `data-visualisation.md`, `prioritisation.md`, `user-personas.md`, …) and longer craft references under a subsection (`chart-dashboard-principles.md`). This folder is designed to grow — new pages go here and get registered in the hub tables and `index.md`.
+- `product/` — **Deprecated 2026-08-07**, superseded by the Stacks MCP. Was *Product Management Best Practices*: `best-practices.md` (hub + house rules), one page per subsection (`ui.md`, `gamification.md`, `data-visualisation.md`, `prioritisation.md`, `user-personas.md`, `ai-product-patterns.md`) and a craft reference (`chart-dashboard-principles.md`). **Frozen** — no new pages, no new principles, and the existing principle numbering must not shift because platform pages cite it. Product guidance now comes from Stacks at planning time (`contributing/planning-with-stacks.md`).
 - `repos/` — One page per repository: `ally-be`, `ally-ai`, `ally-ai-learn`, `ally-web`, `ally-mobile`, `infra`.
 - `contributing/` — `dev-setup.md`, `guide.md` (SDLC rules).
 - `overview.md`, `memory.md`, `context.md`, `log.md` — Meta/session state.

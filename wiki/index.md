@@ -18,15 +18,18 @@ Welcome to the **Ally Developer Wiki** catalog. This catalog is parsed by the LL
 - [Login `allowedRoles` — Client-Supplied Filter & Role-Retirement Test Case](platform/login-allowed-roles.md) — Why auth calls carry a client-sent role list, how retiring a role locked every consumer user out of login, and the regression test that guards it
 - [Platform Stats](platform/stats.md) — **Generated.** Current counts of entities, migrations, modules, providers — so prose never has to state a number
 
-## Product Management
-- [Product Management Best Practices](product/best-practices.md) — **Hub.** House rules for every product decision + the index of subsections (read before building anything user-facing)
-- [UI & Interaction](product/ui.md) — States before styling, hierarchy, permission-aware UI, latency, accessibility, i18n
-- [Gamification](product/gamification.md) — Badges, streaks, leaderboards, progress — and when not to gamify
-- [Data Visualisation](product/data-visualisation.md) — Charts, dashboards and the honesty rules for showing numbers
-- [Chart & Dashboard Design Principles](product/chart-dashboard-principles.md) — Deep reference under Data Visualisation: perception rules, chart anatomy, chart-type lookup, acceptance checklist, anti-patterns
-- [Prioritisation](product/prioritisation.md) — Choosing what to build, slicing it, and writing down the non-goals
-- [User Personas](product/user-personas.md) — Counsellor, learner, trainer, tenant admin, super-admin
-- [AI-Product Patterns](product/ai-product-patterns.md) — Model proposes, person decides: provenance, human-in-the-loop review, validated classification, recording the "no"
+## Product Management — ⚠️ Deprecated (2026-08-07)
+
+Superseded by the **Stacks MCP** — see [Planning with the Stacks MCP](contributing/planning-with-stacks.md). These pages are frozen and kept for history; nothing in them is a gate, and no new principles go here.
+
+- [Product Management Best Practices](product/best-practices.md) — **Hub (deprecated).** The former house rules + subsection index
+- [UI & Interaction](product/ui.md) — *(deprecated)* States before styling, hierarchy, permission-aware UI, latency, accessibility, i18n
+- [Gamification](product/gamification.md) — *(deprecated)* Badges, streaks, leaderboards, progress — and when not to gamify
+- [Data Visualisation](product/data-visualisation.md) — *(deprecated)* Charts, dashboards and the honesty rules for showing numbers
+- [Chart & Dashboard Design Principles](product/chart-dashboard-principles.md) — *(deprecated)* Deep reference under Data Visualisation: perception rules, chart anatomy, chart-type lookup, acceptance checklist, anti-patterns
+- [Prioritisation](product/prioritisation.md) — *(deprecated)* Choosing what to build, slicing it, and writing down the non-goals
+- [User Personas](product/user-personas.md) — *(deprecated)* Counsellor, learner, trainer, tenant admin, super-admin
+- [AI-Product Patterns](product/ai-product-patterns.md) — *(deprecated)* Model proposes, person decides: provenance, human-in-the-loop review, validated classification, recording the "no"
 
 ## Repositories
 - [ally-be](repos/ally-be.md) — Core backend (NestJS)
@@ -39,6 +42,7 @@ Welcome to the **Ally Developer Wiki** catalog. This catalog is parsed by the LL
 ## Contributing
 - [Developer Setup](contributing/dev-setup.md) — Clone repos and run the full local stack
 - [Contributing Guide](contributing/guide.md) — SDLC rules, code standards, PR process
+- [Planning with the Stacks MCP](contributing/planning-with-stacks.md) — Search the guidance corpus before writing any implementation plan, and cite what you use
 - [Release Process](contributing/release-process.md) — Shared production-release process: versioning, pipeline, troubleshooting
 - [Documentation System](contributing/docs-system.md) — How docs are routed, deduplicated, enforced in CI, and kept current
 

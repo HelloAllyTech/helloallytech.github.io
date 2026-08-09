@@ -1,8 +1,8 @@
 ---
 title: infra — Infrastructure & Dev Environment
 tags: [repo, infra, ansible, terraform, docker, devops]
-summary: The infra repo provisions Ally's Hetzner baremetal, Incus containers, and AWS services via Ansible + Terraform, and holds the shell scripts developers use to bootstrap repos and run the local stack.
-last_reconciled: 2026-07-11
+summary: The infra repo provisions Ally's Hetzner baremetal, Incus containers, and AWS services via Ansible + Terraform, holds the shell scripts developers use to bootstrap repos and run the local stack, and defines how operators get SSH and VPN access to the fleet.
+last_reconciled: 2026-08-09
 ---
 
 # infra — Infrastructure & Dev Environment
@@ -115,6 +115,34 @@ Production/dev runs on a fleet of **Hetzner baremetal** hosts, each provisioned 
 - **Secrets** — Ansible Vault; set `ANSIBLE_VAULT_PASSWORD_FILE` and place the deploy key at `~/.ssh/id_ansible_ally` (see `ansible/README.md`).
 
 The `infra_upgrade.md` doc records a cost/reliability audit and a proposed AWS consolidation (collapsing services onto fewer nodes behind a bastion, keeping managed Postgres) to reduce monthly cost and operational surface.
+
+## Operator Access
+
+Getting a person onto the fleet is two separate problems — reaching a host over SSH, and reaching the private network at all. They fail differently and are worth keeping apart in your head.
+
+### Host access over SSH
+
+Ansible authenticates with the dedicated deploy key described under **Secrets** above. Two things about the fleet are not obvious from the inventory:
+
+- **Root login is not uniform.** Most hosts accept the deploy key as root; at least one accepts it only as the unprivileged `ally` user, with operations running through `sudo`. A play whose group sets `ansible_user: root` fails on those hosts even though the key is perfectly valid. Set the connecting user to match the host rather than assuming the group's default, and read "denied as root, fine as `ally`" as a per-host configuration difference, not a broken credential.
+- **Group names describe intent, not hardware.** The group that reads as baremetal also contains smaller cloud instances. Never infer machine class, core count, or available memory from the group a host sits in — check the host.
+
+There is also more than one operator key in circulation, and they do not all open the same hosts. If a host refuses one key, that is a fact about which key was provisioned there, not evidence that the host is down.
+
+### VPN access
+
+Two different things share the name **Wireguard** in this repo, and conflating them causes real confusion:
+
+1. **Container peering** — machine-to-machine, provisioned by cloud-init in the Incus templates with per-container keys, as described under *Incus provisioning* above. No human is involved.
+2. **Operator access** — people and laptops join the private network through a **self-service access portal**: a Rails application that owns the peer registry in its own database and reconciles the hub's live interface from it.
+
+Three rules follow from that split:
+
+- **Register operator peers through the portal, never by hand.** A peer written directly onto the hub's running interface is invisible to the portal's database, and is dropped the next time the portal reconciles. Hand-provisioning looks like it works and then silently stops working.
+- **The hub's identity must live on exactly one host.** A Wireguard identity *is* its private key, so a standby built by copying the hub's configuration inherits the hub's identity rather than backing it up. Two hosts then answer as the same peer while their registries drift apart, and only one of them is actually receiving handshakes. If you want a standby, give it its own keypair and fail over by changing where clients point — never by cloning the key.
+- **The portal is on the critical path for onboarding.** Access to the private network is gated on the portal being up, so it is not an optional internal tool. Portal sign-in is Google OAuth; administrator rights are a flag on the user record, and a single bootstrap address configured in the environment is auto-promoted on first login. Everyone else has to be promoted by an existing administrator — so if exactly one person holds that bootstrap address, they are a single point of failure for granting access.
+
+Internal service names resolve only from inside the private network. Name resolution failing for internal hosts almost always means the tunnel is down, not that DNS is broken.
 
 ## SQS Queues & LocalStack
 

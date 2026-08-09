@@ -122,18 +122,58 @@ AI agents (and humans) can quickly query the local knowledge database directly f
   llmwiki\search.bat "<query_term>"
   ```
 
+### Command Line Lint CLI
+Health-check the wiki before committing. `lint` reports broken links, orphan pages, missing/invalid frontmatter, and malformed `log.md` entries.
+
+```bash
+./llmwiki/lint            # human-readable report, exits 1 on errors (broken links)
+./llmwiki/lint --strict   # also fail on warnings (orphans, frontmatter, log format)
+./llmwiki/lint --quiet    # only problems + summary
+./llmwiki/lint <wiki-dir> # lint a specific wiki/ directory
+```
+
+It exits non-zero when it finds errors, so it fits straight into CI — e.g. run `./llmwiki/lint` on every push to keep the wiki honest. The engine's own suite runs `python3 tests/test_lint.py` against `tests/fixture_good` and `tests/fixture_bad`.
+
 ---
 
 ## 🔄 Fetching Engine Updates
 
-Pull down new features, UI layouts, or search fixes without touching your wiki pages. How you update depends on how you added the engine:
+Pull down new features, UI layouts, or search fixes without touching your wiki pages.
 
-**If you vendored it (Option A):** replace the folder with a fresh copy —
+**Automate with an AI Coding Assistant (recommended):** paste this into your agent's chat inside the wiki workspace:
+```markdown
+Please read the LLMWiki engine upgrade instruction manual from this URL:
+https://raw.githubusercontent.com/ajeygore/llmwiki/main/update.md
+Follow its instructions to upgrade the LLMWiki engine in this workspace to the latest version.
+```
+It detects whether the engine is vendored or a submodule, updates it accordingly, reconciles any root-level template changes (like `index.html`) that a plain folder refresh wouldn't pick up, and logs/commits the change. The same manual ships inside every workspace at `llmwiki/update.md` once the engine is installed.
+
+**Manual — how you update depends on how you added the engine:**
+
+If you vendored it (Option A): replace the folder with a fresh copy —
 ```bash
 rm -rf llmwiki && git clone --depth 1 https://github.com/ajeygore/llmwiki.git llmwiki && rm -rf llmwiki/.git
 ```
 
-**If you added it as a submodule (Option B):** fetch and merge from the remote engine repo —
+If you added it as a submodule (Option B): fetch and merge from the remote engine repo —
 ```bash
 git submodule update --remote --merge
 ```
+
+Either way, note that `setup.py` only creates files that are missing, so upgrades that change `index.html` or `agents.md` won't reach your workspace from a folder refresh alone — see `llmwiki/update.md` for how to reconcile those.
+
+---
+
+## 🌐 Publish to GitHub Pages (optional)
+
+The viewer is fully client-side — it loads Markdown with relative `fetch()` calls and routes purely via the URL hash — so a wiki workspace can be hosted read-only on GitHub Pages with **no code changes**. `setup.py` generates a ready-to-use deploy workflow at `.github/workflows/pages.yml` (plus a `.nojekyll` marker) in every new workspace. To turn it on:
+
+1. Push your wiki workspace repo to GitHub. Make sure the engine is **committed** — vendor it (Option A), or the workflow's `submodules: recursive` checkout will pull it (Option B).
+2. In the repo, open **Settings → Pages → Build and deployment** and set **Source** to **GitHub Actions**.
+3. Each push to `main` publishes to `https://<user>.github.io/<repo>/`.
+
+**Notes**
+- The Actions flow serves `.md` files verbatim (Jekyll is bypassed); the `.nojekyll` marker also makes the simpler *Deploy from a branch* option work.
+- Pages publishes **everything** in the repo, including `raw/` — don't commit private source material you don't want public (or use a private repo, which requires a paid plan for Pages).
+- A page appears in the sidebar/catalog only if it's linked from `wiki/index.md`; unlinked files remain reachable by direct URL but aren't listed.
+- Pages is read-only; agents continue editing the Markdown locally via git.

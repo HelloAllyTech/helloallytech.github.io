@@ -2,6 +2,8 @@
 
 You are an AI coding assistant helping the user bootstrap a new personal knowledge base in this empty repository. Please follow these steps to initialize the LLMWiki:
 
+> **Already have a wiki set up?** This manual is for a brand-new, empty repository. To upgrade an existing wiki's engine to the latest version instead, read `update.md`: `https://raw.githubusercontent.com/ajeygore/llmwiki/main/update.md` (or `llmwiki/update.md` inside the workspace).
+
 ## 1. Add the Engine
 Place the engine repository (`https://github.com/ajeygore/llmwiki.git`) inside a folder named `llmwiki/` at the root of the user's workspace. There are two ways to do this — **default to Option A (vendoring)**, which works everywhere. Only use Option B if the workspace is already a Git repository and the user explicitly wants the engine kept as a linked submodule.
 
@@ -46,3 +48,4 @@ Once setup is complete, output a clear message containing:
    - On macOS/Linux: `./llmwiki/run`
    - On Windows: `llmwiki\run.bat`
 3. **Agent Integration**: Tell them to open the wiki dashboard (typically on `http://localhost:8001`), locate the welcome page at `wiki/welcome.md`, copy the **AI Agent Setup Prompt**, and paste it into their coding agent chat to begin auto-populating the wiki!
+4. **Optional — Publish to GitHub Pages**: Mention that setup also generated `.github/workflows/pages.yml` and a `.nojekyll` marker. If they push this repo to GitHub and set **Settings → Pages → Source** to **GitHub Actions**, the wiki is hosted read-only at `https://<user>.github.io/<repo>/`. Warn that Pages publishes everything, including `raw/`, so they should not commit private sources to a public repo.

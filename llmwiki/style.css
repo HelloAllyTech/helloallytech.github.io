@@ -314,7 +314,14 @@ html, body {
   font-weight: 600;
 }
 
-.raw-btn {
+.meta-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.raw-btn,
+.print-btn {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -325,10 +332,13 @@ html, body {
   color: var(--text-secondary);
   text-decoration: none;
   font-size: 0.8rem;
+  font-family: inherit;
+  cursor: pointer;
   transition: all var(--transition-fast);
 }
 
-.raw-btn:hover {
+.raw-btn:hover,
+.print-btn:hover {
   background-color: var(--bg-active);
   color: var(--text-primary);
 }
@@ -910,3 +920,149 @@ html, body {
 }
 
 
+
+/* ── Graph View ──────────────────────────────────────────────────────────
+   Obsidian-style force-directed map. Theme-aware via the engine's CSS vars. */
+.graph-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  margin-bottom: 10px;
+  border-radius: var(--border-radius);
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+.graph-nav-link:hover,
+.graph-nav-link.active {
+  background: var(--bg-active);
+  color: var(--accent-color);
+}
+.graph-nav-icon { font-size: 1rem; line-height: 1; }
+
+.graph-header {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.graph-header h1 { margin: 0; }
+.graph-meta { color: var(--text-muted); font-size: 0.85rem; }
+.graph-status { color: var(--text-muted); text-align: center; padding: 48px 0; }
+.graph-error { color: #e5534b; }
+
+#graphContainer {
+  width: 100%;
+  height: 70vh;
+  min-height: 480px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  background: var(--bg-content);
+  overflow: hidden;
+}
+#graphSvg { width: 100%; height: 100%; display: block; cursor: grab; }
+#graphSvg:active { cursor: grabbing; }
+
+.graph-link { stroke: var(--border-color); stroke-width: 1px; stroke-opacity: 0.55; }
+.graph-link.hot { stroke: var(--accent-color); stroke-width: 1.5px; stroke-opacity: 1; }
+.graph-link.dim { stroke-opacity: 0.08; }
+
+.graph-node circle {
+  fill: var(--accent-color);
+  stroke: var(--bg-content);
+  stroke-width: 1px;
+  transition: fill var(--transition-fast);
+}
+.graph-node:hover circle { fill: var(--accent-hover); }
+.graph-node text {
+  fill: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: 10px;
+  pointer-events: none;
+  /* Halo of the page background so labels stay legible over edges/nodes. */
+  paint-order: stroke;
+  stroke: var(--bg-content);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+.graph-node.dim { opacity: 0.22; transition: opacity var(--transition-fast); }
+.graph-node.dim text { opacity: 0.5; }
+
+/* ==========================================================================
+   Print — output only the current page's rendered content, not app chrome.
+   ========================================================================== */
+@media print {
+  .sidebar,
+  .sidebar-overlay,
+  .content-header,
+  .copy-code-btn {
+    display: none !important;
+  }
+
+  html, body, .app-container, .main-content, .content-wrapper {
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
+    background: #fff !important;
+    margin: 0;
+    padding: 0;
+  }
+
+  .content-wrapper {
+    padding: 0 !important;
+  }
+
+  .markdown-body {
+    max-width: 100% !important;
+    color: #000 !important;
+  }
+
+  .markdown-body h1,
+  .markdown-body h2,
+  .markdown-body h3,
+  .markdown-body h4 {
+    color: #000 !important;
+  }
+
+  .markdown-body a {
+    color: #000 !important;
+    text-decoration: underline;
+  }
+
+  .markdown-body pre,
+  .markdown-body code {
+    background: #f5f5f5 !important;
+    color: #000 !important;
+    border: 1px solid #ddd;
+  }
+
+  .markdown-body th,
+  .markdown-body td {
+    border: 1px solid #ccc !important;
+    color: #000 !important;
+  }
+
+  .markdown-body th {
+    background-color: #f0f0f0 !important;
+  }
+
+  .markdown-body blockquote {
+    color: #333 !important;
+    border-color: #ccc !important;
+  }
+
+  .markdown-body pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+
+  .markdown-body a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.75em;
+    color: #555 !important;
+  }
+}

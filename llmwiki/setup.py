@@ -4,6 +4,9 @@ import sys
 import argparse
 from datetime import datetime
 
+DEFAULT_VIEWER_PORT = 8001
+
+
 def create_file_if_missing(filepath, content, description):
     if os.path.exists(filepath):
         print(f"ℹ️  File already exists, skipping: {os.path.basename(filepath)}")
@@ -125,6 +128,12 @@ AI Agents should read these files to ingest new knowledge into the `/wiki/` fold
         </div>
         
         <div class="meta-info">
+          <button id="printPageBtn" class="print-btn" aria-label="Print this page" title="Print this page">
+            <svg class="print-icon" viewBox="0 0 24 24" width="14" height="14">
+              <path fill="currentColor" d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-1 11H6v-5h12v5zm1-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-3-9H8v4h8V3z"/>
+            </svg>
+            Print
+          </button>
           <a href="#" id="rawLink" target="_blank" class="raw-btn">
             <svg class="raw-icon" viewBox="0 0 24 24" width="14" height="14">
               <path fill="currentColor" d="M12.89 3L14.85 3.4L11.11 21L9.15 20.6L12.89 3M19.59 12L16 8.41V5.58L22.42 12L16 18.41V15.58L19.59 12M1.58 12L8 5.58V8.41L4.41 12L8 15.58V18.41L1.58 12Z"/>
@@ -165,7 +174,8 @@ This repository is an **LLMWiki** knowledge base. It is designed to be maintaine
 - `/wiki/index.md` — The content catalog containing links and summaries of all pages. Used by the browser engine to construct the navigation sidebar.
 - `/wiki/log.md` — The chronological action log.
 - `/wiki/skills/` — Custom workspaces-specific skills directory. Each subfolder contains a specialized agent skill.
-- `/llmwiki/` — The LLMWiki rendering engine (JS and CSS assets).
+- `/llmwiki/` — The LLMWiki rendering engine (JS and CSS assets). Never modify files in here.
+- `/llmwiki/update.md` — Instruction manual for upgrading the engine to the latest upstream version.
 - `/index.html` — The customizable HTML template for human browsing.
 - `/agents.md` — This instruction manual.
 
@@ -231,6 +241,41 @@ If executing automated loops or scheduled agent flows (cron triggers, cron itera
 All logs in `/wiki/log.md` must use the parseable prefix format:
 `## [YYYY-MM-DD] action | Description`
 This makes the logs parseable via unix command-line tools.
+
+---
+
+## Reprocess After Every Major Task
+
+A wiki is only worth reading if it is current. **After every major task in the
+project this wiki documents, reprocess the wiki, commit, and push.**
+
+**Major** means: a merged change that alters behaviour, a completed piece of
+work, a decision, a deploy, or an incident whose diagnosis is worth keeping.
+Not: typo fixes, dependency bumps, or refactors that change nothing observable.
+
+1. **Log it** — append to `/wiki/log.md` in the parseable format above.
+2. **Update the pages the change made wrong.** A change that invalidates a page
+   is not finished until the page is right.
+3. **Record the decision**, if a real choice was made — including the options
+   rejected and why. That is what nobody can reconstruct later.
+4. **Update any verbatim copies under `/raw/`** if their sources changed.
+   Snapshots rot silently.
+5. **Catalog it** — every new page must be linked from `/wiki/index.md`, or it
+   is an orphan nobody will find.
+6. **Lint, then commit.** Run `./llmwiki/lint` **after your last edit**,
+   including the log entry itself, and fix what it reports:
+   ```bash
+   ./llmwiki/lint && git add -A && git commit && git push
+   ```
+7. **Push.** An updated wiki nobody else can see has not been updated.
+
+Nothing fails when a wiki goes stale — it simply misleads the next person, and
+it does so with the authority of written documentation. That is why this is a
+step in the work rather than an afterthought.
+
+**Never put secret values in a wiki.** Referencing where a secret lives is
+fine; the value never is. A private repository is not the same as a safe place
+for a credential.
 """
     create_file_if_missing(agents_md_path, agents_md_content, "Agent manual instructions")
     
@@ -362,17 +407,45 @@ AI agents (and humans) can quickly query the local knowledge database directly f
 
 ## 🔄 Fetching Engine Updates
 
-Pull down new features, UI layouts, or search fixes without touching your wiki pages. How you update depends on how you added the engine:
+Pull down new features, UI layouts, or search fixes without touching your wiki pages.
 
-**If you vendored it (Option A):** replace the folder with a fresh copy —
+**Automate with an AI Coding Assistant (recommended):** paste this into your agent's chat inside this workspace:
+```markdown
+Please read the LLMWiki engine upgrade instruction manual at llmwiki/update.md
+(or https://raw.githubusercontent.com/ajeygore/llmwiki/main/update.md).
+Follow its instructions to upgrade the LLMWiki engine in this workspace to the latest version.
+```
+It detects whether the engine is vendored or a submodule, updates it accordingly, reconciles any root-level template changes (like `index.html`) that a plain folder refresh wouldn't pick up, and logs/commits the change.
+
+**Manual — how you update depends on how you added the engine:**
+
+If you vendored it (Option A): replace the folder with a fresh copy —
 ```bash
 rm -rf llmwiki && git clone --depth 1 https://github.com/ajeygore/llmwiki.git llmwiki && rm -rf llmwiki/.git
 ```
 
-**If you added it as a submodule (Option B):** fetch and merge from the remote engine repo —
+If you added it as a submodule (Option B): fetch and merge from the remote engine repo —
 ```bash
 git submodule update --remote --merge
 ```
+
+Either way, note that this setup script only creates files that are missing, so upgrades that change `index.html` or `agents.md` won't reach your workspace from a folder refresh alone — see `llmwiki/update.md` for how to reconcile those.
+
+---
+
+## 🌐 Publish to GitHub Pages (optional)
+
+The viewer is fully client-side (relative `fetch()` calls + hash-based routing), so your wiki can be hosted read-only on GitHub Pages with no code changes. A deploy workflow was generated at `.github/workflows/pages.yml`, manual-only by default. To turn it on:
+
+1. Push this repository to GitHub. The engine must be **committed** — vendor it (Option A), or the workflow will pull it during checkout if it's a submodule (Option B).
+2. In the repo, open **Settings → Pages → Build and deployment** and set **Source** to **GitHub Actions**.
+3. Every push to `main` publishes to `https://<user>.github.io/<repo>/`.
+
+Notes:
+- The Actions flow serves your `.md` files verbatim (no Jekyll). A `.nojekyll` marker is also included so the simpler *Deploy from a branch* option works too.
+- Pages publishes **everything** in the repo, including `raw/`. Don't commit private source material you don't want public (or use a private repo, which needs a paid plan for Pages).
+- A page only appears in the sidebar/catalog if it's linked from `wiki/index.md`; unlinked files are still reachable by direct URL but won't be listed.
+- Pages is a read-only view — agents keep editing the Markdown locally via git as usual.
 """
     create_file_if_missing(readme_path, readme_content, "Quickstart README")
     
@@ -598,7 +671,77 @@ Place long-form API specifications, database schemas, library guides, or coding 
 This keeps the main `SKILL.md` instruction file short and token-efficient, while allowing agents to load references on-demand when performing skill tasks.
 """
     create_file_if_missing(skill_ref_path, skill_ref_content, "example skill references readme")
-    
+
+    # 14a. Pin this wiki's viewer port. Every wiki defaulting to 8001 means
+    #      whichever starts first wins it and the rest drift to 8002, 8003 —
+    #      with nothing in the URL saying which wiki you actually opened.
+    port_file_path = os.path.join(wiki_root, '.llmwiki-port')
+    port_file_content = f"""{DEFAULT_VIEWER_PORT}  # viewer port for this wiki
+
+Change this if you run more than one wiki on this machine, so each has its own
+port and the URL identifies which wiki you are looking at. Overridden by
+--port or WIKI_PORT.
+"""
+    create_file_if_missing(port_file_path, port_file_content, "viewer port pin")
+
+    # 14. Create .nojekyll so GitHub Pages serves raw .md files verbatim
+    #     (branch-deploy runs Jekyll by default, which would convert/omit .md).
+    nojekyll_path = os.path.join(wiki_root, '.nojekyll')
+    create_file_if_missing(nojekyll_path, "", "GitHub Pages .nojekyll marker")
+
+    # 15. Create a GitHub Actions workflow to publish the wiki to GitHub Pages.
+    #     The Actions deploy flow bypasses Jekyll entirely and checks out
+    #     submodules, so it works whether the engine is vendored or a submodule.
+    pages_workflow_path = os.path.join(wiki_root, '.github', 'workflows', 'pages.yml')
+    pages_workflow_content = """name: Deploy LLMWiki to GitHub Pages
+
+# Manual until you turn Pages on. Enable it in Settings -> Pages -> Source:
+# GitHub Actions, then uncomment the push trigger below for deploy-on-merge.
+#
+# It ships manual-only because `actions/configure-pages` fails when Pages is
+# not enabled — so an on-push default would make every commit in a fresh wiki
+# go red, hiding real failures behind a workflow that was never asked for.
+#
+# Before enabling: this publishes the WHOLE workspace, including raw/. Do not
+# turn it on for a public repo holding anything private.
+on:
+  workflow_dispatch:
+  # push:
+  #   branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one concurrent deployment; don't cancel an in-progress run.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive   # pulls the engine when added as a submodule
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'               # publish the whole wiki workspace as-is
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+"""
+    create_file_if_missing(pages_workflow_path, pages_workflow_content, "GitHub Pages deploy workflow")
+
     print("-" * 50)
     print(f"✅ {wiki_name} Repository Skeleton Ready!")
     print("💡 Start your server by running: ./llmwiki/run")

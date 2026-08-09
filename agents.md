@@ -11,7 +11,8 @@ This repository is an **LLMWiki** knowledge base. It is designed to be maintaine
 - `/wiki/index.md` — The content catalog containing links and summaries of all pages. Used by the browser engine to construct the navigation sidebar.
 - `/wiki/log.md` — The chronological action log.
 - `/wiki/skills/` — Custom workspaces-specific skills directory. Each subfolder contains a specialized agent skill.
-- `/llmwiki/` — The LLMWiki rendering engine (JS and CSS assets).
+- `/llmwiki/` — The LLMWiki rendering engine (JS and CSS assets). Never modify files in here.
+- `/llmwiki/update.md` — Instruction manual for upgrading the engine to the latest upstream version.
 - `/index.html` — The customizable HTML template for human browsing.
 - `/agents.md` — This instruction manual.
 
@@ -86,3 +87,44 @@ If executing automated loops or scheduled agent flows (cron triggers, cron itera
 All logs in `/wiki/log.md` must use the parseable prefix format:
 `## [YYYY-MM-DD] action | Description`
 This makes the logs parseable via unix command-line tools.
+
+---
+
+## Reprocess After Every Major Task
+
+A wiki is only worth reading if it is current. **After every major task in the
+project this wiki documents, reprocess the wiki, commit, and push.**
+
+**Major** means: a merged change that alters behaviour, a completed piece of
+work, a decision, a deploy, or an incident whose diagnosis is worth keeping.
+Not: typo fixes, dependency bumps, or refactors that change nothing observable.
+
+1. **Log it** — append to `/wiki/log.md` in the parseable format above.
+2. **Update the pages the change made wrong.** A change that invalidates a page
+   is not finished until the page is right.
+3. **Record the decision**, if a real choice was made — including the options
+   rejected and why. That is what nobody can reconstruct later.
+4. **Update any verbatim copies under `/raw/`** if their sources changed.
+   Snapshots rot silently.
+5. **Catalog it** — every new page must be linked from `/wiki/index.md`, or it
+   is an orphan nobody will find.
+6. **Lint, then commit.** Run both linters **after your last edit**, including
+   the log entry itself, and fix what they report. `scripts/wiki_lint.py` is the
+   Ally-specific one and the CI gate; `./llmwiki/lint` is the engine's generic
+   pass. Regenerate the indexes first if page frontmatter changed:
+   ```bash
+   python3 scripts/gen-routing.py
+   python3 scripts/wiki_lint.py && ./llmwiki/lint
+   git add -A && git commit && git push
+   ```
+7. **Push.** An updated wiki nobody else can see has not been updated. `main` is
+   protected here — open a PR rather than relying on an admin bypass.
+
+Nothing fails when a wiki goes stale — it simply misleads the next person, and
+it does so with the authority of written documentation. That is why this is a
+step in the work rather than an afterthought.
+
+**Never put secret values in a wiki.** Referencing where a secret lives is
+fine; the value never is. A private repository is not the same as a safe place
+for a credential. This site is public, so the bar is higher still: no
+hostnames, addresses, or region details either.

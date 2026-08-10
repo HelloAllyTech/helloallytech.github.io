@@ -26,7 +26,7 @@
         "environment"
       ],
       "last_reconciled": "2026-07-11",
-      "words": 610,
+      "words": 637,
       "url": "https://tech.helloally.ai/#/wiki/contributing/dev-setup.md",
       "skip_reason": ""
     },
@@ -57,14 +57,14 @@
         "standards"
       ],
       "last_reconciled": "2026-07-28",
-      "words": 769,
+      "words": 767,
       "url": "https://tech.helloally.ai/#/wiki/contributing/guide.md",
       "skip_reason": ""
     },
     {
       "path": "contributing/planning-with-stacks.md",
       "title": "Working with the Stacks MCP",
-      "summary": "Pull Stacks context whenever a product judgement comes up — while planning and while coding — how to run the planning_context prompt, how to cite what comes back, and how the server is wired in.",
+      "summary": "Pull Stacks context whenever a product judgement comes up — while planning and while coding — how an agent searches the library itself, how to cite what comes back, and how the server is wired in.",
       "tags": [
         "contributing",
         "agents",
@@ -73,7 +73,7 @@
         "workflow"
       ],
       "last_reconciled": "2026-08-10",
-      "words": 1917,
+      "words": 2075,
       "url": "https://tech.helloally.ai/#/wiki/contributing/planning-with-stacks.md",
       "skip_reason": ""
     },
@@ -126,7 +126,7 @@
         "log"
       ],
       "last_reconciled": "",
-      "words": 7544,
+      "words": 7893,
       "url": "https://tech.helloally.ai/#/wiki/log.md",
       "skip_reason": "append-only history — read only when auditing what changed"
     },
@@ -168,7 +168,7 @@
         "reference"
       ],
       "last_reconciled": "2026-07-28",
-      "words": 1084,
+      "words": 1097,
       "url": "https://tech.helloally.ai/#/wiki/platform/agent-guide.md",
       "skip_reason": ""
     },
@@ -585,7 +585,7 @@
         "general"
       ],
       "last_reconciled": "2026-07-28",
-      "words": 434,
+      "words": 443,
       "url": "https://tech.helloally.ai/#/wiki/welcome.md",
       "skip_reason": ""
     }

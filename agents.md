@@ -22,7 +22,7 @@ This repository is an **LLMWiki** knowledge base. It is designed to be maintaine
 
 When the user asks you to interact with this wiki, you must follow the guidelines for the respective operational flow.
 
-> **Ally house rule (applies to every repo, not just this one):** before writing an implementation plan, run `/stacks:planning_context` with a description of the task, and incorporate relevant returned guidance, citing chunk titles. There is no search tool — it is an MCP prompt only a human can invoke, so when no Stacks context block is in the conversation, ask for it rather than guessing. See `wiki/contributing/planning-with-stacks.md`.
+> **Ally house rule (applies to every repo, not just this one):** whenever a product judgement comes up — before writing an implementation plan, and equally mid-implementation — call the stacks MCP's `search_chunks` tool and incorporate relevant returned guidance, citing chunk titles. Search on your own initiative with specific noun phrases; `get_chunks` gives the full passage behind an id, `list_tags` shows how the library is organised. Never claim Stacks does or doesn't cover something: tags aren't contents, and an empty search isn't a gap. `/stacks:planning_context` remains as the human entry point. See `wiki/contributing/planning-with-stacks.md`.
 
 ### 1. Ingestion Flow (Adding a Source)
 1. **Read and Extract**: Read the raw source provided by the user (usually located under a `/raw/` folder, or provided directly in the prompt). Summarize the key claims and information.

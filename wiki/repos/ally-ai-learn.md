@@ -2,7 +2,7 @@
 title: ally-ai-learn — Voice Training Agent
 tags: [repo, ai, livekit, langgraph, voice, python]
 summary: A LiveKit-based voice AI agent (FastAPI + LangGraph) that simulates mental-health client conversations, detecting counseling skills in real time, scoring them, and publishing events to ally-be via AWS SQS.
-last_reconciled: 2026-07-21
+last_reconciled: 2026-08-10
 ---
 
 # ally-ai-learn — Voice Training Agent
@@ -40,6 +40,16 @@ The service is composed of a FastAPI app plus LiveKit agent workers. The core of
 - `app/main.py` — FastAPI application: `GET /api/health`, `/api/v1` routers (scenario report, voice preview), CORS/middleware.
 - `app/worker.py` — v1 `AgentWorker`; 3-phase session lifecycle (configure → initialize → start).
 - `app/worker_v2.py` — Roleplay Studio v2 worker (gated by `ROLEPLAY_V2_ENABLED`, default on).
+
+**Worker connection lifecycle and health signals**
+
+A worker is only useful while it holds its long-lived WebSocket to LiveKit and stays registered under `AGENT_NAME`. Everything below exists because a fleet that has lost that registration looks, from every other angle, completely healthy.
+
+- **Giving up is silent, and the default budget is short.** The agents SDK retries a lost connection with `min(n*2, 10)s` backoff up to `WorkerOptions(max_retry=...)`. On exhaustion it sets an internal `_connection_failed` flag, raises inside its own task, and **stops trying** — the process does not exit. The SDK default of 16 works out to only ~2.5 minutes, which is shorter than most planned maintenance on the LiveKit side. Treat `max_retry` as a liveness setting, not a tuning knob.
+- **The container self-heal only triggers on process exit.** `start.sh` runs uvicorn and the worker side by side and tears the container down when *either* exits (`wait -n`), so the orchestrator restarts it. A worker that has given up but is still resident defeats this entirely.
+- **Two HTTP surfaces, and only one is a health signal.** FastAPI's `GET /api/health` returns a static `ok` — it proves the HTTP process is up and nothing more. The agents SDK runs its *own* health server on a separate port that returns **503** when the worker has given up connecting or its inference process is dead, and serves `GET /worker` with `agent_name`, `active_jobs` and worker load. Container and orchestrator health checks must check the SDK's server; checking only the FastAPI endpoint is indistinguishable from checking nothing.
+- **The active-session metric is not a liveness signal.** It is emitted from the SDK's `load_fnc` hook, which keeps running while the worker is disconnected, so it continues publishing at full rate throughout an outage. It is a demand signal for autoscaling — never alarm on it to detect a dead fleet.
+- **Dispatch is by name.** A job only reaches a worker registered under the exact name the backend dispatches to. A name mismatch between backend and worker produces "the agent never joined", identical in appearance to a worker that is absent.
 
 **LangGraph conversation flow** (`app/core/graph/`)
 - `graph_builder.py` — `build_simulation_graph()` (live voice) and `build_report_graph()` (text-only N-turn simulation for reports).

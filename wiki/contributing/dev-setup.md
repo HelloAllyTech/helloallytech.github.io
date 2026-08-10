@@ -53,12 +53,16 @@ To stop everything: `./infra/dev_cleanup.sh` (or `docker compose down` inside th
 ## Agent Tooling — the Stacks MCP
 
 Every Ally repo commits a `.mcp.json` at its root declaring the `stacks` MCP server, which agents
-must search before writing an implementation plan. The file carries no credential — it expands
-`${STACKS_API_KEY}` from your environment at connect time.
+must search whenever a product judgement comes up — while planning and while coding. The file
+carries no credential — it expands `${STACKS_API_KEY}` from your environment at connect time.
+Alongside it each repo commits a `stacks` skill and a `UserPromptSubmit` hook, so the corpus
+reaches a session without anyone adding or invoking anything.
 
 Once, per machine: get a key from the platform team, add `export STACKS_API_KEY="…"` to your
 `~/.zshrc`, open a fresh shell, and approve the `stacks` server the first time an agent session
-prompts for it. Full rule and troubleshooting: [Planning with the Stacks MCP](planning-with-stacks.md).
+prompts for it. Export the key in your shell profile rather than a single terminal — the hook
+reads it from the environment the session was launched with. Full rule and troubleshooting:
+[Working with the Stacks MCP](planning-with-stacks.md).
 
 ## General Requirements
 

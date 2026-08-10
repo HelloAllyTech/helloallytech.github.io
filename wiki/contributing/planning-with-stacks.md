@@ -1,27 +1,41 @@
 ---
-title: Planning with the Stacks MCP
+title: Working with the Stacks MCP
 tags: [contributing, agents, planning, mcp, workflow]
-summary: Every implementation plan starts with a Stacks MCP search — how to run the queries, how to cite what comes back, and how to configure the server.
-last_reconciled: 2026-08-07
+summary: Search Stacks whenever a product judgement comes up — while planning and while coding — how to run the queries, how to cite what comes back, and how the server is wired in.
+last_reconciled: 2026-08-10
 ---
 
-# Planning with the Stacks MCP
+# Working with the Stacks MCP
 
 **Stacks** is a retrieval service (RAG) that holds product-management and engineering-practice
 guidance, exposed to Claude Code and other agents over MCP. It is wired into every Ally repo, so
-the guidance is available at the moment a plan is being written rather than in review, when
-re-planning is expensive.
+the guidance is available at the moment a decision is being made rather than in review, when
+re-deciding is expensive.
 
 ## The rule
 
 > [!IMPORTANT]
-> **Before writing an implementation plan, call the stacks MCP's `search_chunks` tool with 2–3
-> queries covering the task's main topics, and incorporate relevant returned guidance, citing
-> chunk titles.**
+> **Whenever a decision about how the product should behave comes up, call the stacks MCP's
+> `search_chunks` tool with 2–3 queries on the topic, incorporate relevant returned guidance, and
+> cite chunk titles. Planning is the most important moment, not the only one.**
 
-This applies to any planning session that produces an implementation plan — a plan-mode plan, a
-design doc, a spec, or a written breakdown before the first commit. Trivial mechanical work
-(a rename, a dependency bump, a typo fix) does not need it.
+Concretely, that means:
+
+| Moment | Why it matters |
+|---|---|
+| **Before writing an implementation plan** — a plan-mode plan, design doc, spec, or written breakdown before the first commit | The original rule. Guidance that arrives after the plan is a citation exercise |
+| **While implementing**, at each point you would otherwise invent the answer: an empty, loading, edge or failure state; a user-facing label, button or error message; what a view shows and what it omits; a threshold, limit, cadence or reward rule | Where most product decisions are actually made, and where the corpus went unused before 2026-08-10 |
+| **While reviewing**, for how a change behaves rather than how it reads | Cheaper than re-deciding after merge |
+
+Trivial mechanical work (a rename, a dependency bump, a typo fix) does not need it.
+
+> [!NOTE]
+> Until 2026-08-10 this rule — and the MCP server's own tool descriptions — said *planning* only.
+> That wording was load-bearing in a way that was easy to miss: a connected session reads the tool
+> description to decide when the tool applies, concludes Stacks is a planning tool, and stops
+> querying the moment implementation starts, no matter what a repo's `CLAUDE.md` says. Both the
+> server copy and the repo instructions were widened together; changing one without the other
+> puts it back.
 
 ## Running the search
 
@@ -37,9 +51,13 @@ task along its actual topics so the queries land in different places:
 Write queries as topics, not as the ticket title. `"scenario_voices table migration"` retrieves
 nothing; `"database migration rollout strategy"` retrieves the guidance that matters.
 
-**Read the results before writing the plan, not after.** The point is that returned guidance
-changes the plan — which slice ships first, which states the UI needs, what the non-goals are. A
-search whose results arrive after the plan is written is a citation exercise.
+**Read the results before you decide, not after.** The point is that returned guidance changes
+the outcome — which slice ships first, which states the UI needs, what the non-goals are. A
+search whose results arrive after the decision is a citation exercise.
+
+`get_chunks` fetches the verbatim source excerpt behind a chunk when the exact wording matters;
+`list_tags` and `list_documents` show what the corpus covers when you are not sure it holds
+anything on your topic.
 
 ## Citing what you use
 
@@ -83,9 +101,30 @@ more.
 
 ## Configuration
 
-Every Ally repo has a `.mcp.json` at its root declaring the `stacks` server, so the tool is
-available as soon as an agent session starts in that repo. The file is committed; the credential
-is not — it is read from the environment at connect time.
+Every Ally repo commits four things at its root, so a session is wired up the moment it starts
+and nobody has to add or invoke anything by hand:
+
+| File | What it does |
+|---|---|
+| `.mcp.json` | Declares the `stacks` server. Committed; the credential is not — `${STACKS_API_KEY}` is read from the environment at connect time |
+| `CLAUDE.md` / `AGENTS.md` | State the rule above, so it is in context from the first turn |
+| `.claude/skills/stacks/SKILL.md` | A skill whose description names the trigger moments. Its one-line description sits in context every turn at negligible cost, so the rule keeps re-asserting itself deep into a long session, where a `CLAUDE.md` line read at startup has long since stopped competing for attention |
+| `.claude/settings.json` + `.claude/hooks/stacks-search.sh` | A `UserPromptSubmit` hook that runs a small search automatically when a prompt looks product-shaped |
+
+**About the hook.** It is a floor, not the rule — it catches prompts you would otherwise not have
+searched on, and it is deliberately conservative:
+
+- It fires only on product-judgement phrasing. "Fix the typo", "bump axios", "why is this test
+  failing" do not match; "what should the empty state show", "add a streak counter", "the right
+  wording for this error message" do.
+- It asks for 3 chunks, not the server default of 8 — roughly 1.3k tokens rather than 3.4k, which
+  is the difference between an occasional nudge and forcing compaction.
+- It stops after 4 injections per session.
+- It fails open and silent. No key, a Stacks outage, a slow response, malformed input — every path
+  exits cleanly and your prompt goes through untouched. You will not be told it did nothing.
+
+Because it fails silently by design, **never treat the hook as evidence the search happened.**
+When guidance mattered, query deliberately and cite what you used.
 
 **One-time setup per engineer:**
 
@@ -107,6 +146,16 @@ results. If it is missing or every call fails to authorize:
   server for that project.
 - Restart the session after changing either — `.mcp.json` and the environment are both read at
   startup.
+
+To check the hook specifically, run it by hand from a repo root — it should print a JSON block
+with an `additionalContext` field:
+
+```bash
+echo '{"prompt":"what should the empty state show","session_id":"manual"}' | .claude/hooks/stacks-search.sh
+```
+
+Silence means one of its guards tripped: no `STACKS_API_KEY` in that shell, no `jq`, the prompt
+did not match the gate, or the per-session cap was already spent.
 
 Do not work around a broken Stacks connection by skipping the search silently. Fix it, or say in
 the plan that Stacks was unavailable.

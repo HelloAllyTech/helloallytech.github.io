@@ -39,7 +39,7 @@ Commitlint / Husky hooks enforce this in the TypeScript repos.
 
 ## Development Workflow
 
-0. **Before you plan, search Stacks.** Call the stacks MCP's `search_chunks` tool with 2–3 queries covering the task's main topics, and incorporate relevant returned guidance, citing chunk titles — see [Planning with the Stacks MCP](planning-with-stacks.md). This is where product guidance now comes from; the in-wiki [Product Management Best Practices](../product/best-practices.md) section was deprecated on 2026-08-07. Trivial mechanical changes (rename, dependency bump, typo) skip this.
+0. **Search Stacks — before you plan, and again whenever a product judgement comes up.** Call the stacks MCP's `search_chunks` tool with 2–3 queries on the topic, and incorporate relevant returned guidance, citing chunk titles — see [Working with the Stacks MCP](planning-with-stacks.md). Planning is the most important moment, not the only one: reach for it mid-implementation too, whenever you would otherwise invent an empty or failure state, a user-facing label, a threshold or a cadence. This is where product guidance now comes from; the in-wiki [Product Management Best Practices](../product/best-practices.md) section was deprecated on 2026-08-07. Trivial mechanical changes (rename, dependency bump, typo) skip this.
 1. **Create a feature branch** following the naming convention.
 2. **Make your changes** following the code standards for that repo.
 3. **Test thoroughly** — run tests (`npm test` / `poetry run pytest`) and linters (`npm run lint` / `poetry run flake8 app/`).

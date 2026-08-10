@@ -57,14 +57,14 @@
         "standards"
       ],
       "last_reconciled": "2026-07-28",
-      "words": 744,
+      "words": 769,
       "url": "https://tech.helloally.ai/#/wiki/contributing/guide.md",
       "skip_reason": ""
     },
     {
       "path": "contributing/planning-with-stacks.md",
       "title": "Working with the Stacks MCP",
-      "summary": "Search Stacks whenever a product judgement comes up — while planning and while coding — how to run the queries, how to cite what comes back, and how the server is wired in.",
+      "summary": "Pull Stacks context whenever a product judgement comes up — while planning and while coding — how to run the planning_context prompt, how to cite what comes back, and how the server is wired in.",
       "tags": [
         "contributing",
         "agents",
@@ -73,7 +73,7 @@
         "workflow"
       ],
       "last_reconciled": "2026-08-10",
-      "words": 1431,
+      "words": 1917,
       "url": "https://tech.helloally.ai/#/wiki/contributing/planning-with-stacks.md",
       "skip_reason": ""
     },
@@ -113,7 +113,7 @@
       "summary": "",
       "tags": [],
       "last_reconciled": "",
-      "words": 631,
+      "words": 629,
       "url": "https://tech.helloally.ai/#/wiki/index.md",
       "skip_reason": "human navigation catalog — ROUTING.md supersedes it for agents"
     },
@@ -126,7 +126,7 @@
         "log"
       ],
       "last_reconciled": "",
-      "words": 7192,
+      "words": 7544,
       "url": "https://tech.helloally.ai/#/wiki/log.md",
       "skip_reason": "append-only history — read only when auditing what changed"
     },
@@ -140,7 +140,7 @@
         "learnings"
       ],
       "last_reconciled": "2026-08-09",
-      "words": 1888,
+      "words": 1934,
       "url": "https://tech.helloally.ai/#/wiki/memory.md",
       "skip_reason": ""
     },
@@ -168,7 +168,7 @@
         "reference"
       ],
       "last_reconciled": "2026-07-28",
-      "words": 1049,
+      "words": 1084,
       "url": "https://tech.helloally.ai/#/wiki/platform/agent-guide.md",
       "skip_reason": ""
     },
@@ -349,7 +349,7 @@
         "agents"
       ],
       "last_reconciled": "2026-07-31",
-      "words": 1337,
+      "words": 1331,
       "url": "https://tech.helloally.ai/#/wiki/product/best-practices.md",
       "skip_reason": ""
     },
@@ -585,7 +585,7 @@
         "general"
       ],
       "last_reconciled": "2026-07-28",
-      "words": 427,
+      "words": 434,
       "url": "https://tech.helloally.ai/#/wiki/welcome.md",
       "skip_reason": ""
     }

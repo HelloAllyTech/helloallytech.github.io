@@ -42,7 +42,7 @@ Superseded by the **Stacks MCP** — see [Planning with the Stacks MCP](contribu
 ## Contributing
 - [Developer Setup](contributing/dev-setup.md) — Clone repos and run the full local stack
 - [Contributing Guide](contributing/guide.md) — SDLC rules, code standards, PR process
-- [Working with the Stacks MCP](contributing/planning-with-stacks.md) — Search the guidance corpus whenever a product judgement comes up, while planning and while coding, and cite what you use
+- [Working with the Stacks MCP](contributing/planning-with-stacks.md) — Run `/stacks:planning_context` whenever a product judgement comes up, while planning and while coding, and cite what you use
 - [Release Process](contributing/release-process.md) — Shared production-release process: versioning, pipeline, troubleshooting
 - [Documentation System](contributing/docs-system.md) — How docs are routed, deduplicated, enforced in CI, and kept current
 

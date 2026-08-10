@@ -11,9 +11,9 @@ last_reconciled: 2026-07-31
 > **Deprecated — 2026-08-07. Superseded by the Stacks MCP.**
 >
 > Product guidance is no longer maintained in this wiki. It is retrieved from the external
-> **Stacks** corpus at planning time: *before writing an implementation plan, call the stacks
-> MCP's `search_chunks` tool with 2–3 queries covering the task's main topics, and incorporate
-> relevant returned guidance, citing chunk titles.* See
+> **Stacks** corpus at planning time: *before writing an implementation plan, run
+> `/stacks:planning_context` with a description of the task, and incorporate relevant returned
+> guidance, citing chunk titles.* See
 > [Planning with the Stacks MCP](../contributing/planning-with-stacks.md).
 >
 > **Do not add new principles here** — new product judgement calls go into Stacks. Nothing on

@@ -1,7 +1,7 @@
 ---
 title: Working with the Stacks MCP
 tags: [contributing, agents, planning, mcp, workflow]
-summary: Search Stacks whenever a product judgement comes up — while planning and while coding — how to run the queries, how to cite what comes back, and how the server is wired in.
+summary: Pull Stacks context whenever a product judgement comes up — while planning and while coding — how to run the planning_context prompt, how to cite what comes back, and how the server is wired in.
 last_reconciled: 2026-08-10
 ---
 
@@ -15,9 +15,9 @@ re-deciding is expensive.
 ## The rule
 
 > [!IMPORTANT]
-> **Whenever a decision about how the product should behave comes up, call the stacks MCP's
-> `search_chunks` tool with 2–3 queries on the topic, incorporate relevant returned guidance, and
-> cite chunk titles. Planning is the most important moment, not the only one.**
+> **Whenever a decision about how the product should behave comes up, run
+> `/stacks:planning_context` with a description of the task, incorporate relevant returned
+> guidance, and cite chunk titles. Planning is the most important moment, not the only one.**
 
 Concretely, that means:
 
@@ -37,27 +37,64 @@ Trivial mechanical work (a rename, a dependency bump, a typo fix) does not need 
 > server copy and the repo instructions were widened together; changing one without the other
 > puts it back.
 
-## Running the search
+## There is no search tool
 
-**Use 2–3 queries, not one.** A single query retrieves one neighbourhood of the corpus. Split the
-task along its actual topics so the queries land in different places:
+Later on 2026-08-10 the server was narrowed to a single entry point, and it is not a tool:
 
-| Task | Queries that cover it |
+| Surface | Type | Who invokes it |
+|---|---|---|
+| `/stacks:planning_context` | MCP **prompt**, one argument `task_description` | you, in chat |
+| `get_chunks` | tool, `ids` (1–20) from a returned block | the agent |
+
+`search_chunks`, `list_tags` and `list_documents` were **removed outright** — calls to them now
+fail as unknown tools.
+
+The structural consequence is the part worth holding on to. A prompt runs only when a human
+invokes it, so **an agent can no longer reach the library on its own initiative, and can no longer
+enumerate what the library contains.** Two habits follow:
+
+- **Don't let a session claim Stacks does or doesn't cover something.** It has no way to check, and
+  a confident "Stacks has nothing on empty states" is unfalsifiable from inside the session. The
+  most it can honestly say is what a returned block did or didn't contain.
+- **A missing context block usually means nobody ran the prompt** — not that the library came up
+  empty. If an agent is about to invent an answer, run the prompt for it.
+
+## Getting the context
+
+Describe the task, not a search phrase. The argument is a task description and the server runs one
+hybrid search over it:
+
+```
+/stacks:planning_context rolling out a database migration that changes voice config for live sessions
+```
+
+| Task | A description that works |
 |---|---|
-| A learner-facing streak widget | `gamification streaks`, `progress feedback loops`, `notification frequency` |
-| A new analytics chart on the admin console | `dashboard chart selection`, `sample size honesty`, `admin permission gating` |
-| Splitting a service in two | `service boundaries`, `incremental migration strategy`, `rollout and rollback` |
+| A learner-facing streak widget | `adding a streak counter to the learner home screen — what cadence, what reward, what it shows on a broken streak` |
+| A new analytics chart on the admin console | `a new chart on the admin analytics console showing per-cohort practice minutes, including small-sample cohorts` |
+| Splitting a service in two | `splitting the session service in two, migrating incrementally without downtime` |
 
-Write queries as topics, not as the ticket title. `"scenario_voices table migration"` retrieves
-nothing; `"database migration rollout strategy"` retrieves the guidance that matters.
+`"scenario_voices table migration"` retrieves nothing useful; the sentence above it retrieves the
+guidance that matters. Minimum three characters.
 
 **Read the results before you decide, not after.** The point is that returned guidance changes
-the outcome — which slice ships first, which states the UI needs, what the non-goals are. A
-search whose results arrive after the decision is a citation exercise.
+the outcome — which slice ships first, which states the UI needs, what the non-goals are. Context
+that arrives after the decision is a citation exercise.
 
-`get_chunks` fetches the verbatim source excerpt behind a chunk when the exact wording matters;
-`list_tags` and `list_documents` show what the corpus covers when you are not sure it holds
-anything on your topic.
+**Judge relevance yourself.** The prompt always returns its eight top-ranked chunks whether or not
+they fit — there is no relevance floor and no "nothing found" response. A block full of off-topic
+chunks is a normal result, not a signal to force a fit.
+
+`get_chunks` fetches the verbatim source excerpt behind a chunk, plus its section and book
+summaries, when the exact wording matters. It takes ids from a block already in the conversation
+and cannot search; invented ids will not resolve.
+
+> [!WARNING]
+> **The server's upstream embedder is rate limited to 3 requests per minute**, shared across every
+> session, every engineer and the automatic hook. Over that ceiling the call returns an error —
+> and because the hook fails silent, that looks exactly like "no guidance found". If a block
+> doesn't appear when you expected one, wait a minute and run the prompt again before concluding
+> anything about the corpus.
 
 ## Citing what you use
 
@@ -70,9 +107,10 @@ Name the **chunk title** inline where the guidance shapes a decision, so a revie
    (Stacks: *Gamification — Extrinsic Rewards and Motivation Crowding*)
 ```
 
-Cite only chunks you actually applied. If 2–3 queries return nothing relevant, say so in one line
-— "Stacks searched (`x`, `y`, `z`) — nothing applicable" — and move on. A silent skip and a
-genuine miss look identical to a reviewer.
+Cite only chunks you actually applied. If a block came back with nothing relevant, say so in one
+line — "Stacks context retrieved — nothing applicable" — and move on. A silent skip and a genuine
+miss look identical to a reviewer. If no block was retrieved at all, say *that* instead; "nothing
+applicable" and "never looked" are different claims and only one of them is checkable.
 
 ## Stacks replaced the in-wiki product practices
 
@@ -94,8 +132,8 @@ The old pages are still readable and still linked. Treat them as **history, not 
 That last point is worth being deliberate about. The deprecated pages hold Ally-specific
 findings — Carbon's chart-overflow behaviour, the `roles[]`-vs-collapsed-`role` gating trap, the
 minimum-group-size rule for tenant-isolated metrics — that a general product-management corpus
-has no reason to contain. **If a query returns nothing and you suspect the answer is one of
-those, check the deprecated page before re-deriving it.** Anything you find there that is still
+has no reason to contain. **If a block comes back with nothing for one of those, check the
+deprecated page before re-deriving it.** Anything you find there that is still
 true and still load-bearing belongs in Stacks; putting it back into the wiki is not the path any
 more.
 
@@ -109,22 +147,29 @@ and nobody has to add or invoke anything by hand:
 | `.mcp.json` | Declares the `stacks` server. Committed; the credential is not — `${STACKS_API_KEY}` is read from the environment at connect time |
 | `CLAUDE.md` / `AGENTS.md` | State the rule above, so it is in context from the first turn |
 | `.claude/skills/stacks/SKILL.md` | A skill whose description names the trigger moments. Its one-line description sits in context every turn at negligible cost, so the rule keeps re-asserting itself deep into a long session, where a `CLAUDE.md` line read at startup has long since stopped competing for attention |
-| `.claude/settings.json` + `.claude/hooks/stacks-search.sh` | A `UserPromptSubmit` hook that runs a small search automatically when a prompt looks product-shaped |
+| `.claude/settings.json` + `.claude/hooks/stacks-search.sh` | A `UserPromptSubmit` hook that pulls a small context block automatically when a prompt looks product-shaped |
 
-**About the hook.** It is a floor, not the rule — it catches prompts you would otherwise not have
-searched on, and it is deliberately conservative:
+**About the hook.** Since the server dropped its search tool, this hook is the *only* automatic
+path into the library — an agent cannot invoke `planning_context` itself. It is still a floor
+rather than the rule, and deliberately conservative:
 
 - It fires only on product-judgement phrasing. "Fix the typo", "bump axios", "why is this test
   failing" do not match; "what should the empty state show", "add a streak counter", "the right
   wording for this error message" do.
-- It asks for 3 chunks, not the server default of 8 — roughly 1.3k tokens rather than 3.4k, which
-  is the difference between an occasional nudge and forcing compaction.
-- It stops after 4 injections per session.
-- It fails open and silent. No key, a Stacks outage, a slow response, malformed input — every path
-  exits cleanly and your prompt goes through untouched. You will not be told it did nothing.
+- It trims the response to the 3 strongest chunks. `planning_context` has no `max_results` and
+  always returns 8 (~3.2k tokens); the trim brings that back to ~1.4k, which is the difference
+  between an occasional nudge and forcing compaction. Kept chunks keep their ids, so `get_chunks`
+  still works on them.
+- It stops after 4 injections per session, and waits at least 25 seconds between fires. The
+  server no longer rate limits us, but its upstream embedder does — 3 requests/minute shared with
+  whatever you run by hand — so an ungoverned hook would eat the quota your own
+  `/stacks:planning_context` needs.
+- It fails open and silent. No key, a Stacks outage, a slow response, a rate-limit error,
+  malformed input — every path exits cleanly and your prompt goes through untouched. You will not
+  be told it did nothing.
 
-Because it fails silently by design, **never treat the hook as evidence the search happened.**
-When guidance mattered, query deliberately and cite what you used.
+Because it fails silently by design, **never treat the hook as evidence the library was
+consulted.** When guidance mattered, run the prompt deliberately and cite what you used.
 
 **One-time setup per engineer:**
 
@@ -137,8 +182,8 @@ When guidance mattered, query deliberately and cite what you used.
 3. Start a fresh agent session in any Ally repo and approve the `stacks` server when prompted.
    Project-scoped MCP servers require approval once per project.
 
-**Checking it works** — in a session, confirm a `search_chunks` tool is available and returns
-results. If it is missing or every call fails to authorize:
+**Checking it works** — in a session, confirm `/stacks:planning_context` is offered as a slash
+command and returns a block of chunks. If it is missing or every call fails to authorize:
 
 - `echo $STACKS_API_KEY` in the *same* shell the agent was launched from — a variable exported in
   a different terminal, or set after the session started, will not be picked up.
@@ -155,9 +200,11 @@ echo '{"prompt":"what should the empty state show","session_id":"manual"}' | .cl
 ```
 
 Silence means one of its guards tripped: no `STACKS_API_KEY` in that shell, no `jq`, the prompt
-did not match the gate, or the per-session cap was already spent.
+did not match the gate, the per-session cap was already spent, the 25-second cooldown had not
+elapsed, or the upstream embedder rate-limited the call. The cooldown is machine-wide, so a
+second run straight after the first is silent by design — wait, then retry.
 
-Do not work around a broken Stacks connection by skipping the search silently. Fix it, or say in
+Do not work around a broken Stacks connection by skipping the library silently. Fix it, or say in
 the plan that Stacks was unavailable.
 
 ---

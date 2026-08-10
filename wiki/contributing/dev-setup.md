@@ -55,13 +55,15 @@ To stop everything: `./infra/dev_cleanup.sh` (or `docker compose down` inside th
 Every Ally repo commits a `.mcp.json` at its root declaring the `stacks` MCP server, which agents
 must search whenever a product judgement comes up — while planning and while coding. The file
 carries no credential — it expands `${STACKS_API_KEY}` from your environment at connect time.
-Alongside it each repo commits a `stacks` skill and a `UserPromptSubmit` hook, so the corpus
-reaches a session without anyone adding or invoking anything.
+Alongside it each repo commits a `stacks` skill carrying the retrieval technique, so the corpus
+reaches a session without anyone adding or invoking anything. An agent calls `search_chunks`
+itself when a judgement comes up; the keyword-gated `UserPromptSubmit` hook that used to do this
+was retired on 2026-08-10 once searching became possible.
 
 Once, per machine: get a key from the platform team, add `export STACKS_API_KEY="…"` to your
 `~/.zshrc`, open a fresh shell, and approve the `stacks` server the first time an agent session
-prompts for it. Export the key in your shell profile rather than a single terminal — the hook
-reads it from the environment the session was launched with. Full rule and troubleshooting:
+prompts for it. Export the key in your shell profile rather than a single terminal — the server is
+connected using the environment the session was launched with. Full rule and troubleshooting:
 [Working with the Stacks MCP](planning-with-stacks.md).
 
 ## General Requirements

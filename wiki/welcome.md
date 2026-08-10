@@ -49,10 +49,10 @@ Read `agents.md` at the repo root, then follow its Ingestion, Query, and Lint fl
 3. Persist session progress in `wiki/context.md`.
 4. Catalog every new page in `wiki/index.md` and log changes in `wiki/log.md`.
 5. Keep pages cross-linked and consistent with the repos they describe.
-6. Before writing an implementation plan, run `/stacks:planning_context` with a
-   description of the task, and incorporate relevant returned guidance, citing chunk
-   titles. There is no search tool — a session cannot invoke it for you.
-   (`wiki/product/` is deprecated — history only.)
+6. Whenever a product judgement comes up — before writing an implementation plan, and
+   again mid-implementation — search Stacks with the `search_chunks` tool and cite the
+   chunk titles you apply. An agent searches for itself; you do not have to fetch
+   context for it. (`wiki/product/` is deprecated — history only.)
 ```
 
 ---

@@ -68,6 +68,10 @@ Feature modules live under `src/<domain>/` (controllers, services, DTOs, and `en
 - `scenario-report/`, `scenario-session-review/`, `scribe-session-review/` — reporting and threaded review/feedback.
 - `session-event/`, `case/`, `reference-document/` — event tracking, case management, supporting materials.
 
+**WhatsApp Q&A bot**
+- `knowledge-base/` — the bot's corpus. Upload (presigned S3) or paste, then extract (PDF/DOCX/EPUB/URL/plain text), chunk to ~400 tokens on section boundaries, and index into ally-ai's `KnowledgeChunk` collection over SQS. Postgres is the system of record and the vector index is derived: `kb_document_chunks.id` **is** the Weaviate object UUID. Nothing is hard-deleted — archiving hides a document from retrieval while its chunks stay, so citations already recorded in the conversation log still resolve.
+- `whatsapp/` — the channel. Provider-agnostic behind a `WHATSAPP_PROVIDER` token (Meta Cloud API is the only implementation); webhook → dedupe → rate limit → consent → keyword templates → retrieval → send, plus the admin read side (conversation log, unanswered-question queue, usage analytics). Open to anyone with the number, so the rate limit, consent gate and disclaimer are load-bearing rather than optional.
+
 **Platform & infrastructure**
 - `auth/`, `authorization/` — authentication plus RBAC guards and permission decorators.
 - `tenant/`, `user/`, `settings/` — multi-tenant management, users, config.
@@ -85,7 +89,7 @@ Feature modules live under `src/<domain>/` (controllers, services, DTOs, and `en
 - `/audio-ingest` — cloud-telephony integration.
 - `/scenario-report` — real-time scenario reporting.
 
-**Auth model** — the REST API is versioned (`/api/v1/...`). Supported methods: JWT (access/refresh flow), email OTP (v2), Google OAuth, Magic Link, and `X-API-Key` for service-to-service calls. Multi-tenancy is enforced at the entity level, with fine-grained RBAC via groups and permission guards. See `DATA_SCHEMA.md` for the full store map (105 TypeORM tables plus Weaviate, Redis, SQS, S3, LiveKit).
+**Auth model** — the REST API is versioned (`/api/v1/...`). Supported methods: JWT (access/refresh flow), email OTP (v2), Google OAuth, Magic Link, and `X-API-Key` for service-to-service calls. The WhatsApp webhook (`POST /api/v1/webhook/whatsapp`) carries no guard at all — an HMAC-SHA256 signature over the **raw** request body *is* its authentication, so `main.ts` captures the raw body in `express.json`'s `verify` hook rather than re-reading the stream (which is already drained by the time a handler runs). Multi-tenancy is enforced at the entity level, with fine-grained RBAC via groups and permission guards. See `DATA_SCHEMA.md` for the full store map (105 TypeORM tables plus Weaviate, Redis, SQS, S3, LiveKit).
 
 **Roles** — there is no `role` column on `users`. A role *is* a row in `groups` whose `name` is a `UserRole` value, joined through `user_groups`; permissions are unioned across every role a user holds. The nine roles are `CLIENT`, `COUNSELOR`, `LEARNER`, `SIMULATION_REVIEWER`, `SCRIBE_REVIEWER`, `ADMIN`, `MULTI_TENANT_ADMIN`, `SUPER_ADMIN`, and `SUPER_DUPER_ADMIN`.
 
@@ -104,13 +108,16 @@ Role and permission lookups are cached in Redis (`user:roles:<id>`, `user:groups
 
 ## Integration Points
 
-- **ally-ai** — reached at `AI_SERVICE_API_URL`; outbound calls authenticate with `AI_SERVICE_OUTBOUND_API_KEY`. ally-ai owns the Weaviate vector DB (`Conversation`, `ReferenceDocument` collections). SQS and LiveKit bridge the two services.
+- **ally-ai** — reached at `AI_SERVICE_API_URL`; outbound calls authenticate with `AI_SERVICE_OUTBOUND_API_KEY`. ally-ai owns the Weaviate vector DB (`Conversation`, `ReferenceDocument`, `KnowledgeChunk` collections). SQS and LiveKit bridge the two services. The WhatsApp bot adds three calls: `knowledge-chunks/bulk-upsert` (indexing), `knowledge-agent/answer` (grounded answering, explicit 25s timeout so a slow call cannot outlive the SQS visibility window and get the question answered twice), and `knowledge-agent/crisis-check` (run concurrently with the answer, 15s).
+- **Meta WhatsApp Cloud API** — inbound webhook plus outbound sends. Bound behind a `WHATSAPP_PROVIDER` token so swapping to a BSP is one factory change; Meta's 24-hour customer-service window is why the DLQ handler records a failure but never replies.
 - **ally-ai-learn** — reached at `AI_LEARN_SERVICE_API_URL` with `AI_LEARN_SERVICE_OUTBOUND_API_KEY`.
 - **LiveKit** — via `livekit-server-sdk` using `LIVEKIT_URL` / `LIVEKIT_API_KEY` / `LIVEKIT_API_SECRET`; handles room creation, participant lifecycle, agent dispatch (`LIVEKIT_AGENT_NAME`), and webhook events.
 - **AWS SQS queues** (from `.env.example`):
   - `sqs-ai-transcription-request-queue` (+ `-dlq`) — transcription requests.
   - `sqs-audio-file-retry-queue` (+ `-dlq`) — audio file retries.
   - `sqs-learn-message-and-event-queue` — learning messages and events from ally-ai-learn.
+  - `whatsapp-inbound` (+ `-dlq`) — one message per inbound WhatsApp message. A standard queue, not FIFO: dedupe lives in Postgres (unique `provider_message_id`), and FIFO's 5-minute dedupe window is far shorter than Meta's retry window.
+  - `kb-ingest` (+ `-dlq`) — corpus extraction, chunking and indexing.
 - **ally-web / ally-mobile** — consume the versioned REST API plus the Socket.IO gateways above. CORS origins are configured via `ALLOWED_ORIGINS` (defaults include the landing page :3000, helpline dashboard :8080, admin dashboard :8081).
 - **Redis message broker** — pub/sub for inter-service event delivery (`message-broker/`).
 - **Metabase** — analytics dashboards via `METABASE_URL` / `METABASE_API_KEY`.

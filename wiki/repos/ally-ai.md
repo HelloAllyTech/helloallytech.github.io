@@ -40,6 +40,8 @@ The app is a FastAPI application (`app/main.py`) whose lifespan initializes the 
 - `/language-quality` — language quality scoring
 - `/round-trip-wer` — round-trip word error rate for transcription quality
 - `/analytics-agent` — two stateless transforms behind the admin Analytics Agent tab: `/plan` (question + schema catalogue → one read-only SELECT, or a clarifying question) and `/answer` (result rows → prose, caveats and a chart specification). No database access; ally-be runs the query. See [Analytics Agent](../platform/analytics-agent.md).
+- `/knowledge-chunks` — write and read side of the `KnowledgeChunk` collection for the WhatsApp Q&A bot: `bulk-upsert` (per-object success/failure so ally-be can retry only what failed), `search`, `document/{id}` (delete by document), `ids` (paged, for reconciliation), and `{chunk_id}`.
+- `/knowledge-agent` — the bot's answering loop. `/answer` returns one of three intents — `answer` (grounded, with citations), `decline` (the corpus does not cover it) or `clarify` (too vague to retrieve against) — **all as HTTP 200**, because a decline is a correct result and only a genuine failure should push ally-be onto its fallback path. `/crisis-check` is separate rather than a stage inside `/answer`, so ally-be can run the two concurrently and the safety net costs no latency on an ordinary question.
 
 **Core business logic** (`app/core/`):
 
@@ -49,6 +51,9 @@ The app is a FastAPI application (`app/main.py`) whose lifespan initializes the 
 - `embeddings/` — OpenAI embedding client/service for vectorization
 - `vector_db/` — Weaviate client (`weaviate_client.py`) and collection helpers
 - `reference_documents/` — reference document retrieval (distance-threshold based)
+- `knowledge_base/` — `KnowledgeChunk` read/write service for the WhatsApp bot's corpus
+- `knowledge_agent/` — the bot's agent: detect language → translate to English → embed → retrieve → answer, decline or clarify, plus the crisis classifier. Citations are returned as integers indexing the numbered passages and validated in code, out-of-range values dropped: a model asked to echo a UUID will eventually invent a plausible one, and a fabricated id cannot be detected whereas an out-of-range integer can.
+- `llm/` — `dispatch.py`, one `generate_structured` call across providers. Gemini uses `response_schema`; Anthropic has no equivalent, so structured output goes through a single forced tool call.
 - `drift/`, `language_quality/`, `round_trip/` — LLM-judge modules (each with `judge.py`, `prompt.py`, `schemas.py`; `round_trip` also has `wer.py`)
 - `analytics_agent/` — the analytics agent's planner and narrator (`agent.py`, `prompt.py`, `schemas.py`). The schema catalogue arrives on the request from ally-be rather than being defined here, so the tables the model is shown and the tables the guard permits cannot drift apart.
 - `text_generations/` — OpenAI text-generation client/service and structured-output models
@@ -78,6 +83,14 @@ A dedicated worker `app/core/queue/transcription_request_sqs_worker.py` consumes
 **S3** — `app/core/storage/s3_service.py`; results bucket set via `QUEUE__TRANSCRIBE_AND_SUMMARIZE_RESULTS_BUCKET`.
 
 **Weaviate** — vector storage/search for embeddings and reference documents; schema managed by migrations (`app/migrations/`, `MigrationHistory` collection). Reference document matching uses `REFERENCE_DOCS__DISTANCE_THRESHOLD` (default `0.35`).
+
+The `KnowledgeChunk` collection (migration `004`) backs the WhatsApp Q&A bot. Three things about it differ from the older collections and are deliberate:
+
+- **The object UUID is `kb_document_chunks.id` in ally-be.** Postgres is the system of record; this index is derived.
+- **It stores the chunk `text`**, unlike `RoadmapOpportunity`. The retrieve→generate loop runs inside ally-ai in one call, so without the text every question would need a back-call to ally-be. Staleness is closed structurally instead: chunk text is immutable for a given `(document_id, chunk_version, chunk_index)`, so an edit writes new objects and deletes the old ones rather than mutating in place.
+- **There is no `tenant_id`.** The corpus is global. A future private per-tenant corpus is a NEW collection, not a filter bolted onto a shared one.
+
+Retrieval uses two thresholds, not one: `MIN_SIMILARITY` (0.35) is a permissive floor and `DECLINE_SIMILARITY` (0.42) is the actual decision. A relevant passage matched against a short paraphrased question scores roughly 0.40–0.60 with `text-embedding-3-small`, so a single hard floor at the decision value would decline constantly on legitimate rephrasings.
 
 **Slack** — optional alerting (`SLACK_ALERTS__*`).
 

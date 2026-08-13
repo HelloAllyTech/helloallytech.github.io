@@ -2,7 +2,7 @@
 title: Working with the Stacks MCP
 tags: [contributing, agents, planning, mcp, workflow]
 summary: Pull Stacks context whenever a product judgement comes up — while planning and while coding — how an agent searches the library itself, how to cite what comes back, and how the server is wired in.
-last_reconciled: 2026-08-10
+last_reconciled: 2026-08-13
 ---
 
 # Working with the Stacks MCP
@@ -96,14 +96,34 @@ chunks; `search_chunks` returns four by default. A result set full of off-topic 
 outcome, not a signal to force a fit.
 
 **An agent's queries look different from yours.** `search_chunks` wants a specific noun phrase
-(`"empty state design patterns"`) and works best called two to four times across a task's distinct
-aspects; the prompt wants the whole task description above. Both are right — the prompt runs one
-search over whatever you typed, while an agent can afford several sharp queries. Search results
-come back compact (title, book, section, framing sentence, id) so that searching often is cheap.
+(`"empty state design patterns"`); the prompt wants the whole task description above. Both are
+right — the prompt runs one search over whatever you typed, while an agent can afford several
+sharp queries. Search results come back compact (title, book, section, framing sentence, id) so
+that searching often is cheap.
+
+> [!NOTE]
+> **How many queries, and what `max_results`, keeps moving as the corpus changes — treat both as
+> knobs to turn up, not fixed numbers.** "Two to four queries at the default `max_results` of 4"
+> was right when chunks were long paragraphs. Chunks were restructured (2026-08-13) into short,
+> title-as-principle entries (e.g. *"Design autonomy sliders to build user trust"*) — each one
+> carries less, so getting equivalent coverage of a topic now means **both** a higher
+> `max_results` per call (8 rather than 4) **and** more distinct queries per task (beyond the old
+> 2–4), covering more of the task's distinct aspects rather than the same handful more deeply.
+> Searching is cheap; err toward more of both rather than defaulting back to the old numbers.
+
+> [!NOTE]
+> **Corpus composition is an active moving target — books are still being added.** A characterization
+> of what the library covers from any one session (including this page, if it starts to read that
+> way) is a snapshot, not a scoping fact. Don't skip a query because "Stacks doesn't have anything
+> on that" based on a past session's results — re-check `list_tags` or just run the query again.
+> This is the same discipline as the relevance rule above, applied to your own prior observations,
+> not just to claims about gaps.
 
 `get_chunks` fetches the verbatim source excerpt behind a chunk, plus its section and book
 summaries, when the exact wording matters. It takes ids from a search result or a returned block;
-invented ids will not resolve.
+invented ids will not resolve. The book summary is repeated verbatim on every chunk from the same
+book — batching several ids from one title in a single call spends real tokens on duplicated text,
+worth knowing before requesting many at once.
 
 > [!WARNING]
 > **A rate-limit error means retry, not "no guidance found".** If a search fails that way, wait a

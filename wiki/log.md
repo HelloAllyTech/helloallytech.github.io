@@ -8,6 +8,12 @@ summary: A chronological log tracking all wiki updates and modifications.
 
 This is an append-only log of modifications, updates, and indexing runs performed on the wiki. All logs use the parseable prefix format: `## [YYYY-MM-DD] action | description`.
 
+## [2026-08-14] add | Catalog four previously-undocumented repos: calibrate, calibrate-backend, calibrate-frontend, ally-changelog.
+- **The gap.** These repos existed on disk and in GitHub scope but had no `wiki/repos/` page and weren't listed in `wiki/index.md` — an agent asking "does the wiki know about calibrate/posthog?" would correctly find nothing, since the catalog only ever named the original six repos.
+- **Added pages:** `repos/calibrate.md` (the open-source ARTPARK-SAHAI-ORG evaluation engine/CLI), `repos/calibrate-backend.md` (its FastAPI hosting layer), `repos/calibrate-frontend.md` (its Next.js UI), `repos/ally-changelog.md` (the auto-written cross-repo changelog journal, previously undocumented despite being self-explanatory from its own README).
+- **Not added:** `ally-metabase` — a vendored fork of open-source Metabase, deployed via `infra`'s `metabase.yml`/`posthog.yml` playbooks rather than being an Ally-authored service; left out pending an explicit decision on whether it warrants its own page versus staying documented only as an infra-deployed service.
+- Updated `wiki/index.md`'s Repositories list and this repo's own `CLAUDE.md` Scope line to name all four. Regenerated `ROUTING.md`/`manifest.json` via `scripts/gen-routing.py`.
+
 ## [2026-08-10] update | Stacks search restored to agents; the prompt-submit hook retired across all repos.
 - **The narrowing was reversed.** `search_chunks` and `list_tags` are callable again, so a session reaches the library at the moment a judgement comes up rather than waiting for a human to run `/stacks:planning_context`. The prompt stays as the human entry point. `list_documents` was not restored: a book catalogue is browsing, whereas tags feed back into a search filter.
 - **Not a plain revert.** `search_chunks` now returns compact hits — title, book, section, framing sentence, id — instead of full bodies, on its own 4/10 result budget. Full bodies at the old default cost ~3.2k tokens a search, so a session searching ten times while coding would have spent ~32k tokens of its own context on prose it skims. `get_chunks` keeps depth one call away, which is what makes searching often affordable.

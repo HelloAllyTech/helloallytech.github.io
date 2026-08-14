@@ -38,6 +38,10 @@ Superseded by the **Stacks MCP** — see [Planning with the Stacks MCP](contribu
 - [ally-web](repos/ally-web.md) — Web apps (Nx: Next.js + Vite/React)
 - [ally-mobile](repos/ally-mobile.md) — Mobile app (React Native)
 - [infra](repos/infra.md) — Infrastructure & dev environment (Ansible + Terraform)
+- [calibrate](repos/calibrate.md) — Voice-agent evaluation framework (open-source, Python)
+- [calibrate-backend](repos/calibrate-backend.md) — Calibrate API service (FastAPI)
+- [calibrate-frontend](repos/calibrate-frontend.md) — Calibrate web UI (Next.js)
+- [ally-changelog](repos/ally-changelog.md) — Auto-written cross-repo changelog journal
 
 ## Contributing
 - [Developer Setup](contributing/dev-setup.md) — Clone repos and run the full local stack

@@ -113,7 +113,7 @@
       "summary": "",
       "tags": [],
       "last_reconciled": "",
-      "words": 629,
+      "words": 658,
       "url": "https://tech.helloally.ai/#/wiki/index.md",
       "skip_reason": "human navigation catalog — ROUTING.md supersedes it for agents"
     },
@@ -126,7 +126,7 @@
         "log"
       ],
       "last_reconciled": "",
-      "words": 7893,
+      "words": 8047,
       "url": "https://tech.helloally.ai/#/wiki/log.md",
       "skip_reason": "append-only history — read only when auditing what changed"
     },
@@ -507,6 +507,21 @@
       "skip_reason": ""
     },
     {
+      "path": "repos/ally-changelog.md",
+      "title": "ally-changelog — Cross-Repo Changelog Journal",
+      "summary": "Holds the auto-written CHANGELOG.md fed by merges across every Ally repo, via a shared dispatch workflow.",
+      "tags": [
+        "repo",
+        "changelog",
+        "automation",
+        "github-actions"
+      ],
+      "last_reconciled": "2026-08-14",
+      "words": 404,
+      "url": "https://tech.helloally.ai/#/wiki/repos/ally-changelog.md",
+      "skip_reason": ""
+    },
+    {
       "path": "repos/ally-mobile.md",
       "title": "ally-mobile — Mobile App",
       "summary": "React Native iOS/Android app for mental-health counsellors, covering live sessions with transcription, peer reviews, voice-based AI simulations, and Scribe voice-dictation notes.",
@@ -537,6 +552,55 @@
       "last_reconciled": "2026-08-06",
       "words": 1457,
       "url": "https://tech.helloally.ai/#/wiki/repos/ally-web.md",
+      "skip_reason": ""
+    },
+    {
+      "path": "repos/calibrate-backend.md",
+      "title": "calibrate-backend — Calibrate API Service",
+      "summary": "FastAPI backend for the hosted Calibrate product — serves calibrate-frontend and orchestrates calibrate benchmark/simulation runs.",
+      "tags": [
+        "repo",
+        "calibrate",
+        "backend",
+        "fastapi",
+        "python"
+      ],
+      "last_reconciled": "2026-08-14",
+      "words": 196,
+      "url": "https://tech.helloally.ai/#/wiki/repos/calibrate-backend.md",
+      "skip_reason": ""
+    },
+    {
+      "path": "repos/calibrate-frontend.md",
+      "title": "calibrate-frontend — Calibrate Web UI",
+      "summary": "Next.js UI for the hosted Calibrate product — datasets, personas, scenarios, simulations, and evaluation results.",
+      "tags": [
+        "repo",
+        "calibrate",
+        "frontend",
+        "nextjs",
+        "evaluation"
+      ],
+      "last_reconciled": "2026-08-14",
+      "words": 228,
+      "url": "https://tech.helloally.ai/#/wiki/repos/calibrate-frontend.md",
+      "skip_reason": ""
+    },
+    {
+      "path": "repos/calibrate.md",
+      "title": "calibrate — Voice Agent Evaluation Framework",
+      "summary": "Open-source CLI/library for benchmarking STT, TTS and LLM providers and running persona-based voice-agent simulations.",
+      "tags": [
+        "repo",
+        "calibrate",
+        "evaluation",
+        "voice-agents",
+        "python",
+        "cli"
+      ],
+      "last_reconciled": "2026-08-14",
+      "words": 383,
+      "url": "https://tech.helloally.ai/#/wiki/repos/calibrate.md",
       "skip_reason": ""
     },
     {

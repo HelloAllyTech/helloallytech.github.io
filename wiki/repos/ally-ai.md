@@ -38,6 +38,7 @@ The app is a FastAPI application (`app/main.py`) whose lifespan initializes the 
 - `/reference-documents` — reference document semantic search / management
 - `/drift` — response-drift scoring
 - `/language-quality` — language quality scoring
+- `/feedback-groundedness` — judges each post-session feedback claim against the transcript (`supported` / `unsupported` / `contradicted` / `misattributed`), plus whether a quoted span is actually in the transcript. Claims arrive already split by ally-be, one verdict per claim: a `contradicted` improvement is the harmful case — the learner marked down for work the transcript shows them doing — and separating it from an unearned compliment is only possible per claim.
 - `/round-trip-wer` — round-trip word error rate for transcription quality
 - `/analytics-agent` — two stateless transforms behind the admin Analytics Agent tab: `/plan` (question + schema catalogue → one read-only SELECT, or a clarifying question) and `/answer` (result rows → prose, caveats and a chart specification). No database access; ally-be runs the query. See [Analytics Agent](../platform/analytics-agent.md).
 - `/knowledge-chunks` — write and read side of the `KnowledgeChunk` collection for the WhatsApp Q&A bot: `bulk-upsert` (per-object success/failure so ally-be can retry only what failed), `search`, `document/{id}` (delete by document), `ids` (paged, for reconciliation), and `{chunk_id}`.
@@ -54,7 +55,7 @@ The app is a FastAPI application (`app/main.py`) whose lifespan initializes the 
 - `knowledge_base/` — `KnowledgeChunk` read/write service for the WhatsApp bot's corpus
 - `knowledge_agent/` — the bot's agent: detect language → translate to English → embed → retrieve → answer, decline or clarify, plus the crisis classifier. Citations are returned as integers indexing the numbered passages and validated in code, out-of-range values dropped: a model asked to echo a UUID will eventually invent a plausible one, and a fabricated id cannot be detected whereas an out-of-range integer can.
 - `llm/` — `dispatch.py`, one `generate_structured` call across providers. Gemini uses `response_schema`; Anthropic has no equivalent, so structured output goes through a single forced tool call.
-- `drift/`, `language_quality/`, `round_trip/` — LLM-judge modules (each with `judge.py`, `prompt.py`, `schemas.py`; `round_trip` also has `wer.py`)
+- `drift/`, `language_quality/`, `round_trip/`, `feedback_groundedness/` — LLM-judge modules (each with `judge.py`, `prompt.py`, `schemas.py`; `round_trip` also has `wer.py`). Every one of them emits ONLY labels, booleans and counts — never a score, rate or rating. Rates, severity weights and correlations are computed by ally-be in SQL at read time, so re-weighting a metric never means re-judging the corpus.
 - `analytics_agent/` — the analytics agent's planner and narrator (`agent.py`, `prompt.py`, `schemas.py`). The schema catalogue arrives on the request from ally-be rather than being defined here, so the tables the model is shown and the tables the guard permits cannot drift apart.
 - `text_generations/` — OpenAI text-generation client/service and structured-output models
 - `storage/` — `s3_service.py` for S3 access

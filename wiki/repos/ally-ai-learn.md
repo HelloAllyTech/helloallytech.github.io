@@ -68,6 +68,14 @@ A worker is only useful while it holds its long-lived WebSocket to LiveKit and s
 - `simulation_instructions.py` — `SimulationBehaviorInstruction` (SHOULD_DO / SHOULD_NOT_DO counselor behaviors) and `SimulationStateInstruction` (ordered agent states with score windows).
 - `app/core/agent/factory.py` — `parse_room_metadata()`, provider client configuration, agent creation.
 
+**Live supervisor notes** (`app/core/supervisor/`)
+- A second, cheap LLM watching the same committed turns as the actor, which occasionally sends the learner a one-line coaching hint rendered in a **Supervisor** tab in the session sidebar. Opt-in per simulation (`promptData.supervisorNotesEnabled`, default off) behind the `SUPERVISOR_NOTES_ENABLED` global kill-switch, so it is a no-op for almost every session.
+- **It can never delay a reply.** `on_learner_turn_committed` schedules a tracked task with a hard `SUPERVISOR_NOTES_TIMEOUT_S`, mirroring the v2 Director. A slow or failing supervisor loses a note; it does not slow the voice path. Same reasoning as the deferred-naturalness setup — a session must keep running when an optional extra fails.
+- **Sparsity is enforced in code, not the prompt.** An LLM asked whether it should speak will tend to say yes, so `SUPERVISOR_NOTES_MAX_PER_SESSION` (10), `SUPERVISOR_NOTES_MIN_TURN_GAP` (2), one call in flight at a time, and a re-check of both caps after the call returns are all applied around the model rather than inside it.
+- **Delivery and persistence are separate paths.** Notes go to the browser on the `supervisor` data-channel topic *and* to ally-be as a `supervisor_note` SQS message. `seq` is 1-based per session; it is what makes the ally-be write idempotent, and it is the order the post-session debrief reads them in.
+- Notes are written in the session language, from `scenario.language_code`. Prompt: `app/prompts/supervisor/live_note.txt`.
+- v1 only — `worker.py`. Not wired into `worker_v2.py`, whose Director already emits per-turn `trainee_feedback`.
+
 **Provider layer** (factory pattern) — `app/tts/`, `app/stt/`, `app/llms/`, each with `base.py`, `factory.py`, and per-provider implementations. Selection is driven by scenario metadata with env-based fallbacks.
 
 **Scoring & reports**

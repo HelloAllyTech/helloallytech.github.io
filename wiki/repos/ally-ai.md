@@ -47,7 +47,7 @@ The app is a FastAPI application (`app/main.py`) whose lifespan initializes the 
 **Core business logic** (`app/core/`):
 
 - `conversations/` — `conversation_service.py`, conversation analysis
-- `summaries/` — `summary_service.py`, session summarization
+- `summaries/` — `summary_service.py`, session summarization. The roleplay debrief (`generate_scenario_evaluation`) writes the learner-facing `supervisor_note` in Ally's supervisor voice, and takes two kinds of extra context: `supervisor_memory` (what the supervisor carries about this learner between debriefs) and `live_notes` (the coaching hints already shown to the learner *during* the session, when that roleplay had live supervisor notes on). `live_notes` lets the note pick up a thread the learner already read rather than deliver it cold; the empty case is rendered as an explicit sentence rather than a blank, because a blank there makes the model invent advice it never gave. The prompt's honesty rule follows from the same distinction — with live notes the supervisor really was reading along, so "I saw" and "I flagged at the time" are allowed, while "I heard" never is: it does not listen to audio.
 - `transcriptions/` — audio transcription services with pluggable providers (`DeepgramTranscriptionService`, `OpenAITranscriptionService`, `SarvamTranscriptionService`)
 - `embeddings/` — OpenAI embedding client/service for vectorization
 - `vector_db/` — Weaviate client (`weaviate_client.py`) and collection helpers

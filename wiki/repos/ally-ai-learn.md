@@ -2,7 +2,7 @@
 title: ally-ai-learn — Voice Training Agent
 tags: [repo, ai, livekit, langgraph, voice, python]
 summary: A LiveKit-based voice AI agent (FastAPI + LangGraph) that simulates mental-health client conversations, detecting counseling skills in real time, scoring them, and publishing events to ally-be via AWS SQS.
-last_reconciled: 2026-08-10
+last_reconciled: 2026-08-24
 ---
 
 # ally-ai-learn — Voice Training Agent
@@ -50,6 +50,7 @@ A worker is only useful while it holds its long-lived WebSocket to LiveKit and s
 - **Two HTTP surfaces, and only one is a health signal.** FastAPI's `GET /api/health` returns a static `ok` — it proves the HTTP process is up and nothing more. The agents SDK runs its *own* health server on a separate port that returns **503** when the worker has given up connecting or its inference process is dead, and serves `GET /worker` with `agent_name`, `active_jobs` and worker load. Container and orchestrator health checks must check the SDK's server; checking only the FastAPI endpoint is indistinguishable from checking nothing.
 - **The active-session metric is not a liveness signal.** It is emitted from the SDK's `load_fnc` hook, which keeps running while the worker is disconnected, so it continues publishing at full rate throughout an outage. It is a demand signal for autoscaling — never alarm on it to detect a dead fleet.
 - **Dispatch is by name.** A job only reaches a worker registered under the exact name the backend dispatches to. A name mismatch between backend and worker produces "the agent never joined", identical in appearance to a worker that is absent.
+- **Mitigated (2026-08):** `app/core/worker_health.py` closes three of the gaps above directly. It wraps the SDK's `load_fnc` hook — the same one the active-session metric rides on — to also read the `AgentServer`'s registration state, so `GET /api/health` now reports real `registration_health()` (`registered` / `connecting` / `starting` / `connection_lost` / `worker_unreachable`) instead of a static `ok`. Its `WorkerHealthMonitor` turns a permanent connection loss into an actual process exit, so the container self-heal (`wait -n` in `start.sh`) has something to trigger on. The agents SDK's own health server and the `max_retry` liveness setting above are unchanged and still the first things to check.
 
 **LangGraph conversation flow** (`app/core/graph/`)
 - `graph_builder.py` — `build_simulation_graph()` (live voice) and `build_report_graph()` (text-only N-turn simulation for reports).

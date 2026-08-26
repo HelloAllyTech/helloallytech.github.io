@@ -64,7 +64,7 @@ infra/
 | `ally_core.yml` | Deploy `ally-be` (Postgres/Redis/SQS/LiveKit env, ECR image, migrations) |
 | `ally_ai.yml` | Deploy `ally-ai` |
 | `ally_learn.yml` | Deploy `ally-ai-learn` |
-| `ally_web.yml` / `web.yml` | Deploy `ally-web` frontends |
+| `web.yml` | Caddy static-web setup on `admin_servers` (unrelated to the retired `ally-web` app despite the name) |
 | `ally_admin.yml` / `ally_helpline.yml` | Deploy admin / helpline dashboards |
 | `metabase.yml`, `posthog.yml` | Analytics services |
 | `dm.yml`* / `build.yml` / `ci.yml` | Domain manager, build, and CI/TeamCity hosts |
@@ -80,7 +80,7 @@ The recommended entry point is to `source ally-env.sh`, which registers `ally-*`
 
 - **`bootstrap-contributor.sh`** — Fork-based variant for external contributors; sets `origin` = your fork and `upstream` = the official repo (see `CONTRIBUTING-QUICK-START.md`).
 
-- **`dev_env.sh`** (alias `ally-dev`) — Starts the full local stack. It sources `_os.sh`, then in `ally-be`: copies `.env`/`docker.env` from examples if missing, seeds `TEST_ACCOUNTS` (admin/counselor/learner/org-admin/user-cla, all with a default local password), runs `docker compose up -d`, `make health-check`, `npm run migration:run`, and `npm run seed`. Then in `ally-web`: builds `Dockerfile.deps` and runs `docker compose up -d --build`. Exposes Admin `:8081`, Helpline `:8080`, Web `:3000`.
+- **`dev_env.sh`** (alias `ally-dev`) — Starts the full local stack. It sources `_os.sh`, then in `ally-be`: copies `.env`/`docker.env` from examples if missing, seeds `TEST_ACCOUNTS` (admin/counselor/learner/org-admin/user-cla, all with a default local password), runs `docker compose up -d`, `make health-check`, `npm run migration:run`, and `npm run seed`. Then in `ally-web`: builds `Dockerfile.deps` and runs `docker compose up -d --build`. Exposes Admin `:8081`, Helpline `:8080`.
 
 - **`dev_cleanup.sh`** (alias `ally-dev-cleanup`) — Stops and removes all Docker containers.
 

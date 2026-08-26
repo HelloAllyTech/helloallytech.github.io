@@ -44,7 +44,7 @@ Fetch as `https://tech.helloally.ai/#/wiki/<path>`, or raw Markdown at `https://
 - `repos/calibrate-backend.md` (196w) — FastAPI backend for the hosted Calibrate product — serves calibrate-frontend and orchestrates calibrate benchmark/simulation runs
 - `repos/calibrate-frontend.md` (228w) — Next.js UI for the hosted Calibrate product — datasets, personas, scenarios, simulations, and evaluation results
 - `repos/calibrate.md` (383w) — Open-source CLI/library for benchmarking STT, TTS and LLM providers and running persona-based voice-agent simulations
-- `repos/infra.md` (1961w) — The infra repo provisions Ally's Hetzner baremetal, Incus containers, and AWS services via Ansible +…
+- `repos/infra.md` (1968w) — The infra repo provisions Ally's Hetzner baremetal, Incus containers, and AWS services via Ansible +…
 
 ## Contributing & setup
 
@@ -75,4 +75,4 @@ Fetch as `https://tech.helloally.ai/#/wiki/<path>`, or raw Markdown at `https://
 - `index.md` — human navigation catalog — ROUTING.md supersedes it for agents
 - `log.md` — append-only history — read only when auditing what changed
 
-_42 pages, 61,157 words total. Loading all of it would cost roughly 81,542 tokens — which is the entire reason this index exists._
+_42 pages, 61,164 words total. Loading all of it would cost roughly 81,552 tokens — which is the entire reason this index exists._

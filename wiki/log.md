@@ -8,6 +8,12 @@ summary: A chronological log tracking all wiki updates and modifications.
 
 This is an append-only log of modifications, updates, and indexing runs performed on the wiki. All logs use the parseable prefix format: `## [YYYY-MM-DD] action | description`.
 
+## [2026-09-03] update | ally-ai gains a fifth judge: thinking-filler quality.
+- `repos/ally-ai.md`: added `/filler-quality` to the API surface and `filler_quality/` to the judge-module list. It judges the short back-channels a voice session's AI client utters while its real reply forms.
+- Recorded WHY the judge exists rather than just that it does: the filler's speed was already measured per turn, its quality was not, and the gap is not neutral. Because the filler is the character's first words, response latency is measured to it — so a filler that lands instantly but sounds nothing like the character improves every latency chart while making the roleplay worse. That is the failure the judge catches.
+- Its three dimensions (`character_fit`, `context_fit`, `safety`) are noted, with the point of the third spelled out: the real reply is generated separately and afterwards, so a filler that commits to anything is a guess the reply may contradict a second later.
+- The page's existing invariant — every judge module emits only labels, booleans and counts, never a score, rate or rating — holds for this one too and needed no amendment; it is why the rubric emits findings rather than the 1-5 ratings its plan first proposed.
+
 ## [2026-09-03] update | ally-ai-learn's latency-masking layer documented as a set of design constraints.
 - `repos/ally-ai-learn.md` gains **Latency masking & naturalness**, covering the four levers that share one background audio track (comfort tone, back-channels, thinking filler, interim reply) and, in detail, the filler — which was rebuilt in ally-ai-learn to predict the pause rather than wait to observe one, to size the clip so it ends about when the reply begins, to stop repeating itself, and to be generated with the character's own register and the learner's current utterance in view.
 - Written as constraints rather than a component list, because the interesting content is *why* each rule exists: waiting to observe a gap spends the latency the filler exists to mask; a clip that does not fit its gap leaves dead air or is cut mid-word; identical audio replayed is what makes a character sound like a soundboard; and anything generated on a timer necessarily predates the turn it covers. Each of those is a way a filler is worse than silence.

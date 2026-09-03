@@ -126,7 +126,7 @@
         "log"
       ],
       "last_reconciled": "",
-      "words": 8782,
+      "words": 8985,
       "url": "https://tech.helloally.ai/#/wiki/log.md",
       "skip_reason": "append-only history — read only when auditing what changed"
     },
@@ -486,8 +486,8 @@
         "weaviate",
         "python"
       ],
-      "last_reconciled": "2026-07-30",
-      "words": 1663,
+      "last_reconciled": "2026-09-03",
+      "words": 1785,
       "url": "https://tech.helloally.ai/#/wiki/repos/ally-ai.md",
       "skip_reason": ""
     },

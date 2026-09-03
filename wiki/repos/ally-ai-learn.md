@@ -93,6 +93,8 @@ Two constraints shape all of this. **A filler must never contradict the reply th
 
 Because a filler counts as the character's first words, it is what response latency is measured to. Each turn therefore records which audio the learner actually heard first and the unmasked time to the real reply alongside it, so a rise in filler coverage can never be read as a latency improvement. Per-turn records also carry why a filler did or did not play, how long it took to become audible, and how much silence followed it.
 
+The same ambiguity reaches the transcript, and is resolved the same way. A filler and an interim reply are spoken by the character and are persisted as ordinary client messages — same sender, same table — so each transcript line the worker publishes now declares which kind of utterance it is: the real reply, a filler, or an interim. Anything downstream that counts or judges client turns has to exclude the latter two, or a contentless "Hmm" is scored as a turn of roleplay and inflates the denominator under every quality rate. The marker is written by the live worker only, so its absence means *unknown* rather than *reply*, and lines recorded before it existed are read as replies — which is right for a corpus that predates the feature.
+
 Everything here is best-effort by construction: any failure loses that layer for the session and nothing else. The expensive setup work is deliberately kept off the opening-statement path.
 
 **Provider layer** (factory pattern) — `app/tts/`, `app/stt/`, `app/llms/`, each with `base.py`, `factory.py`, and per-provider implementations. Selection is driven by scenario metadata with env-based fallbacks.

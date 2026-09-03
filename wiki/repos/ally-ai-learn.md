@@ -2,7 +2,7 @@
 title: ally-ai-learn — Voice Training Agent
 tags: [repo, ai, livekit, langgraph, voice, python]
 summary: A LiveKit-based voice AI agent (FastAPI + LangGraph) that simulates mental-health client conversations, detecting counseling skills in real time, scoring them, and publishing events to ally-be via AWS SQS.
-last_reconciled: 2026-08-24
+last_reconciled: 2026-09-03
 ---
 
 # ally-ai-learn — Voice Training Agent
@@ -76,6 +76,24 @@ A worker is only useful while it holds its long-lived WebSocket to LiveKit and s
 - **Delivery and persistence are separate paths.** Notes go to the browser on the `supervisor` data-channel topic *and* to ally-be as a `supervisor_note` SQS message. `seq` is 1-based per session; it is what makes the ally-be write idempotent, and it is the order the post-session debrief reads them in.
 - Notes are written in the session language, from `scenario.language_code`. Prompt: `app/prompts/supervisor/live_note.txt`.
 - v1 only — `worker.py`. Not wired into `worker_v2.py`, whose Director already emits per-turn `trainee_feedback`.
+
+**Latency masking & naturalness** (`app/core/livekit/`, v1)
+
+Four levers ride one LiveKit `BackgroundAudioPlayer` — its own published track, so none of them can ever preempt or race the character's real reply: a faint comfort room tone, back-channels while the learner speaks, the thinking filler after they stop, and an optional interim reply. They exist because voice-to-voice latency is felt, not measured: the gap before a reply reads as a dropped call.
+
+The thinking filler is the most developed of the four, and its design is mostly a set of answers to ways a filler can be worse than silence.
+
+- **It predicts the gap rather than waiting to observe one.** The obvious implementation — pause briefly, then play only if the reply has not arrived — spends the very latency it exists to mask. Instead a per-session moving average of the pipeline's own time-to-first-token and time-to-first-byte says how long this turn will take, so the decision is immediate. Turns fast enough to need no cover get neither a filler nor a delay.
+- **It fits the clip to the gap.** Clips are rendered once into pre-decoded audio held in memory, which means their length is known when one is chosen. A short hum played over a long wait leaves dead air behind it and draws attention to the pause; a clip that overruns gets cut off mid-word. Selection picks a duration that lands just under the predicted wait, and if silence still opens up, one further filler of a different kind covers it — never more than two, because a character who keeps muttering reads as stalling rather than thinking.
+- **It does not repeat.** Phrases accumulate across the session rather than a small batch replacing itself, and selection avoids anything heard recently, avoids two of the same kind of sound in a row, and uses a second recording of a line before reusing the first. Identical audio played twice is what makes a character sound like a soundboard.
+- **It sounds like this character, in this moment.** Generation receives the persona's authored speech samples and the discourse particles that language actually uses, alongside the character's own last line, so the filler continues their register rather than resetting to a neutral one.
+- **It can fit the turn it answers.** Generation happens at three moments: once at session start from the character alone (so fillers exist before the first turn), after each exchange while the pipeline is idle, and — the only one that can see the current turn — from the learner's partial transcript while they are still speaking. Anything produced on a timer necessarily predates the turn it ends up covering.
+
+Two constraints shape all of this. **A filler must never contradict the reply that follows it**, so generated phrases are checked in code as well as by the prompt: nothing long enough to be a statement, no questions, no numbers, and nothing echoing a specific from a partial transcript that may yet mean something else. And **clip rendering never runs on the session's own speech engine** — a run of synthesis errors there closes the whole session, which has taken live sessions down before.
+
+Because a filler counts as the character's first words, it is what response latency is measured to. Each turn therefore records which audio the learner actually heard first and the unmasked time to the real reply alongside it, so a rise in filler coverage can never be read as a latency improvement. Per-turn records also carry why a filler did or did not play, how long it took to become audible, and how much silence followed it.
+
+Everything here is best-effort by construction: any failure loses that layer for the session and nothing else. The expensive setup work is deliberately kept off the opening-statement path.
 
 **Provider layer** (factory pattern) — `app/tts/`, `app/stt/`, `app/llms/`, each with `base.py`, `factory.py`, and per-provider implementations. Selection is driven by scenario metadata with env-based fallbacks.
 

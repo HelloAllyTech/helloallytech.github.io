@@ -77,6 +77,16 @@ A worker is only useful while it holds its long-lived WebSocket to LiveKit and s
 - Notes are written in the session language, from `scenario.language_code`. Prompt: `app/prompts/supervisor/live_note.txt`.
 - v1 only — `worker.py`. Not wired into `worker_v2.py`, whose Director already emits per-turn `trainee_feedback`.
 
+**AI video actor** (`app/core/livekit/video_actor.py`, v1, experimental — publishes nothing today)
+
+Optionally gives a character a face: a lip-synced video track published into the same room as its voice. It sits strictly after speech synthesis, on the output side, so nothing about transcription, the model turn, turn-taking or synthesis changes.
+
+Three gates decide, and the two that matter default off — a per-admin toggle controlling who can even see the switch when authoring, the roleplay's own flag, and a platform-level switch that exists to stop video everywhere in one restart. No roleplay sets its flag, so every session is audio-only.
+
+The care in it is about audio, not video. Turning the actor on means telling the session to stop publishing its own speech, because the avatar republishes it in sync with the picture — so a half-started avatar leaves the learner hearing nothing, which is worse than a missing face. Startup is therefore bounded and returns a handle rather than a flag, and only a live handle earns the suppression: a missing plugin, a slow vendor or any error mid-start all fall back to exactly the audio-only session the platform ships today, and the client is told nothing because there is nothing the learner should do about it.
+
+The default renderer draws in-process and is deliberately not AI-generated video — it exists to exercise the publish path without a vendor account. Hosted avatar providers are imported lazily, so an uninstalled one costs a log line rather than taking down every session including the ones with the feature off.
+
 **Latency masking & naturalness** (`app/core/livekit/`, v1)
 
 Four levers ride one LiveKit `BackgroundAudioPlayer` — its own published track, so none of them can ever preempt or race the character's real reply: a faint comfort room tone, back-channels while the learner speaks, the thinking filler after they stop, and an optional interim reply. They exist because voice-to-voice latency is felt, not measured: the gap before a reply reads as a dropped call.

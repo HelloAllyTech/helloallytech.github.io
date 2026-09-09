@@ -42,7 +42,7 @@ The app is a FastAPI application (`app/main.py`) whose lifespan initializes the 
 - `/feedback-groundedness` — judges each post-session feedback claim against the transcript (`supported` / `unsupported` / `contradicted` / `misattributed`), plus whether a quoted span is actually in the transcript. Claims arrive already split by ally-be, one verdict per claim: a `contradicted` improvement is the harmful case — the learner marked down for work the transcript shows them doing — and separating it from an unearned compliment is only possible per claim.
 - `/round-trip-wer` — round-trip word error rate for transcription quality
 - `/analytics-agent` — two stateless transforms behind the admin Analytics Agent tab: `/plan` (question + schema catalogue → one read-only SELECT, or a clarifying question) and `/answer` (result rows → prose, caveats and a chart specification). No database access; ally-be runs the query. See [Analytics Agent](../platform/analytics-agent.md).
-- `/knowledge-chunks` — write and read side of the `KnowledgeChunk` collection for the WhatsApp Q&A bot: `bulk-upsert` (per-object success/failure so ally-be can retry only what failed), `search`, `document/{id}` (delete by document), `ids` (paged, for reconciliation), and `{chunk_id}`.
+- `/knowledge-chunks` — write and read side of a corpus's chunk collection (`corpus` query parameter selects it; defaults to `whatsapp_qa` for the deploy window, since ally-ai ships before ally-be): `bulk-upsert` (per-object success/failure so ally-be can retry only what failed), `search`, `document/{id}` (delete by document), `ids` (paged, for reconciliation), and `{chunk_id}`.
 - `/knowledge-agent` — the bot's answering loop. `/answer` returns one of three intents — `answer` (grounded, with citations), `decline` (the corpus does not cover it) or `clarify` (too vague to retrieve against) — **all as HTTP 200**, because a decline is a correct result and only a genuine failure should push ally-be onto its fallback path. `/crisis-check` is separate rather than a stage inside `/answer`, so ally-be can run the two concurrently and the safety net costs no latency on an ordinary question.
 
 **Core business logic** (`app/core/`):
@@ -53,7 +53,7 @@ The app is a FastAPI application (`app/main.py`) whose lifespan initializes the 
 - `embeddings/` — OpenAI embedding client/service for vectorization
 - `vector_db/` — Weaviate client (`weaviate_client.py`) and collection helpers
 - `reference_documents/` — reference document retrieval (distance-threshold based)
-- `knowledge_base/` — `KnowledgeChunk` read/write service for the WhatsApp bot's corpus
+- `knowledge_base/` — chunk read/write service for ONE corpus, bound to its collection at construction (`corpus.py` maps corpus to collection); one cached instance per corpus
 - `knowledge_agent/` — the bot's agent: detect language → translate to English → embed → retrieve → answer, decline or clarify, plus the crisis classifier. Citations are returned as integers indexing the numbered passages and validated in code, out-of-range values dropped: a model asked to echo a UUID will eventually invent a plausible one, and a fabricated id cannot be detected whereas an out-of-range integer can.
 - `llm/` — `dispatch.py`, one `generate_structured` call across providers. Gemini uses `response_schema`; Anthropic has no equivalent, so structured output goes through a single forced tool call.
 - `drift/`, `language_quality/`, `round_trip/`, `feedback_groundedness/`, `filler_quality/` — LLM-judge modules (each with `judge.py`, `prompt.py`, `schemas.py`; `round_trip` also has `wer.py`). Every one of them emits ONLY labels, booleans and counts — never a score, rate or rating. Rates, severity weights and correlations are computed by ally-be in SQL at read time, so re-weighting a metric never means re-judging the corpus.
@@ -86,13 +86,23 @@ A dedicated worker `app/core/queue/transcription_request_sqs_worker.py` consumes
 
 **Weaviate** — vector storage/search for embeddings and reference documents; schema managed by migrations (`app/migrations/`, `MigrationHistory` collection). Reference document matching uses `REFERENCE_DOCS__DISTANCE_THRESHOLD` (default `0.35`).
 
-The `KnowledgeChunk` collection (migration `004`) backs the WhatsApp Q&A bot. Three things about it differ from the older collections and are deliberate:
+**One collection per knowledge corpus, not one collection with a scope argument.** `KnowledgeChunk` (migration `004`) backs the WhatsApp Q&A bot; `CharacterChunk` (migration `005`) backs the Character Library interview agent. Both are built from `KnowledgeChunkProperties` verbatim — a passage is the same shape whatever it grounds, so the citation chain is identical and deliberately not re-invented. Callers pass a `corpus` (`whatsapp_qa` / `character_library`, matching `kb_documents.corpus` in ally-be) which resolves to a collection in `app/core/knowledge_base/corpus.py`.
+
+A `corpus` PROPERTY on one shared collection was considered and rejected for three reasons:
+
+- **A similarity threshold only means something against one distribution.** Chunk size is chosen per corpus in ally-be — 400 tokens for a 1600-character WhatsApp reply, 800 for a character vignette that must hold a whole observation together — and a longer passage embeds more diffusely. One index holding both sizes leaves one threshold straddling two distributions.
+- **Filtered ANN search is weaker than unfiltered.** HNSW traverses a graph built over every vector in the collection, so scoping by a low-selectivity filter costs recall or degrades to a scan.
+- **A scope passed as an argument can be forgotten; a collection cannot.** An omitted filter would ground a health worker's clinical answer in material written for a fictional character — which reads as good clinical prose and is not an answer to their question.
+
+`document_ids` still exists on a search, but it scopes WITHIN one corpus (ally-be's curator topic boost: search the mapped documents first, top up from the rest). It is a real engine-side PRE-filter — it was once applied after the search over an over-fetched window, which cannot narrow a ranking but starves it, since the engine ranks the whole collection and the best allowed passage routinely sits outside the global top-k. An empty allow-list returns nothing rather than widening.
+
+Three things about these collections differ from the older ones and are deliberate:
 
 - **The object UUID is `kb_document_chunks.id` in ally-be.** Postgres is the system of record; this index is derived.
 - **It stores the chunk `text`**, unlike `RoadmapOpportunity`. The retrieve→generate loop runs inside ally-ai in one call, so without the text every question would need a back-call to ally-be. Staleness is closed structurally instead: chunk text is immutable for a given `(document_id, chunk_version, chunk_index)`, so an edit writes new objects and deletes the old ones rather than mutating in place.
-- **There is no `tenant_id`.** The corpus is global. A future private per-tenant corpus is a NEW collection, not a filter bolted onto a shared one.
+- **There is no `tenant_id`.** Both corpora are global. A future private per-tenant corpus is likewise a NEW collection, not a filter bolted onto a shared one.
 
-Retrieval uses two thresholds, not one: `MIN_SIMILARITY` (0.35) is a permissive floor and `DECLINE_SIMILARITY` (0.42) is the actual decision. A relevant passage matched against a short paraphrased question scores roughly 0.40–0.60 with `text-embedding-3-small`, so a single hard floor at the decision value would decline constantly on legitimate rephrasings.
+Retrieval on the WhatsApp path uses two thresholds, not one: `MIN_SIMILARITY` (0.35) is a permissive floor and `DECLINE_SIMILARITY` (0.42) is the actual decision. A relevant passage matched against a short paraphrased question scores roughly 0.40–0.60 with `text-embedding-3-small`, so a single hard floor at the decision value would decline constantly on legitimate rephrasings.
 
 **Slack** — optional alerting (`SLACK_ALERTS__*`).
 

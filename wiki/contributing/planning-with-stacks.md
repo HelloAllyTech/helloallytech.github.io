@@ -2,7 +2,7 @@
 title: Working with the Stacks MCP
 tags: [contributing, agents, planning, mcp, workflow]
 summary: Pull Stacks context whenever a product judgement comes up — while planning and while coding — how an agent searches the library itself, how to cite what comes back, and how the server is wired in.
-last_reconciled: 2026-08-13
+last_reconciled: 2026-09-15
 ---
 
 # Working with the Stacks MCP
@@ -57,7 +57,7 @@ chunk bodies.
 > [!NOTE]
 > For a few hours on 2026-08-10 the server was narrowed to just `get_chunks` and the prompt, and
 > this page said "there is no search tool". That was a mistake and was reversed the same day.
-> `list_documents` was not restored — a book catalogue is browsing, whereas tags feed back into a
+> `list_documents` was not restored — a source catalogue is browsing, whereas tags feed back into a
 > search filter. If you find a page or a repo instruction claiming an agent cannot search, it is
 > stale; this table is current.
 
@@ -98,8 +98,13 @@ outcome, not a signal to force a fit.
 **An agent's queries look different from yours.** `search_chunks` wants a specific noun phrase
 (`"empty state design patterns"`); the prompt wants the whole task description above. Both are
 right — the prompt runs one search over whatever you typed, while an agent can afford several
-sharp queries. Search results come back compact (title, book, section, framing sentence, id) so
-that searching often is cheap.
+sharp queries. Search results come back compact — title, section, tags, a relevance score, an id
+and one framing sentence — so that searching often is cheap.
+
+Note what a hit does *not* carry: there is no title or author of the material a chunk was distilled
+from, anywhere in the API. Attribution stops at the section. That is deliberate — a chunk is the
+team's own distilled principle, to be weighed on whether it fits the decision in front of you, not
+a reference to go and look up.
 
 > [!NOTE]
 > **How many queries, and what `max_results`, keeps moving as the corpus changes — treat both as
@@ -112,18 +117,18 @@ that searching often is cheap.
 > Searching is cheap; err toward more of both rather than defaulting back to the old numbers.
 
 > [!NOTE]
-> **Corpus composition is an active moving target — books are still being added.** A characterization
+> **Corpus composition is an active moving target — new material is still being added.** A characterization
 > of what the library covers from any one session (including this page, if it starts to read that
 > way) is a snapshot, not a scoping fact. Don't skip a query because "Stacks doesn't have anything
 > on that" based on a past session's results — re-check `list_tags` or just run the query again.
 > This is the same discipline as the relevance rule above, applied to your own prior observations,
 > not just to claims about gaps.
 
-`get_chunks` fetches the verbatim source excerpt behind a chunk, plus its section and book
+`get_chunks` fetches the verbatim source excerpt behind a chunk, plus its section and source
 summaries, when the exact wording matters. It takes ids from a search result or a returned block;
-invented ids will not resolve. The book summary is repeated verbatim on every chunk from the same
-book — batching several ids from one title in a single call spends real tokens on duplicated text,
-worth knowing before requesting many at once.
+invented ids will not resolve. The source summary is repeated verbatim on every chunk drawn from
+the same source — batching several ids from one source in a single call spends real tokens on
+duplicated text, worth knowing before requesting many at once.
 
 > [!WARNING]
 > **A rate-limit error means retry, not "no guidance found".** If a search fails that way, wait a
@@ -133,7 +138,7 @@ worth knowing before requesting many at once.
 >
 > The "3 requests per minute" figure that used to sit here was wrong for retrieval. It is
 > `EMBED_MAX_RPM`, a deliberately pessimistic guess at the embedder's free tier that applies only
-> to *book ingestion*; the search path never passed through that limit at all. The real retrieval
+> to *corpus ingestion*; the search path never passed through that limit at all. The real retrieval
 > ceiling is unmeasured — the authoritative numbers are the rate-limit headers the server logs on
 > a 429. Don't quote 3/min.
 
@@ -180,12 +185,13 @@ more.
 
 ## Configuration
 
-Every Ally repo commits three things at its root, so a session is wired up the moment it starts
+Every Ally repo commits four things at its root, so a session is wired up the moment it starts
 and nobody has to add or invoke anything by hand:
 
 | File | What it does |
 |---|---|
-| `.mcp.json` | Declares the `stacks` server. Committed; the credential is not — `${STACKS_API_KEY}` is read from the environment at connect time |
+| `.mcp.json` | Declares the `stacks` server. It carries **no endpoint and no credential** — all it does is exec the bridge below |
+| `.claude/stacks-bridge.mjs` | A stdio→HTTP proxy that resolves a key at startup, which is why there is nothing to set up — see **Why a bridge** below |
 | `CLAUDE.md` / `AGENTS.md` | State the rule above, so it is in context from the first turn |
 | `.claude/skills/stacks/SKILL.md` | A skill whose description names the trigger moments. Its one-line description sits in context every turn at negligible cost, so the rule keeps re-asserting itself deep into a long session, where a `CLAUDE.md` line read at startup has long since stopped competing for attention |
 
@@ -205,30 +211,64 @@ context looked identical to one where the library had nothing.
 That last property is the one to carry forward: **silence is not evidence the library was
 consulted.** Ask what was searched and what was cited.
 
+### Why a bridge
+
+`.mcp.json` can expand `${ENV_VAR}` but cannot run a command, so an HTTP server declaration can
+only carry a credential that *already exists* in the environment. That left two ways to reach
+zero-setup: commit a key — impossible, four of the seven Ally repos are public — or run a process
+that can **obtain** one. The bridge is that process. It speaks MCP over stdio to Claude Code and
+forwards each message to the HTTP endpoint, using a key it resolves once at startup, in three
+tiers:
+
+| | Tier | Why it exists |
+|---|---|---|
+| 1 | `STACKS_API_KEY` in the environment | An engineer who already set one keeps working, and CI can inject one without touching GitHub |
+| 2 | `~/.claude/.stacks-key` — the cache, mode `0600` | Short-circuits tier 3 |
+| 3 | `gh auth token` → `POST /api/mcp/exchange` | The server verifies HelloAllyTech org membership, drops the GitHub token, and returns a key the bridge caches |
+
+Because tier 2 short-circuits, tier 3 runs **once per machine**, not once per session — and on any
+machine that has run a session before, **tier 2 is what actually serves.**
+
+> [!IMPORTANT]
+> **Setup is zero: `gh auth login` once per machine is the whole story.** There is no key to
+> request, export, or rotate by hand, and none is ever committed. An unset `STACKS_API_KEY` is the
+> normal state on a working machine — **do not read it as a broken setup.**
+
+**The bridge fails loud, and that is the point.** The hook it replaced failed open and silent, so a
+session that got no context looked identical to a library with nothing to say. A bridge cannot do
+that: with no key there is no server at all, and it exits with a message naming the fix.
+
+**Its copies have no sync mechanism.** Nine files in all — the canonical
+`clients/stacks-bridge.mjs` in the Stacks server repo, plus eight deployed copies (the `ally-code`
+workspace root and the seven Ally repos). Nothing fails loudly when one drifts, so **diff the
+copies before blaming the server.**
+
 **One-time setup per engineer:**
 
-1. Get a Stacks API key from the platform team. Keys are per-person; never commit or paste one
-   into a repo, a wiki page, or a ticket.
-2. Export it from your shell profile (`~/.zshrc`):
-   ```bash
-   export STACKS_API_KEY="…"
-   ```
-3. Start a fresh agent session in any Ally repo and approve the `stacks` server when prompted.
-   Project-scoped MCP servers require approval once per project.
+1. `gh auth login`, once per machine, as an account in the **HelloAllyTech** org.
+2. Start a fresh agent session in any Ally repo and approve the `stacks` server when prompted —
+   project-scoped MCP servers require approval once per project.
 
-**Checking it works** — in a session, confirm `/stacks:planning_context` is offered as a slash
-command and returns a block of chunks. If it is missing or every call fails to authorize:
+That is the whole of it. The first session on a machine exchanges your GitHub token for a key and
+caches it; every session after that reads the cache.
 
-- `echo $STACKS_API_KEY` in the *same* shell the agent was launched from — a variable exported in
-  a different terminal, or set after the session started, will not be picked up.
-- Confirm you are running in a repo that has `.mcp.json` at its root, and that you approved the
-  server for that project.
-- Restart the session after changing either — `.mcp.json` and the environment are both read at
-  startup.
+**Checking it works** — ask the session to list the Stacks tools. `search_chunks`, `get_chunks` and
+`list_tags` should all be there, alongside `/stacks:planning_context` as a slash command. A session
+offering only `get_chunks` is talking to a stale deployment.
 
-To check the tools specifically, ask the session to list them — `search_chunks`, `get_chunks` and
-`list_tags` should all be available, alongside `/stacks:planning_context` as a slash command. A
-session that offers only `get_chunks` is talking to a stale deployment.
+**If it is missing or every call fails, the bridge has already said why — read its stderr before
+guessing.** Every failure path names its own fix:
+
+| Message on stderr | What it means |
+|---|---|
+| `No Stacks key and no GitHub login to derive one from` | Tier 3 had nothing to work with — run `gh auth login` |
+| `Stacks refused to issue a key (…)` | `gh` is authenticated as someone outside the HelloAllyTech org |
+| `Stacks rejected the cached key (401)` | The cached key was revoked or rotated — `rm ~/.claude/.stacks-key`, then start a new session |
+| `Could not reach the Stacks server…` | Network, or the endpoint is down. Nothing local to fix |
+
+Restart the session after any of these — the key and `.mcp.json` are both resolved at startup.
+Diagnosing this by checking `$STACKS_API_KEY` will mislead you: it is one tier of three, and on a
+healthy machine it is normally unset.
 
 If a search returns an authorization error, it is the key; if it returns a rate-limit message,
 retry. Neither means the corpus is empty.

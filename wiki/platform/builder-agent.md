@@ -1,0 +1,205 @@
+---
+title: Builder Agent — From a Sentence to a Merged Pull Request
+tags: [platform, builder, agent, automation, ci, release, admin, llm]
+summary: The Builder agent takes a described change, interviews you into a PRD, writes the code in a GitHub Actions runner, and keeps the resulting pull requests moving — reviewing, approving, prompting for merge and releasing. How the loop works, what bounds it, and why so much of its machinery is about not lying to the reader.
+last_reconciled: 2026-09-17
+---
+
+# Builder Agent
+
+Builder turns a described change into pull requests, then keeps them moving until
+somebody merges them. You describe what you want in a sentence, it interviews you into a
+PRD, dispatches a coding run into a GitHub Actions runner, and opens pull requests across
+whichever repos the work touched. After that a reconcile loop watches them: reading CI,
+bringing stale branches up to date, sending a reviewer at the diff, approving what comes
+back clean, offering a merge button, and dispatching the production release once merged.
+
+It is not a chat tool that writes code into your editor. Every run happens on a runner,
+against real branches, and the artefacts are real pull requests that a person reviews.
+
+---
+
+## The shape of a session
+
+A **session** is one piece of work. It moves through statuses:
+
+| Status | Meaning |
+|---|---|
+| `INTERVIEWING` | The PRD interview is in progress |
+| `PRD_READY` | The interview converged; there is something to build from |
+| `BUILDING` | A run is dispatched or running |
+| `WAITING_FOR_INPUT` | A run paused mid-build and needs an answer |
+| `COMPLETED` | Pull requests opened, or the build finished with nothing to open |
+| `FAILED` | The build gave up — retryable |
+| `CANCELLED` | Stopped by a person |
+
+A session owns **runs**. A run is one dispatched invocation on a runner, in one of four
+modes:
+
+- **build** — the main pass that writes the change
+- **resume** — continues a run that paused on a question, once answered
+- **fix** — sent at an open pull request with failing CI or unanswered review comments
+- **review** — reads an already-open pull request with fresh context and reports findings
+
+Within a run the agent announces a **stage** as it goes — setup, planning, coding,
+testing, the machine test gate, verification, finalising, opening pull requests,
+reporting, done. The stage is what the progress rail in the admin UI displays.
+
+---
+
+## The contract a run must keep
+
+The runner cannot tell "finished quietly" from "died": `claude -p` exits 0 whenever the
+agent produces a final response, including when it ends its turn mid-protocol. So the
+protocol is explicit, and an outcome gate enforces it.
+
+- **Announce stages**, so the UI reflects where the work is.
+- **Run the machine test gate.** A run claiming `done` without a recorded passing gate is
+  refused and recorded failed — testing used to be prompt-instructed with the agent's own
+  summary as the only evidence, which is not checkable. A run that edited no files is
+  exempt, because it is making no claim for a gate to verify.
+- **Report an outcome exactly once, last.** A run that stops without doing so is recorded
+  as a failure even when its work pushed cleanly.
+- **Never wait for CI.** CI runs *after* the run ends, on the commits just pushed. There
+  is nothing to wait for and nothing will notify the agent. If CI goes red, the reconcile
+  loop dispatches a fresh fix run that can actually read the failure.
+
+That last rule exists because a run once fixed a real defect, pushed it, went green — and
+then spent two thirds of its turns trying to wait for confirmation that could never
+arrive, before ending its turn without reporting. The work was merge-ready; the platform
+recorded a failure, advised retrying it, and counted it against the circuit breaker.
+
+---
+
+## The reconcile loop
+
+Every five minutes, for each open pull request Builder opened:
+
+1. Refresh state from GitHub — merge status, head commit, check rollup.
+2. Ingest feedback — failing checks and human review comments become actionable items.
+3. Bring the branch up to date with master if it has fallen behind.
+4. Dispatch a **review** run if the diff has not been read at this commit.
+5. Otherwise dispatch a **fix** run if anything actionable is outstanding.
+6. Approve, if a review came back clean and every required check is green.
+7. Offer the merge button once GitHub itself says nothing is standing in the way.
+
+A separate pass watches releases, and another re-tests failed session verdicts against
+what the pull requests actually did.
+
+### Switches
+
+Four independent toggles, plus a master kill switch. They are separable on purpose —
+"review it but do not spend on fixing it" is a useful setting, and so is "do everything
+but do not deploy".
+
+| Switch | What it allows |
+|---|---|
+| `enabled` | The kill switch. Nothing automatic runs without it |
+| `autoReviewEnabled` | Sending a reviewer at an open pull request |
+| `autoFixEnabled` | Sending a fix run at failing CI or review comments |
+| `autoApproveEnabled` | Approving a pull request whose review came back clean |
+| `autoReleaseEnabled` | Dispatching the production release after a merge |
+
+Bringing a stale branch up to date is deliberately **not** behind `autoFixEnabled`: it is
+one API call with no agent, no model and no runner behind it, and gating it on the
+spend switch meant that turning off expensive work also turned off the free work — leaving
+green, approved pull requests parked behind a branch that was merely out of date.
+
+---
+
+## What bounds it
+
+Several limits, each answering a different runaway:
+
+- **A spend ceiling per session.** A run that reaches it parks and asks, holding its work
+  open for a window rather than discarding it. Raising the ceiling releases it.
+- **A cap on fix runs per pull request.** A fix that cannot fix it will not fix it on the
+  fourth attempt.
+- **A cap on review runs per pull request**, so a reviewer is not re-reading an unchanged
+  diff every few minutes.
+- **A consecutive-failure circuit breaker** per session. Two failures in a row and
+  automatic work stops until somebody looks.
+
+The breaker judges on evidence rather than on the error text: a run that failed at the
+protocol but changed files *and* left the session's pull requests green has converged, and
+does not count. Both halves are required — edits with red CI is a fix loop making things
+worse, and green CI with no edits credits the previous run's success twice.
+
+---
+
+## Approval, and why it is stricter than it looks
+
+Builder can approve its own pull requests, which is the step that unblocks everything else:
+`master` requires an approving review, and the bot holds only write access, so without
+this a green, reviewed, finding-free pull request still waits on a human to click.
+
+Two properties keep that honest.
+
+**A dispatched review is not a passed review.** The field recording which commit a review
+read is stamped at *dispatch*, so reconcile knows not to start a second review against the
+same head. It says a review happened, not that it came back clean. Approval rests on a
+separate record written only where zero findings were actually recorded — otherwise a
+review run that dispatched and then crashed would look identical to a clean one.
+
+**An approval survives Builder's own branch update.** Both repos protect master with
+`dismiss_stale_reviews` *and* the requirement that a branch be current — together a closed
+loop, since bringing a branch current pushes a commit that dismisses the approval, and the
+review cap refuses a third review. It is broken by looking at what the new commit is: an
+update-branch merge authored by us, carrying the reviewed head as its first parent, means
+the pull request's own commits are untouched and only master moved underneath them. CI
+must still be green on the new head, so a semantic conflict dragged in from master is
+caught before anything is approved.
+
+---
+
+## Where it can work
+
+Builder builds in `ally-be`, `ally-web`, `ally-ai`, `ally-ai-learn` and `ally-mobile`.
+Each repo definition carries the commands the agent must use — its test, lint and
+typecheck invocations — so the machine gate runs what CI runs rather than what the agent
+guesses.
+
+Opportunities on the product roadmap can be handed to Builder directly. Doing so marks the
+opportunity as under development, and a sweep moves it to released once every pull request
+the session opened has merged **and** deployed. "Shipped" is deliberately stricter than
+"merged": a merged pull request whose release failed is the one state a person most needs
+to see, rather than have quietly marked done.
+
+---
+
+## Reading the UI honestly
+
+A large share of Builder's machinery exists to stop the page stating the opposite of the
+evidence beneath it, because in a system this asynchronous the two drift apart easily.
+
+A run's fate and a pull request's fate are different facts. A run can fail at the protocol
+while its work merges and deploys; a run can succeed having written nothing. The platform
+therefore re-tests stored verdicts against evidence on a tick rather than writing them once
+and trusting them: a session's failure banner clears when its pull requests are green, a
+session settles completed when its work has merged, CI failures keyed to superseded commits
+are retired, and a release marked failed is corrected when a successful release of that
+target started after the merge.
+
+The general rule, learned the expensive way: **put the correction where the evidence lives.**
+A fix for the session verdict was written three times before it worked, twice placed inside
+a loop over *open* pull requests — while the strongest evidence that work succeeded is a
+merge, which is exactly what removes a pull request from that loop.
+
+---
+
+## When something looks stuck
+
+- **Nothing is dispatching.** A run parked on a question counts as active and blocks new
+  dispatches until its resume exists. The refusals are logged; silence in the logs means
+  the loop is genuinely idle, not wedged.
+- **"Automatic runs paused" in chat.** The circuit breaker tripped. It announces once per
+  trip, not once per refusal.
+- **A run failed but the work looks fine.** Check the pull requests before retrying. A
+  protocol failure on merged, green work is not a reason to redo it.
+- **A release says merged but not deployed.** That is a real state and worth acting on —
+  it is not corrected automatically unless a successful release of that target has since
+  run.
+
+---
+
+*See also: [Architecture & Data Flow](architecture.md) · [Cross-Repo Agent Guide](agent-guide.md) · [Release Process](../contributing/release-process.md) · [Memory](../memory.md)*

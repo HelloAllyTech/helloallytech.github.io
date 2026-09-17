@@ -126,7 +126,7 @@
         "log"
       ],
       "last_reconciled": "",
-      "words": 9331,
+      "words": 9801,
       "url": "https://tech.helloally.ai/#/wiki/log.md",
       "skip_reason": "append-only history — read only when auditing what changed"
     },
@@ -239,7 +239,7 @@
         "llm"
       ],
       "last_reconciled": "2026-09-17",
-      "words": 1878,
+      "words": 2617,
       "url": "https://tech.helloally.ai/#/wiki/platform/builder-agent.md",
       "skip_reason": ""
     },

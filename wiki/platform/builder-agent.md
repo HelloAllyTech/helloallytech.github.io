@@ -49,7 +49,7 @@ reporting, done. The stage is what the progress rail in the admin UI displays.
 
 ## The contract a run must keep
 
-The runner cannot tell "finished quietly" from "died": `claude -p` exits 0 whenever the
+The runner cannot tell "finished quietly" from "died": a coding CLI exits 0 whenever the
 agent produces a final response, including when it ends its turn mid-protocol. So the
 protocol is explicit, and an outcome gate enforces it.
 
@@ -68,6 +68,41 @@ That last rule exists because a run once fixed a real defect, pushed it, went gr
 then spent two thirds of its turns trying to wait for confirmation that could never
 arrive, before ending its turn without reporting. The work was merge-ready; the platform
 recorded a failure, advised retrying it, and counted it against the circuit breaker.
+
+### Asked for, or made true
+
+The contract above is what the *agent* must do. Everything it can be spared, it is: the
+runner does the work itself rather than instructing a model to.
+
+This distinction was learned from the first run on a second engine. Two invariants had
+only ever been requested in the prompt, and had only ever held because one particular
+agent happened to comply:
+
+- **The working branch.** The prompt said "create `builder/<slug>`". The test gate asks
+  `git diff master...HEAD`, which is empty when HEAD *is* master — so an agent that
+  committed straight to master produced a run where the gate saw nothing to gate on a
+  repo holding the entire change, failed closed, and sent it to remediate work already
+  done. Four rounds of that, seventeen minutes, a correct fix, no pull request, and a
+  recorded verdict of "did not pass the test gate". The runner now checks the branch out
+  before any agent starts, and refuses the run if it cannot.
+- **The reporting helpers.** `stage`, `note`, `ask`, `complete-run` and the rest were
+  shell *function definitions* embedded in the prompt. A coding agent's shell tool spawns
+  a fresh shell per call, so a function defined in one does not exist in the next — they
+  worked only because one agent pasted the whole body every time. The other read the
+  documentation and ran `stage REMEDIATING`, getting `command not found`, silently,
+  because telemetry is not allowed to fail a build. That run coded, tested and committed
+  behind a progress rail frozen an hour earlier. They are executables on `PATH` now.
+
+The general rule, and the more useful half of what that run taught: **an invariant
+something else depends on should not rest on a model's willingness to read step four.**
+Where the runner can establish a precondition itself, asking for it instead is a bug that
+will find you the first time you change engines.
+
+One corollary, worth knowing before writing another helper: the command is
+`complete-run`, not `complete`, because `complete` is a bash builtin and builtins outrank
+`PATH`. The old function form worked precisely because functions outrank builtins — so the
+name was survivable for exactly as long as it was not a file. A test asserts no helper
+name is shadowed this way.
 
 ---
 
@@ -159,6 +194,25 @@ Each repo definition carries the commands the agent must use — its test, lint 
 typecheck invocations — so the machine gate runs what CI runs rather than what the agent
 guesses.
 
+It runs on more than one coding engine, chosen per session or by a default in settings.
+Only two files know anything engine-specific: one installs the engine, one invokes it and
+normalises its output. Everything downstream — the event schema, the pipeline endpoints,
+the admin UI — is engine-neutral.
+
+Model routing is engine-aware, which it had to become rather than being designed that
+way: the configured per-tier defaults are all Anthropic model ids, and several tiers could
+reach one whatever engine was going to be handed it. A small build was the worst case,
+because it plans on a cheaper tier that read the configured default directly and so
+ignored the admin's settings entirely. A default belonging to another engine is now
+skipped rather than translated — there is no honest mapping between two vendors' tiers,
+and the worst case of skipping is a build that plans on the model somebody actually
+picked.
+
+Spend is reported by engines that report it and computed from token counts for engines
+that do not. An estimate from a published rate card, not a billed figure — but a run that
+cannot be priced cannot be capped, and a ceiling that reads every run on one engine as
+free is not a ceiling.
+
 Opportunities on the product roadmap can be handed to Builder directly. Doing so marks the
 opportunity as under development, and a sweep moves it to released once every pull request
 the session opened has merged **and** deployed. "Shipped" is deliberately stricter than
@@ -171,6 +225,11 @@ to see, rather than have quietly marked done.
 
 A large share of Builder's machinery exists to stop the page stating the opposite of the
 evidence beneath it, because in a system this asynchronous the two drift apart easily.
+
+A failure reads where it happened — as the last entry in the run's own feed. It
+used to be two banners, one pinned under the page header and one below the pull
+request list, restating around a transcript what the transcript already
+described; neither moved when you scrolled past what it described.
 
 A run's fate and a pull request's fate are different facts. A run can fail at the protocol
 while its work merges and deploys; a run can succeed having written nothing. The platform
@@ -193,6 +252,15 @@ Builder has taken work end to end unattended — diagnosing a failing check on a
 pull request it had not written, fixing the cause, and going green without a
 person touching it. That has happened **once**. Treat it as promising rather
 than proven, and keep the session open while it works.
+
+Multi-engine support is newer still, and worth stating precisely because the
+first run on a second engine read as a failure and was not one. The engine
+planned, coded, tested and wrote a correct fix. What it did not do was follow
+two prompt-stated conventions that the platform's own gates depended on — so the
+platform recorded a failed build holding working code. Both conventions are now
+the runner's job rather than the agent's, but the lesson generalises past the
+two that were found: **treat a new engine as exercising the harness, not the
+model.**
 
 Two limits are deliberately conservative while that record is short:
 

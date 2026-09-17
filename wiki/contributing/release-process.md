@@ -2,7 +2,7 @@
 title: Release Process
 tags: [contributing, release, versioning, ci, deployment]
 summary: The shared production-release process for every Ally service — semantic versioning policy, the automated pipeline, release-draft review, and troubleshooting.
-last_reconciled: 2026-08-06
+last_reconciled: 2026-09-17
 ---
 
 # Release Process
@@ -28,6 +28,25 @@ this site is public, so it carries no infrastructure identifiers.
 - All changes merged to the release branch.
 - CI green.
 - Code review complete.
+
+**"CI green" became enforceable on 2026-09-17.** Until then `master` on `ally-be` and
+`ally-web` required exactly one status check, so every other check was advisory and
+anyone could merge past a red one. Two pull requests did, three hours apart, and left a
+type error on `master` that the test job does not catch — `ts-jest` does not type-check
+the whole programme the way the production build does. Nothing could be released in
+between: the build job failed, and migration, deploy and the release draft were all
+skipped.
+
+Both repos now require their full check set, and `enforce_admins` is on, so no role can
+merge past a red check. The practical consequences:
+
+- A branch must be current with `master` before it merges, for everyone. Expect more
+  update-branch cycles, and note that an update dismisses existing approvals.
+- **There is no emergency override any more.** If `master` breaks such that the required
+  checks cannot pass, the route out is to lift enforcement, fix, and restore it:
+  `gh api -X DELETE repos/<org>/<repo>/branches/master/protection/enforce_admins`, then
+  `-X POST` the same path afterwards. Worth knowing the command exists before you need
+  it rather than during an incident.
 
 ## 2. Pick a version
 
@@ -112,6 +131,26 @@ registry exists with the right permissions.
 **Deploy fails** — verify the repository variables for the production role, region and
 registry are set; confirm the cluster and service exist; read the container logs and
 deployment events; check task-definition CPU/memory and IAM permissions.
+
+**"Deployment not found after stabilization. The deployment was likely rolled back"** —
+often it was not rolled back. A second release of the same service supersedes the first
+deployment, and the action watching the earlier one then cannot find it and reports this.
+Check the service's deployment list and the image tag actually running before believing
+the message: a superseded deployment leaves a *newer* image live, a real rollback leaves
+an older one. This happened twice in one day while two people released in parallel.
+
+**A green deploy that is not live yet** — the workflow reporting success does not mean
+every task is running the new image. Until the old tasks drain they keep serving, and
+anything that picks one replica to act — a scheduled job holding a database advisory
+lock, for instance — may still be running the previous release for several minutes.
+Confirm by task start time and task-definition revision, not by the workflow's verdict.
+
+**The version validator rejects a tag that was computed automatically** — in a repo where
+several independently-released apps share one tag namespace, scanning "the tags" can miss
+a prefix entirely if it only reads the first page of results. The scan then looks like a
+repo that has never been released and proposes a first version, which the validator
+rejects for not being newer. The validator refusing it is the good outcome; the versions
+would otherwise walk backwards.
 
 **Migration fails** — check the migration itself, database connectivity, and user
 permissions, then read the migration task's logs. Fix forward and redeploy.

@@ -88,8 +88,8 @@
         "ci",
         "deployment"
       ],
-      "last_reconciled": "2026-08-06",
-      "words": 768,
+      "last_reconciled": "2026-09-17",
+      "words": 1196,
       "url": "https://tech.helloally.ai/#/wiki/contributing/release-process.md",
       "skip_reason": ""
     },
@@ -126,7 +126,7 @@
         "log"
       ],
       "last_reconciled": "",
-      "words": 10023,
+      "words": 9114,
       "url": "https://tech.helloally.ai/#/wiki/log.md",
       "skip_reason": "append-only history — read only when auditing what changed"
     },
@@ -139,8 +139,8 @@
         "memory",
         "learnings"
       ],
-      "last_reconciled": "2026-08-19",
-      "words": 2258,
+      "last_reconciled": "2026-09-17",
+      "words": 3125,
       "url": "https://tech.helloally.ai/#/wiki/memory.md",
       "skip_reason": ""
     },

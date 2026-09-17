@@ -37,8 +37,17 @@ the whole programme the way the production build does. Nothing could be released
 between: the build job failed, and migration, deploy and the release draft were all
 skipped.
 
-Both repos now require their full check set, and `enforce_admins` is on, so no role can
-merge past a red check. The practical consequences:
+Both repos now require every check that gates correctness — tests, lint-and-typecheck,
+secret scanning, and on `ally-be` the runner-harness and workflow-lint jobs — with
+`enforce_admins` on, so no role can merge past a red one.
+
+**`docs-guard` is deliberately NOT in that set.** It runs and it shows red, but it does
+not block. It enforces a documentation policy rather than correctness, its escape is a
+label rather than a fix, and measuring the last twenty merges showed it was the one
+required check that would have stopped work someone had every reason to ship. Keeping it
+advisory retains the nag without the standoff.
+
+The practical consequences:
 
 - A branch must be current with `master` before it merges, for everyone. Expect more
   update-branch cycles, and note that an update dismisses existing approvals.

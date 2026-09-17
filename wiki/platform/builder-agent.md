@@ -187,6 +187,25 @@ merge, which is exactly what removes a pull request from that loop.
 
 ---
 
+## Current maturity
+
+Builder has taken work end to end unattended — diagnosing a failing check on a
+pull request it had not written, fixing the cause, and going green without a
+person touching it. That has happened **once**. Treat it as promising rather
+than proven, and keep the session open while it works.
+
+Two limits are deliberately conservative while that record is short:
+
+- **One build at a time.** Concurrent sessions have never run, so the per-session
+  locks and budget accounting are untested in parallel. Raise
+  `maxConcurrentBuilds` once there is evidence.
+- **A spend ceiling of $25 per session**, which is roughly what a modest feature
+  costs. A run that reaches it parks and asks rather than stopping.
+
+If it gets stuck, that is worth reporting rather than working around — the
+failure modes below were all found that way, and each one that gets fixed is one
+nobody hits again.
+
 ## When something looks stuck
 
 - **Nothing is dispatching.** A run parked on a question counts as active and blocks new

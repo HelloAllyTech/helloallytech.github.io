@@ -2,7 +2,7 @@
 title: Builder Agent — From a Sentence to a Merged Pull Request
 tags: [platform, builder, agent, automation, ci, release, admin, llm]
 summary: The Builder agent takes a described change, interviews you into a PRD, writes the code in a GitHub Actions runner, and keeps the resulting pull requests moving — reviewing, approving, prompting for merge and releasing. How the loop works, what bounds it, and why so much of its machinery is about not lying to the reader.
-last_reconciled: 2026-09-17
+last_reconciled: 2026-09-21
 ---
 
 # Builder Agent
@@ -59,7 +59,9 @@ protocol is explicit, and an outcome gate enforces it.
   summary as the only evidence, which is not checkable. A run that edited no files is
   exempt, because it is making no claim for a gate to verify.
 - **Report an outcome exactly once, last.** A run that stops without doing so is recorded
-  as a failure even when its work pushed cleanly.
+  as a failure even when its work pushed cleanly. The runner now backstops this: if it
+  exits for any reason without an outcome having been reported, it commits and pushes the
+  working trees and files the failure itself, naming the phase it stopped in.
 - **Never wait for CI.** CI runs *after* the run ends, on the commits just pushed. There
   is nothing to wait for and nothing will notify the agent. If CI goes red, the reconcile
   loop dispatches a fresh fix run that can actually read the failure.
@@ -92,6 +94,31 @@ agent happened to comply:
   documentation and ran `stage REMEDIATING`, getting `command not found`, silently,
   because telemetry is not allowed to fail a build. That run coded, tested and committed
   behind a progress rail frozen an hour earlier. They are executables on `PATH` now.
+
+Two more of the same shape were found later, and neither needed a second engine to show
+up — both are the runner trusting something it should have been doing itself:
+
+- **An engine's exit status was read as a verdict on the work.** An engine stops for
+  reasons that say nothing about whether what it wrote is any good: its own budget
+  ceiling, a provider error, a loop it detected in itself. Each arrived as a non-zero
+  status, and the runner script died on the spot — before the test gate, before any
+  outcome was reported, with the working tree unpushed. An hour of gated, correct work
+  could be discarded because something returned 1. The wall-clock timeout beside it had
+  already settled the right answer: say what happened and let the gate judge what is on
+  disk. **The gate is the arbiter of whether a
+  phase produced anything worth keeping — it runs the suites. An exit status is not.**
+- **The pull request description.** The finalise agent writes the title and body to a
+  file and the runner opens the pull request from it. An agent that committed its work
+  and then ended its turn without writing that file left a branch nobody would ever look
+  at — reconcile iterates pull requests, so a branch that is not one is invisible to CI
+  ingestion, review, approval, merge and release alike. The run was recorded as a failure
+  and a person had to open the pull request by hand. The argument against opening it
+  automatically was that a generic body makes a worse pull request than none, which holds
+  against a generic body and not against the commit messages the agent wrote itself,
+  about this diff, one per unit of work. The runner assembles the description from those
+  and says in the body that the prose is second-hand, so a reviewer knows to read the
+  diff rather than trust a summary nobody wrote. A branch it still cannot open a pull
+  request for is reported as an orphan, because at that point only a person can fix it.
 
 The general rule, and the more useful half of what that run taught: **an invariant
 something else depends on should not rest on a model's willingness to read step four.**
@@ -148,6 +175,17 @@ Several limits, each answering a different runaway:
 
 - **A spend ceiling per session.** A run that reaches it parks and asks, holding its work
   open for a window rather than discarding it. Raising the ceiling releases it.
+
+  The ceiling is checked at phase boundaries, which for a while was the only thing
+  checking it — and the overshoot happens *inside* a phase. Each phase also carries its
+  own dollar ceiling from the build's size profile, and those were absolute figures that
+  added up to more than many sessions were allowed: the largest profile is
+  $10 + $20 + $6 + $5 for one pass each, dispatched whole against a session ceiling of
+  any size. One run spent $41.92 against a $10.00 ceiling, and the banner saying so
+  appeared only once the money was gone. A phase is now never handed more than the session has left — capped
+  at dispatch, and re-derived from the live remainder immediately before each phase, since
+  a dispatched figure goes stale while the run is going and an admin can lower a ceiling
+  mid-run.
 - **A cap on fix runs per pull request.** A fix that cannot fix it will not fix it on the
   fourth attempt.
 - **A cap on review runs per pull request**, so a reviewer is not re-reading an unchanged
@@ -286,6 +324,17 @@ nobody hits again.
 - **A release says merged but not deployed.** That is a real state and worth acting on —
   it is not corrected automatically unless a successful release of that target has since
   run.
+- **An admin action fails with "Something went wrong on our side."** Read that as a
+  database constraint before reading it as an outage. Every `QueryFailedError` is rendered
+  as that one sentence — deliberately, since the driver text names columns, constraints
+  and tables — so a `CHECK` constraint that an enum has outgrown is indistinguishable from
+  a service being down. Three values were missing at once: the event type a budget hold is
+  recorded as (so Raise budget returned 500 on every submission and a run parked on its
+  ceiling could not be released at all), the one a model escalation is recorded as, and
+  the review stage on the events table, whose sessions-table twin *had* been extended in
+  the same migration. A test compares every enum against the constraint guarding it; it
+  had been written listing four of the eighteen, which is the failure its own comment
+  warns about.
 
 ---
 

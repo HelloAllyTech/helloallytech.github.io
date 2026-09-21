@@ -1,17 +1,16 @@
 ---
 title: ally-web — Web Applications
-tags: [repo, frontend, nx, nextjs, react, vite]
-summary: An Nx monorepo containing Ally's three user-facing web applications — a Next.js landing/resource site (port 3000), a Vite+React helpline dashboard for counselors (port 8080), and a Vite+React admin dashboard for super admins (port 8081) — plus a shared UI library.
-last_reconciled: 2026-08-06
+tags: [repo, frontend, nx, react, vite]
+summary: An Nx monorepo containing Ally's two user-facing web applications — a Vite+React helpline dashboard for counselors (port 8080) and a Vite+React admin dashboard for super admins (port 8081) — plus a shared UI library.
+last_reconciled: 2026-09-22
 ---
 
 # ally-web — Web Applications
 
 ## Purpose
 
-`ally-web` is the frontend layer of the Ally mental health counselor training platform. It is an Nx monorepo (`@ally-ui-mono/source`) that houses three applications and one shared library:
+`ally-web` is the frontend layer of the Ally mental health counselor training platform. It is an Nx monorepo (`@ally-ui-mono/source`) that houses two applications and one shared library:
 
-- A **Next.js landing page / mental-health resource library** (`ally-web`).
 - A **Helpline Dashboard** (`ally-helpline-dashboard`) for mental health counselors — real-time chat, appointment scheduling, case management, analytics, and LiveKit voice sessions.
 - An **Admin Dashboard** (`ally-admin-dashboard`) for super admins — simulation/scenario management, session-event configuration, user/tenant/permission management, LiveKit simulation preview, and simulation-credit monitoring.
 - A **shared UI library** (`libs/ui-shared`) with reusable components, utilities, feature flags, and a logger.
@@ -29,12 +28,11 @@ The applications integrate with the `ally-be` backend (REST + Socket.IO) and wit
 
 | Concern | Technology |
 | --- | --- |
-| Landing page framework | Next.js `~15.2.6` (React 18.3.1), CSS Modules |
 | Dashboard framework | Vite `^5.4.11` + React 18.3.1 |
 | Language | TypeScript `~5.9.3` |
 | Styling | Tailwind CSS `3.4.3` (+ MUI `@mui/material` v7, `@carbon/react`), `tailwind-merge`, `tailwindcss-animate` |
 | State management | Redux Toolkit `^2.11.2` / RTK Query, `react-redux`, `redux-persist` |
-| Routing | `react-router` / `react-router-dom` v7 (dashboards); Next.js App Router (landing) |
+| Routing | `react-router` / `react-router-dom` v7 |
 | Real-time | `socket.io-client` `^4.8.3`, `livekit-client` `^2.17.0`, `@livekit/components-react` |
 | Forms | `react-hook-form` |
 | Animations | `framer-motion` |
@@ -50,12 +48,11 @@ Note: the per-app READMEs list some slightly older dependency versions; the root
 
 ## Apps & Structure
 
-The workspace uses npm workspaces (`apps/*`, `libs/*`) with Nx orchestrating build/test/lint. Nx plugins are configured for `@nx/next`, `@nx/vite`, `@nx/react/router-plugin`, `@nx/js/typescript`, and `@nx/eslint`.
+The workspace uses npm workspaces (`apps/*`, `libs/*`) with Nx orchestrating build/test/lint. Nx plugins are configured for `@nx/vite`, `@nx/react/router-plugin`, `@nx/js/typescript`, and `@nx/eslint`.
 
 ```
 ally-web/
 ├── apps/
-│   ├── ally-web/                  # Landing page — Next.js, port 3000
 │   ├── ally-helpline-dashboard/   # Counselor dashboard — Vite+React, port 8080
 │   └── ally-admin-dashboard/      # Admin dashboard — Vite+React, port 8081
 ├── libs/
@@ -66,9 +63,6 @@ ally-web/
 ├── Dockerfile.deps                # Shared base dependencies image
 ├── nx.json / tsconfig.base.json / package.json
 ```
-
-### ally-web — Landing page / Resource Library (Next.js, port 3000)
-Next.js App Router application (CSS Modules; Inter + Fraunces fonts) providing a mental-health document search platform: full-text document search, category filtering, debounced real-time search, and infinite scroll. Reads `NEXT_PUBLIC_API_BASE_URL` and `NEXT_PUBLIC_API_VERSION`. Served with `npx nx dev ally-web`.
 
 ### ally-helpline-dashboard — Counselor Dashboard (Vite+React, port 8080)
 Dashboard for mental health counselors. Features: real-time chat, LiveKit voice sessions, appointment/calendar management, case management/documentation, analytics and reporting (with PDF export via `jspdf`), dark/light theme, and i18n. Source is organized into `api/`, `components/`, `containers/`, `hooks/`, `pages/`, `reducer/`, `routes/`, `store/`, and `types/`. Reads `VITE_API_BASE_URL`.
@@ -98,7 +92,6 @@ Requires Node.js v22, npm, and Docker (Docker Desktop or Colima).
 **Without Docker:**
 ```bash
 npm install
-npm run start:web        # ally-web landing page  → http://localhost:3000
 npm run start:helpline   # helpline dashboard     → http://localhost:8080
 npm run start:admin      # admin dashboard        → http://localhost:8081
 
@@ -115,7 +108,7 @@ docker compose up                                         # start all three serv
 docker compose up web|helpline|admin                      # or a single service
 ```
 
-Switch Docker backends with `./scripts/docker-switch.sh desktop|colima`. Environment variables are per-app `.env` files (see `compose.yaml`): `NEXT_PUBLIC_API_BASE_URL` / `NEXT_PUBLIC_API_VERSION` (web), `VITE_API_BASE_URL` (dashboards), `VITE_LIVEKIT_URL` (admin).
+Switch Docker backends with `./scripts/docker-switch.sh desktop|colima`. Environment variables are per-app `.env` files (see `compose.yaml`): `VITE_API_BASE_URL` (dashboards), `VITE_LIVEKIT_URL` (admin).
 
 At the workspace level, the wider Ally dev environment can be bootstrapped from the `infra` repo (`infra/scripts/dev_env.sh`).
 
@@ -162,7 +155,6 @@ Git hooks (Husky + lint-staged) auto-run ESLint and Prettier on staged files, pl
 - `README.md` — Root overview: architecture, tech stack, directory layout, Docker/local setup, features, and troubleshooting.
 - `CONTRIBUTING.md` — Git conventions: branch naming, conventional commits, PR format, review process.
 - `TESTING.md` — Dockerized testing strategy (ephemeral vs. dev-container), commands, and CI integration.
-- `apps/ally-web/README.md` — Landing page (Next.js resource library) details.
 - `apps/ally-helpline-dashboard/README.md` — Helpline dashboard features, structure, and scripts.
 - `apps/ally-admin-dashboard/README.md` — Admin dashboard features, full API endpoint list, permissions, path aliases.
 - `libs/ui-shared/README.md` — Shared UI library (Nx-generated).

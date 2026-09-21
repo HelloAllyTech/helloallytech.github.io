@@ -559,17 +559,16 @@
     {
       "path": "repos/ally-web.md",
       "title": "ally-web — Web Applications",
-      "summary": "An Nx monorepo containing Ally's three user-facing web applications — a Next.js landing/resource site (port 3000), a Vite+React helpline dashboard for counselors (port 8080), and a Vite+React admin dashboard for super admins (port 8081) — plus a shared UI library.",
+      "summary": "An Nx monorepo containing Ally's two user-facing web applications — a Vite+React helpline dashboard for counselors (port 8080) and a Vite+React admin dashboard for super admins (port 8081) — plus a shared UI library.",
       "tags": [
         "repo",
         "frontend",
         "nx",
-        "nextjs",
         "react",
         "vite"
       ],
-      "last_reconciled": "2026-08-06",
-      "words": 1457,
+      "last_reconciled": "2026-09-22",
+      "words": 1349,
       "url": "https://tech.helloally.ai/#/wiki/repos/ally-web.md",
       "skip_reason": ""
     },

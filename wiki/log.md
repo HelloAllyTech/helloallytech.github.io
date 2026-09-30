@@ -8,6 +8,11 @@ summary: A chronological log tracking all wiki updates and modifications.
 
 This is an append-only log of modifications, updates, and indexing runs performed on the wiki. All logs use the parseable prefix format: `## [YYYY-MM-DD] action | description`.
 
+## [2026-09-30] update | ally-be: how a rate limit picks its throttler, and why IP keys depend on `trust proxy`.
+- Added a "Rate limiting and client addresses" paragraph to `repos/ally-be.md`, beside the auth model, for ally-be#576. The bug-report route had been running on another route's limits and keying by address, and every IP-keyed limit had been counting all clients as the load balancer.
+- The paragraph records the rules that fix leaves in place: one registered throttler per route, a one-hop `trust proxy` that must never become `true`, `@RateLimit` above the auth guard for user keys, and the fact that the guard is off in local dev.
+- `last_reconciled` is unchanged: one paragraph was added, and the rest of the page was not re-verified.
+
 ## [2026-09-17] add | Document the Builder agent, which had no wiki page despite opening, reviewing, approving and releasing pull requests.
 - **The gap.** Builder has been opening pull requests across five repos, reviewing them, approving them and dispatching production releases, and nothing in the wiki described it. Every lesson recorded in `memory.md` today was about its harness and had nowhere of its own to live.
 - **What the page covers:** the session and run model (four run modes, twelve stages), the protocol contract a run must keep and why an outcome gate enforces it, the five-minute reconcile loop, the five switches and why branch-updating is deliberately outside the spend switch, the four independent limits that bound runaway, and how approval stays honest — a dispatched review is not a passed review, and an approval survives Builder's own branch update by commit lineage rather than by trust.

@@ -58,6 +58,17 @@ A worker is only useful while it holds its long-lived WebSocket to LiveKit and s
 - The simulation graph runs event detection, behavior detection, and knowledge retrieval in parallel from start, converges at a sync point, resolves branching instructions, then generates the client response and sends UI feedback in parallel. Client text → TTS → audio.
 - `resolve_branching_instruction` and `retrieve_knowledge` run as subgraphs so their internal LLM calls are not streamed to the user (workaround for LiveKit agents issue #2836).
 
+**Text-chat roleplays** (`app/core/livekit/text_chat.py`, `docs/text-chat.md`)
+
+A roleplay can also run typed both ways, for training staff on text-based helplines. It is the **same session with the audio pipeline taken out**, not a second engine: dispatch, room metadata, the graph above, events, guardrails, scoring, the SQS transcript and the `end-of-session` score are all shared, and nothing new holds state outside the worker job.
+
+- **Switched by the envelope.** ally-be puts `interactionMode: "TEXT"` on the room-metadata `scenario` section for a text session and sends no key for a voice one; `Scenario.is_text_chat` reads it and only an explicit `TEXT` changes anything.
+- **Transport is LiveKit text streams.** The learner's message arrives on `lk.chat` and the reply is published on `lk.transcription`, one stream per reply. The `AgentSession` has no STT, TTS, VAD or turn detector, and `user_away_timeout` is off because "away" is derived from voice activity.
+- **Voice-only layers are skipped wholesale**: background audio (comfort tone, fillers, back-channel, interim reply), noise cancellation, the video actor, audio-tag guidance and the TTS-failure fallback. Pause is ignored — it gates audio I/O.
+- **COHERENCE guardrails are dropped** (authored and platform-default): they repair mis-transcribed speech, and a typed message is what the learner meant.
+- **Typed input queues instead of interrupting.** LiveKit's default text callback interrupts the agent first, which would cut a reply off half-written on screen; the text-chat callback lets a message that lands mid-reply wait its turn.
+- **Persona style** comes from one appended prompt, `system/text_chat_guidance` (code `ally_ai_learn_system_text_chat_guidance`), which re-frames the call-oriented main prompt as texting. It is synced to ally-be like every prompt, so it can be edited in Prompt Management without a deploy.
+
 **Real-time event / skill detection** (`app/core/events/`)
 - `event_orchestrator/` — registry, scoring (`ScoreEvaluatorMixin`), delivery (`EventSender`).
 - `factory.py` — `build_events_from_metadata()` builds `BaseEvent` instances by detection type.
@@ -201,6 +212,7 @@ docker compose -f docker-compose.local.yml up -d
 - `docs/11-queue-messaging.md` — SQS event delivery, message schemas, deferred termination, LocalStack.
 - `docs/12-prompts-system.md` — template loading and backend override resolution.
 - `docs/13-event-termination.md` — auto-termination configuration and flow.
+- `docs/text-chat.md` — text-chat roleplays: what is shared with voice, what is switched off, the persona's texting guidance.
 - `docs/events-off-gate-design.md` — event gating design notes.
 - `ROLEPLAY_STUDIO_V2.md` — cross-repo reference for the Actor/Director roleplay studio and Scenario Spec.
 - `CONTRIBUTING.md`, `tests/README.md`, `.github/RELEASE_GUIDE.md` — contribution, test, and release guides.

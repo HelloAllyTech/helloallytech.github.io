@@ -62,7 +62,7 @@ Feature modules live under `src/<domain>/` (controllers, services, DTOs, and `en
 - `voice-preview/` — TTS voice preview across ElevenLabs, Deepgram, Sarvam, Google, and Hume.
 
 **Learning & sessions**
-- `learn/`, `scenario-path/` — scenario engine, learning pathways, session management.
+- `learn/`, `scenario-path/` — scenario engine, learning pathways, session management. A session is a voice call or, for text-helpline training, a **text chat** (`scenario_sessions.interactionMode`). Text needs two switches, both off by default: the org preference `TEXT_CHAT_ROLEPLAY_ENABLED` (platform admin) and the scenario's `metadata.textChatEnabled` (author); a TEXT start with either off is refused with `FEATURE_NOT_ENABLED` rather than falling back to voice. The room, dispatch, scoring and debrief are the voice path's — the envelope just carries `interactionMode: "TEXT"`, and no egress recording is started.
 - `scenario-character/` — client-persona (NPC) definitions.
 - `scenario-report/`, `scenario-session-review/`, `scribe-session-review/` — reporting and threaded review/feedback.
 - `session-event/`, `case/`, `reference-document/` — event tracking, case management, supporting materials.

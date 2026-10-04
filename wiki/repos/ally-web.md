@@ -11,7 +11,7 @@ last_reconciled: 2026-09-22
 
 `ally-web` is the frontend layer of the Ally mental health counselor training platform. It is an Nx monorepo (`@ally-ui-mono/source`) that houses two applications and one shared library:
 
-- A **Helpline Dashboard** (`ally-helpline-dashboard`) for mental health counselors — real-time chat, appointment scheduling, case management, analytics, and LiveKit voice sessions.
+- A **Helpline Dashboard** (`ally-helpline-dashboard`) for mental health counselors — real-time chat, appointment scheduling, case management, analytics, and LiveKit voice sessions. Roleplays can also run as a **text chat** where the learner's org and the roleplay both allow it: a Voice call / Text chat picker on the scenario page and track player, and the same `SimulationPage` (ui-shared) with the call card swapped for a chat panel that talks over LiveKit text streams.
 - An **Admin Dashboard** (`ally-admin-dashboard`) for super admins — simulation/scenario management, session-event configuration, user/tenant/permission management, LiveKit simulation preview, and simulation-credit monitoring.
 - A **shared UI library** (`libs/ui-shared`) with reusable components, utilities, feature flags, and a logger.
 

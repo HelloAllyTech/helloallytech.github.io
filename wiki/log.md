@@ -8,6 +8,11 @@ summary: A chronological log tracking all wiki updates and modifications.
 
 This is an append-only log of modifications, updates, and indexing runs performed on the wiki. All logs use the parseable prefix format: `## [YYYY-MM-DD] action | description`.
 
+## [2026-10-04] update | Text-chat roleplays across ally-ai-learn, ally-be and ally-web.
+- `repos/ally-ai-learn.md` gains **Text-chat roleplays**: the same session with the audio pipeline taken out (LiveKit text streams both ways, no STT/TTS/VAD), the voice-only layers it skips, why COHERENCE guardrails are dropped for typed text, why typed input queues rather than interrupting, and the one appended prompt that sets the persona's texting style. Lists the repo's new `docs/text-chat.md`.
+- `repos/ally-be.md`: the two switches a text session needs (org preference `TEXT_CHAT_ROLEPLAY_ENABLED`, scenario `metadata.textChatEnabled`, both off by default), that a refused TEXT start does not fall back to voice, and `scenario_sessions.interactionMode`.
+- `repos/ally-web.md`: the learner's Voice call / Text chat picker and the chat panel inside the shared simulation page.
+
 ## [2026-09-30] update | ally-be: how a rate limit picks its throttler, and why IP keys depend on `trust proxy`.
 - Added a "Rate limiting and client addresses" paragraph to `repos/ally-be.md`, beside the auth model, for ally-be#576. The bug-report route had been running on another route's limits and keying by address, and every IP-keyed limit had been counting all clients as the load balancer.
 - The paragraph records the rules that fix leaves in place: one registered throttler per route, a one-hop `trust proxy` that must never become `true`, `@RateLimit` above the auth guard for user keys, and the fact that the guard is off in local dev.

@@ -8,6 +8,9 @@ summary: A chronological log tracking all wiki updates and modifications.
 
 This is an append-only log of modifications, updates, and indexing runs performed on the wiki. All logs use the parseable prefix format: `## [YYYY-MM-DD] action | description`.
 
+## [2026-10-05] update | ally-ai: LLM usage carries thinking and cached tokens; judges and the per-language debrief are attributed.
+- `repos/ally-ai.md`: the debrief request's optional `usage_task` (and why an unexpected value falls back instead of failing the debrief); the judges' optional `scenario_session_id`, attribution only; and what the `llm_usage` payload's `completion_tokens`, `cached_tokens` and `metadata` mean, since a consumer that adds OpenAI/Gemini cached tokens on top of the prompt count overcharges.
+
 ## [2026-10-04] update | Text-chat roleplays across ally-ai-learn, ally-be and ally-web.
 - `repos/ally-ai-learn.md` gains **Text-chat roleplays**: the same session with the audio pipeline taken out (LiveKit text streams both ways, no STT/TTS/VAD), the voice-only layers it skips, why COHERENCE guardrails are dropped for typed text, why typed input queues rather than interrupting, and the one appended prompt that sets the persona's texting style. Lists the repo's new `docs/text-chat.md`.
 - `repos/ally-be.md`: the two switches a text session needs (org preference `TEXT_CHAT_ROLEPLAY_ENABLED`, scenario `metadata.textChatEnabled`, both off by default), that a refused TEXT start does not fall back to voice, and `scenario_sessions.interactionMode`.

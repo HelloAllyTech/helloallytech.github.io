@@ -2,7 +2,7 @@
 title: Platform Stats
 tags: [platform, reference, generated]
 summary: Generated counts of the things prose keeps getting wrong — entities, migrations, modules, providers. Regenerated weekly; never hand-edited.
-last_reconciled: 2026-09-28
+last_reconciled: 2026-10-05
 ---
 
 # Platform Stats
@@ -16,9 +16,9 @@ counts. If you catch yourself typing a number a script could count, link here in
 
 | What | Repo | Count |
 |---|---|---|
-| PostgreSQL entities | `ally-be` | 231 |
-| TypeORM migrations | `ally-be` | 563 |
-| Feature modules | `ally-be` | 75 |
+| PostgreSQL entities | `ally-be` | 236 |
+| TypeORM migrations | `ally-be` | 576 |
+| Feature modules | `ally-be` | 77 |
 | WebSocket gateways | `ally-be` | 7 |
 | Weaviate collections | `ally-ai` | 7 |
 | Weaviate migrations | `ally-ai` | 8 |
@@ -29,4 +29,4 @@ counts. If you catch yourself typing a number a script could count, link here in
 | Applications | `ally-web` | 2 |
 | Shared libraries | `ally-web` | 1 |
 
-_Counted on 2026-09-28._
+_Counted on 2026-10-05._

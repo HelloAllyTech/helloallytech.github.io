@@ -8,6 +8,9 @@ summary: A chronological log tracking all wiki updates and modifications.
 
 This is an append-only log of modifications, updates, and indexing runs performed on the wiki. All logs use the parseable prefix format: `## [YYYY-MM-DD] action | description`.
 
+## [2026-10-06] update | ally-ai: text helpline copilot endpoints (`/helpline/risk`, `/helpline/turn`).
+- `repos/ally-ai.md`: `/helpline` added to the endpoint list — listener-only output, the risk classifier's shape and bias, why the org threshold lives in ally-be, the turn's safety-question rule, and what the post-generation safety filter drops and deliberately keeps.
+
 ## [2026-10-05] update | ally-ai: LLM usage carries thinking and cached tokens; judges and the per-language debrief are attributed.
 - `repos/ally-ai.md`: the debrief request's optional `usage_task` (and why an unexpected value falls back instead of failing the debrief); the judges' optional `scenario_session_id`, attribution only; and what the `llm_usage` payload's `completion_tokens`, `cached_tokens` and `metadata` mean, since a consumer that adds OpenAI/Gemini cached tokens on top of the prompt count overcharges.
 

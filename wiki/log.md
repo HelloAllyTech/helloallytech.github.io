@@ -8,6 +8,9 @@ summary: A chronological log tracking all wiki updates and modifications.
 
 This is an append-only log of modifications, updates, and indexing runs performed on the wiki. All logs use the parseable prefix format: `## [YYYY-MM-DD] action | description`.
 
+## [2026-10-06] update | ally-be: the copilot-supported text helpline (`helpline/`, `/helpline-chat`).
+- `repos/ally-be.md`: new **Text helpline** module section — why it has its own tables, the humans-only-write-to-talkers rule and how the schema and rooms enforce it, guest tokens, two-layer risk screening with folded flags, encryption at rest and retention, the `TEXT_HELPLINE_ENABLED` gate and the `LISTENER` / `HELPLINE_SUPERVISOR` roles; `/helpline-chat` added to the gateway list with why it uses broker fan-out rather than a Redis adapter.
+
 ## [2026-10-05] update | ally-ai: LLM usage carries thinking and cached tokens; judges and the per-language debrief are attributed.
 - `repos/ally-ai.md`: the debrief request's optional `usage_task` (and why an unexpected value falls back instead of failing the debrief); the judges' optional `scenario_session_id`, attribution only; and what the `llm_usage` payload's `completion_tokens`, `cached_tokens` and `metadata` mean, since a consumer that adds OpenAI/Gemini cached tokens on top of the prompt count overcharges.
 

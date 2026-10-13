@@ -8,6 +8,9 @@ summary: A chronological log tracking all wiki updates and modifications.
 
 This is an append-only log of modifications, updates, and indexing runs performed on the wiki. All logs use the parseable prefix format: `## [YYYY-MM-DD] action | description`.
 
+## [2026-10-13] update | ally-mobile: course share links open the app.
+- `repos/ally-mobile.md` gains a **Deep links** paragraph: the two claimed paths (`/summary/:id`, `/course/:trackId`), that a new path needs both the AASA file and the Android intent filter, why course links are matched first, how a course link waits through login and post-login routing, and that the app has no signed-out course view. For ally-mobile#112.
+
 ## [2026-10-11] update | ally-be: auto-improve (skill experiments) for System Skills.
 - `repos/ally-be.md` gains the `skill-experiment/` module: rubric-judged A/B testing of LLM-drafted prompt variants, with the runtime-placeholder lock, blind judging and fall-back-to-own-text guardrails stated as invariants. Mechanics and the connect-a-skill recipe stay in ally-be's `docs/skill-experiments.md`.
 

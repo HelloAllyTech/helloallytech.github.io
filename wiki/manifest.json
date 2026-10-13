@@ -126,7 +126,7 @@
         "log"
       ],
       "last_reconciled": "",
-      "words": 10207,
+      "words": 10272,
       "url": "https://tech.helloally.ai/#/wiki/log.md",
       "skip_reason": "append-only history — read only when auditing what changed"
     },
@@ -552,7 +552,7 @@
         "android"
       ],
       "last_reconciled": "2026-07-28",
-      "words": 1941,
+      "words": 2124,
       "url": "https://tech.helloally.ai/#/wiki/repos/ally-mobile.md",
       "skip_reason": ""
     },

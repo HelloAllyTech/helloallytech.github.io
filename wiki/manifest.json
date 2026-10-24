@@ -126,7 +126,7 @@
         "log"
       ],
       "last_reconciled": "",
-      "words": 11283,
+      "words": 11512,
       "url": "https://tech.helloally.ai/#/wiki/log.md",
       "skip_reason": "append-only history — read only when auditing what changed"
     },
@@ -258,7 +258,7 @@
         "llm"
       ],
       "last_reconciled": "2026-09-21",
-      "words": 3293,
+      "words": 3436,
       "url": "https://tech.helloally.ai/#/wiki/platform/builder-agent.md",
       "skip_reason": ""
     },
@@ -336,7 +336,7 @@
         "reference",
         "generated"
       ],
-      "last_reconciled": "2026-10-23",
+      "last_reconciled": "2026-10-24",
       "words": 175,
       "url": "https://tech.helloally.ai/#/wiki/platform/stats.md",
       "skip_reason": ""
@@ -525,7 +525,7 @@
         "python"
       ],
       "last_reconciled": "2026-09-03",
-      "words": 3058,
+      "words": 3158,
       "url": "https://tech.helloally.ai/#/wiki/repos/ally-ai.md",
       "skip_reason": ""
     },
@@ -540,7 +540,7 @@
         "api"
       ],
       "last_reconciled": "2026-08-06",
-      "words": 4058,
+      "words": 4318,
       "url": "https://tech.helloally.ai/#/wiki/repos/ally-be.md",
       "skip_reason": ""
     },
@@ -587,7 +587,7 @@
         "vite"
       ],
       "last_reconciled": "2026-09-22",
-      "words": 1401,
+      "words": 1417,
       "url": "https://tech.helloally.ai/#/wiki/repos/ally-web.md",
       "skip_reason": ""
     },

@@ -16,9 +16,9 @@ counts. If you catch yourself typing a number a script could count, link here in
 
 | What | Repo | Count |
 |---|---|---|
-| PostgreSQL entities | `ally-be` | 305 |
-| TypeORM migrations | `ally-be` | 664 |
-| Feature modules | `ally-be` | 84 |
+| PostgreSQL entities | `ally-be` | 307 |
+| TypeORM migrations | `ally-be` | 666 |
+| Feature modules | `ally-be` | 85 |
 | WebSocket gateways | `ally-be` | 9 |
 | Weaviate collections | `ally-ai` | 8 |
 | Weaviate migrations | `ally-ai` | 9 |

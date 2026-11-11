@@ -16,13 +16,13 @@ counts. If you catch yourself typing a number a script could count, link here in
 
 | What | Repo | Count |
 |---|---|---|
-| PostgreSQL entities | `ally-be` | 333 |
-| TypeORM migrations | `ally-be` | 719 |
-| Feature modules | `ally-be` | 88 |
+| PostgreSQL entities | `ally-be` | 343 |
+| TypeORM migrations | `ally-be` | 729 |
+| Feature modules | `ally-be` | 89 |
 | WebSocket gateways | `ally-be` | 9 |
 | Weaviate collections | `ally-ai` | 9 |
 | Weaviate migrations | `ally-ai` | 11 |
-| API endpoint modules | `ally-ai` | 20 |
+| API endpoint modules | `ally-ai` | 22 |
 | Event types | `ally-ai-learn` | 10 |
 | TTS / STT / LLM providers | `ally-ai-learn` | 14 |
 | Numbered developer guides | `ally-ai-learn` | 12 |
